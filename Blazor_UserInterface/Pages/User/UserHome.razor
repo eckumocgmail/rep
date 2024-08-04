@@ -1,0 +1,39 @@
+﻿@page "/user/home/{Id:int}"
+@attribute [Authorize(Roles = "webuser")]
+@inject NavigationManager nav
+@inject DeliveryDbContext db
+@using pickpoint_delivery_service;
+@using Console_BlazorApp.AppUnits.DeliveryApi;
+@using Console_BlazorApp.AppUnits.DeliveryServices;
+<div class="card">
+    <div class="card-header">
+        <h3>Мои автомобили</h3>
+    </div>
+    <div class="card-body">
+        <ul class="list-group">
+            @foreach (var car in Cars)
+            {
+                <li class="list-group-item" @onclick="(evt => { OnCarSelected(car.Id); StateHasChanged(); })" onmouseleave="this.classList.remove('active')" onmouseover="this.classList.add('active')">@car.Year @car.Manufacturer @car.Model @car.Vin @(car.RegNumber)</li>
+            }
+        </ul>
+    </div>
+    <div class="card-footer">
+        <button class="btn btn-sm btn-primary">ок</button>
+    </div>
+</div>
+@code 
+{
+    [Parameter]
+    public int Id { get; set; }
+    public IEnumerable<CustomerCar> Cars { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        Cars = db.Cars.Where( car => car.CustomerId == Id).ToList();
+    }
+
+    public void OnCarSelected(int id)
+    {
+        nav.NavigateTo($"/user/profile/cars/{id}");
+    }
+}

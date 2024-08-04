@@ -1,0 +1,130 @@
+﻿@code
+{
+    [Parameter]
+    public Dictionary<string, string> navigation { get; set; } = new Dictionary<string, string>()
+    {
+        { "", "" },
+        { "", "" },
+        { "", "" },
+    };
+}
+<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">Blazor_UserInterface</a>
+        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</div>
+
+<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+    <nav class="flex-column">
+        @foreach( var kv in navigation)
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="@kv.Key">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> @kv.Value data
+                </NavLink>
+            </div>
+        }
+    </nav>
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+}
+
+
+            @using System.Collections.Concurrent;
+@inherits LayoutComponentBase
+@inject SigninUser signin
+@inject IHttpContextAccessor http
+@inject DbContextUser db
+@inject IJSInvoke jsinvoke
+
+@code
+{
+    List<string> Messages { get; set; } = new();
+    public async Task ShowNotification(string notification)
+    {
+        Messages.Add(notification);
+        //var result = await jsinvoke.Eval<int>($"showNotification('{notification}')");
+    }
+    protected async Task StartCheckout()
+    {
+        while (true)
+        {
+            if (signin.IsSignin())
+            {
+                ConcurrentQueue<string> notifications = signin.GetFromSession<ConcurrentQueue<string>>("InputNotificationsQueue");
+                foreach (var notfication in notifications.ToArray())
+                {
+                    ShowNotification(notfication);
+                }
+                notifications.Clear();
+            }
+            await Task.Delay(1000);
+        }
+    }
+
+
+    protected override async Task OnAfterRenderAsync(bool first)
+    {
+        await Task.CompletedTask;
+        if (first)
+        {
+            StartCheckout();
+        }
+    }
+    bool Opened { get; set; } = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        Task.Run(() =>
+        {
+            while (true)
+            {
+                var messages = signin.GetNotifications();
+                foreach (var message in messages)
+                {
+                    ShowNotification(message);
+                }
+                Thread.Sleep(300);
+            }
+        });
+    }
+}
+
+asdasdas
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-3">
+            <MainNav></MainNav>
+        </div>
+        <div class="col-9" style="height: 100%; overflow-y: auto;">
+            <div class="d-flex flex-column">
+                @foreach (var message in Messages.ToList())
+                {
+                    <div class="alert alert-info">
+                        @message
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick="(evt => { Messages.Remove(message); StateHasChanged(); })">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                }
+            </div>
+            <div>
+                @Body
+            </div>
+        </div>
+    </div>
+</div>

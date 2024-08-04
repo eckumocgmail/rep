@@ -1,0 +1,43 @@
+﻿@inherits LayoutComponentBase
+@typeparam TItem
+@code
+{
+    [Parameter]
+    public string width { get; set; }
+
+    [Parameter]
+    public string height { get; set; }
+
+    [Parameter]
+    public RenderFragment<TItem> Template { get; set; }
+    [Parameter]
+    public RenderFragment? CardHeader { get; set; }
+    [Parameter]
+    public RenderFragment? CardFooter{ get; set; }
+
+    [Parameter]
+    public List<TItem> Items { get; set; }
+}
+<div class="card" style="width: @width; height: @height;">
+    <div class="card-header">
+        @if(CardHeader is not null)
+        {
+            @CardHeader
+        }
+    </div>
+    <div class="card-body">
+        <ul class="list-group">
+            @foreach (var item in Items)
+            {
+                <li class="list-group-item">@Template(item)</li>
+            }            
+        </ul>
+    </div>
+    <div class="card-footer">
+        @if (CardFooter is not null)
+        {
+            @CardFooter
+        }
+    </div>
+</div>
+

@@ -1,0 +1,243 @@
+﻿@page "/public/create-product"
+@attribute [Authorize(Roles = "webuser")]
+@using Console_BlazorApp.AppUnits.DeliveryModel;
+@inject DeliveryDbContext db
+@code
+{
+    public async Task OnFileChanged(InputFileChangeEventArgs evt)
+    {
+        foreach (var file in evt.GetMultipleFiles(3))
+        {
+            try
+            {
+                using (var ms = new MemoryStream())
+                {
+                    using (var stream = file.OpenReadStream())
+                    {
+                        var data = new byte[stream.Length];
+                        await stream.ReadAsync(data);
+                        loadedDatas.Add(new ProductImage()
+                        {
+                            ContentType = file.ContentType,
+                            ImageData = data                            
+                        });
+                        var image = new ProductImage()
+                        {
+                            ImageData = data,
+                            ContentType = file.ContentType,
+                            ProductID = product.Id
+                        };
+                        db.ProductImages.Add(image);
+                        db.SaveChanges();
+                        data.ToJsonOnScreen().WriteToConsole();
+                        product.ProductImages = db.ProductImages.Where(image => image.ProductID == product.Id).ToList();
+                    }
+
+                }
+
+
+                loadedFiles.Add(file);
+
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"File: {file.Name} \n Exception: {ex.Message} \n Stack: {ex.StackTrace}");
+            }
+        }
+
+        isLoading = false;
+    }
+
+}
+<h3>Создать описание товара</h3>
+<div>
+    <code class="text-danger">
+        @foreach(var kv in validationMessages)
+        {
+            <b style="font-size: 16px;">@kv.Key</b>
+            @foreach(var message in kv.Value)
+            {
+                <div style="margin-left: 10px;" class="text-danger">@message</div>
+            }
+        }
+    </code>
+
+    <form @onsubmit="OnFormSubmited" @onsubmit:preventDefault>
+        <div class="form-group">
+            <label for="exampleInputEmail1">Наименование</label>
+            <input type="text" style="width: 100%;" class="form-control" value="@product.ProductName" placeholder="Наименование" @onchange="(evt => { product.ProductName = evt.Value.ToString(); validationMessages = product.Validate();  StateHasChanged(); })">
+            <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+        </div>
+        <div class="form-group">
+            <label>Цена</label>
+            <input type="number" style="width: 100%;" class="form-control" placeholder="Цена" value="@product.ProductCost" @onchange="(evt => { product.ProductCost = float.Parse(evt.Value.ToString());validationMessages = product.Validate();  StateHasChanged(); })">
+        </div>
+        <div class="form-group">
+          
+            <InputFile OnChange="@OnFileChanged" multiple style="width: 100%;" class="form-control"
+                oninput="for(let i=0; i<this.files.length; i++){
+                while(document.getElementById('images').children.length>0)
+                {
+                    document.getElementById('images').removeChild(document.getElementById('images').children[document.getElementById('images').children.length-1]);
+                }
+                let reader = new FileReader();
+                reader.readAsDataURL(this.files[i]);
+                reader.onload=function(){
+                    let img = document.createElement('img');
+                    img.src = reader.result;
+                    document.getElementById('images').appendChild(img);
+                    console.info(reader.result);
+                }}"></InputFile>
+            
+        </div>
+        <div>
+            <b style="font-size: 16px;">Характеристики</b>
+            <table>
+                <tr>
+                    <td>Опция</td>
+                    <td>Значение</td>
+                </tr>
+                @foreach (var tuple in options)
+                {
+                    <tr>
+                        <td><input type="text" value="@tuple.Item1"/></td>
+                        <td><input type="text" value="@tuple.Item2" /></td>
+                    </tr>
+                }
+            </table>
+        </div>
+        <div id="images">
+
+        </div>
+        @*<div>
+            @if (isLoading)
+            {
+                <div class="spinner-border" role="status">
+                    <span class="sr-only">Загрузка...</span>
+                </div>
+            }
+            else
+            {
+                <ul class="list-group">
+                    @foreach (var file in loadedFiles)
+                    {
+                        <li class="list-group-item">
+                            <p>Файл: <b>@file.Name</b></p>
+                            <p>Размер: <b>@file.Size</b> </p>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>*@
+        <div class="form-check">
+            <label>Описание</label>
+            <textarea class="form-control" placeholder="Описание" @onchange="(evt => { product.ProductDesc = evt.Value.ToString(); validationMessages = product.Validate(); StateHasChanged(); })">@product.ProductDesc</textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Зарегистрировать</button>
+    </form>
+ 
+    
+</div>
+
+@inject NavigationManager nav
+@inject SigninUser signin
+@code 
+{
+    public class MyTuple
+    {
+        public string Item1 { get; set; }
+        public object? Item2 { get; set; }
+    }
+    Dictionary<string, List<string>> validationMessages = new();
+    Product product = new()
+    {
+        ProductImages = new()
+    };
+
+    List<MyTuple> options { get; set; } = new();
+    
+
+    private List<ProductImage> loadedDatas = new();
+    private List<IBrowserFile> loadedFiles = new();
+    private int maxAllowedFiles = 3;
+    private bool isLoading;
+
+    public async Task OnFormSubmited()
+    {
+        db.Products.Add(product);
+        db.SaveChanges();
+        foreach(var data in loadedDatas)
+        {
+            data.ProductID = product.Id;
+            db.ProductImages.Add(data);
+            db.SaveChanges();
+        }
+        nav.NavigateTo("/public/search-product");
+        await Task.CompletedTask;
+    }
+
+    private async Task LoadFiles(InputFileChangeEventArgs e)
+    {
+        isLoading = true;
+        loadedDatas.Clear();
+        loadedFiles.Clear();
+        //"CreateProduct"
+        var datas = signin.GetFromSession<List<byte[]>>(this.GetType().Name);
+        foreach (var file in e.GetMultipleFiles(maxAllowedFiles))
+        {
+            try
+            {
+                using(var ms = new MemoryStream())
+                {
+                    using (var stream = file.OpenReadStream())
+                    {
+                        var data = new byte[stream.Length];
+                        await stream.ReadAsync(data);
+                        loadedDatas.Add(new ProductImage()
+                        {
+                            ImageData = data,
+                            ContentType = file.ContentType,                            
+                        });
+                    var image = new ProductImage()
+                        {
+                            ImageData = data,
+                            ContentType = "",
+                            ProductID = product.Id
+                        };
+                        db.ProductImages.Add(image);
+                        db.SaveChanges();
+                        data.ToJsonOnScreen().WriteToConsole();
+                        product.ProductImages = db.ProductImages.Where(image => image.ProductID == product.Id).ToList();
+                    }
+
+                }
+
+
+                loadedFiles.Add(file);
+
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"File: {file.Name} \n Exception: {ex.Message} \n Stack: {ex.StackTrace}" );
+            }
+        }
+
+        isLoading = false;
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        this.product = new Product()
+        {
+            ProductName = "новый товар",
+            ProductDesc = "новый товар",
+            ProductCost = 1,
+            ProductRate = 1            
+        };
+        db.Products.Add(this.product);
+        db.SaveChanges();
+        product.ProductComments = db.ProductComments.Where(pc => pc.ProductId == product.Id).OrderByDescending(pc => pc.CreatedTime).ToList();
+    }
+} 

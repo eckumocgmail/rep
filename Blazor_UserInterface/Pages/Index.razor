@@ -1,0 +1,48 @@
+﻿@page "/"
+@using Console_BlazorApp;
+@layout DefaultLayout
+@inject SigninUser signin
+@inject NavigationManager nav
+@inject IServiceProvider provider
+@code
+{
+    public bool IsReady { get; set; } = false;
+    public TestingReport Report { get; set; }  
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        //await RunTestsAsync();
+        StateHasChanged();
+    }
+
+    public async Task<TestingReport> RunTestsAsync()
+    {
+        await Task.CompletedTask;
+        IsReady = false;
+        StateHasChanged();
+        var unit = new DeliveryServicesUnit(provider);
+        this.Report = unit.DoTest(false);
+        IsReady = true;
+        StateHasChanged();
+        return this.Report;
+    }
+}
+
+<div class="card">
+    <div class="card-header">
+        Методы функционального тестирования
+        <Console_Blazor.Shared.NavMenu></Console_Blazor.Shared.NavMenu>
+    </div>
+    <div class="card-header">        
+        <button class="btn btn-sm btn-primary" @onclick="RunTestsAsync">Выролнить все тесты</button>
+    </div>
+    <div class="card-body">
+        @if (IsReady)
+        {
+            <TestReportView Model="@Report"></TestReportView>
+        }
+    </div>
+    <div class="card-footer"></div>
+</div>
+

@@ -1,0 +1,35 @@
+﻿@page "/user/settings"
+@inject SigninUser signin
+@inject DbContextUser dbu
+@attribute [Authorize(Roles = "webuser")]
+@code
+{
+    private global::UserSettings Settings { get; set; }
+    private UserContext UserContext { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        this.UserContext = signin.Verify();
+        if(this.UserContext is not null)
+        {
+            this.Settings = dbu.UserSettings_.Find(this.UserContext.SettingsID);
+        }
+    }
+}
+<div class="card">
+    <div class="card-header">
+        <h4>Настройки</h4>
+    </div>
+    <div class="card-body">
+        @if (Settings is not null)
+        {
+            <CheckBox Checked="@(Settings.EnableNotifications)" Label="@("Уведомления вколючены")" OnChange="(evt => { Settings.EnableNotifications = evt; })"></CheckBox>
+            <CheckBox Checked="@(Settings.SendNews)" Label="@("Присылать новости на почту")" OnChange="(evt => { Settings.SendNews = evt; })"></CheckBox>
+            <SelectBox Value="@(Settings.ColorTheme)" Options="@(new List<string>{ "dark", "light" })" OnChange="(evt => { Settings.ColorTheme = evt; StateHasChanged(); })"></SelectBox>
+        }        
+    </div>
+    <div class="card-footer">
+        <span class="btn btn-sm btn-primary">применить</span>
+        <span class="btn btn-sm btn-danger">отмена</span>
+    </div>
+</div>
