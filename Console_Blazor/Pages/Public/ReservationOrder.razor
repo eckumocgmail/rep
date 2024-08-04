@@ -1,0 +1,131 @@
+﻿@page "/public/reservation-order/{OrderId:int}"
+@attribute [Authorize( Roles = "webuser")]
+
+@using Console_BlazorApp.AppUnits.DeliveryServices;
+@using pickpoint_delivery_service;
+@using Console_BlazorApp.AppUnits.DeliveryModel;
+@using Console_BlazorApp.AppUnits.DeliveryApi;
+@inject pickpoint_delivery_service.DeliveryDbContext db
+@inject NavigationManager nav
+@inject IProductsInStockService service
+
+
+<div class="card">
+    <div class="card-header">
+        <h3>Точки выдачи</h3>
+    </div>
+    <div class="card-body">
+        <ul class="list-group">
+            @if (Holders is null || Holders.Count() == 0)
+            {
+                <p>нет данных</p>
+            }
+            else
+            {
+                @foreach (var holder in Holders)
+                {
+                    <li class="list-group-item" @onclick="(evt => { OnHolderSelected(holder.Id); StateHasChanged(); })" onmouseleave="this.classList.remove('active')" onmouseover="this.classList.add('active')">
+                        <b>@(Available.Contains(holder) ? "забрать с адреса: " : "доставить по адресу: ")</b>
+                        <div>@holder.HolderLocation</div>
+                    </li>
+                }
+            }
+            
+        </ul>
+    </div>
+    <div class="card-footer">
+        <div>
+            @for (int i = 1; i < PagesCount; i++)
+            {
+                <span class="btn @((i==PageNumber)? "btn-primary": "bg-white")" style="width: 80; height: 80; border: 1px; margin: 2px;" @onclick="(GetCallback(i))">@i</span>
+            }
+        </div>
+         
+    </div>
+
+  
+
+    
+</div>
+@inject SigninUser signin
+@code
+{
+    [Parameter]
+    public int OrderId { get; set; }
+    public int PageNumber { get; set; } = 1;
+    public int PageSize { get; set; } = 10;
+    public int PagesCount { get; set; }
+    public List<Holder> All { get; set; }
+    public List<Holder> Holders { get; set; }
+    public List<Holder> Available { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        try
+        {
+            All = db.Holders.ToList();
+            Available = service.GetReservationStocks(OrderId).ToList();
+            Holders = All.Skip((PageNumber - 1) * PageSize).Take(PageSize).ToList();
+            PagesCount = (int)((All.Count() + (All.Count() % PageSize)) / PageSize);
+        }
+        catch(Exception ex)
+        {
+            this.Error($"Исключение при инициаллизации: {ex}");
+        }
+    }
+    public void UpdatePage()
+    {
+        Holders = All.Skip((PageNumber - 1) * PageSize).Take(PageSize).ToList();
+        PagesCount = (int)((All.Count() + (All.Count() % PageSize)) / PageSize);
+        StateHasChanged();
+    }
+    public void OnHolderSelected(int holderId)
+    {
+        CustomerContext customer = db.Customers.FirstOrDefault(customer => customer.UserId == signin.Verify().Id);
+        if (customer == null)
+        {
+            db.Customers.Add(customer = new CustomerContext()
+                {
+                    FirstName = signin.Verify().Person.FirstName,
+                    LastName = signin.Verify().Person.LastName,
+                    PhoneNumber = signin.Verify().Person.Tel,
+                    UserId = signin.Verify().Id
+                });
+            db.SaveChanges();
+        }
+        db.Orders.Find(OrderId).OnOrderCreated();
+        db.Orders.Find(OrderId).CustomerID = customer.Id; 
+        db.Orders.Find(OrderId).HolderID = holderId;
+        db.SaveChanges();
+
+        db.Orders.Find(OrderId).OnOrderCreated();
+        db.SaveChanges();
+        foreach( var pitem in db.OrderItems.Where(item => item.OrderID == OrderId).ToList())
+        {
+            Console.WriteLine($"ProductId: {pitem.ProductID}");
+            Console.WriteLine($"HolderID: {holderId}");
+           
+            // регистрируем уменьшение колва товара на складе
+            var instock = db.ProductsInStock.FirstOrDefault(instock => instock.ProductID == pitem.ProductID && instock.HolderID == holderId);
+            instock.ProductCount -= pitem.ProductCount;
+            db.Products.First(p => p.Id == pitem.ProductID).NumberOfSales += pitem.ProductCount;
+
+            db.SaveChanges();
+            
+        }
+        nav.NavigateTo($"/user/orders");
+
+    }
+
+    public Action<EventArgs> GetCallback(int i)
+    {
+        int p = i;
+        return evt =>
+        {
+            PageNumber = p;
+            UpdatePage();
+            StateHasChanged();
+        };
+    }
+} 

@@ -1,0 +1,29 @@
+﻿@page "/user/groups"
+@attribute [Authorize(Roles = "webuser")]
+@inject SigninUser signin
+@inject GroupingUser grouping
+<div class="card">
+    <div class="card-body">
+        <ul class="list-group">
+            @foreach (var group in Groups)
+            {
+                <li class="list-group-item" @onclick="(evt => OnAddToGroupClicked(group))"> @group </li>
+            }
+        </ul>
+    </div>
+</div>
+
+@code 
+{
+    public List<string> Groups { get; set; }
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        this.Groups = grouping.GetGroups().ToList();
+    }
+    public void OnAddToGroupClicked(string group)
+    {
+        grouping.AddToGroup(signin.Verify(), group);
+    }
+     
+}

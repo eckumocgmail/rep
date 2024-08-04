@@ -1,0 +1,92 @@
+﻿@using System.Collections.Concurrent;
+@inherits LayoutComponentBase
+@inject AuthenticationStateProvider authProvider
+@inject SigninUser signin
+
+<PageTitle>Console_BlazorApp</PageTitle>
+@code
+{
+    bool Opened = true;
+}
+<div class="page">
+    <div class="sidebar" >
+        
+        <NavMenu Opened="@Opened"/>
+    </div>
+
+    <main>
+        <div class="top-row px-4">
+            @if (signin.IsSignin())
+            {
+                <a> @signin.Verify().Person.GetFullName() </a>
+            }
+            <a href="" target="_blank">Помощь</a>
+        </div>
+
+        <article class="content px-4">            
+            @Body
+        </article>
+    </main>
+</div>
+
+<div id="modal_block" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Modal body text goes here.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary">Save changes</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="notifications_block"  >
+    
+</div>
+@inject SigninUser signin
+@inject IJSInvoke jsinvoke
+@code
+{
+    public async Task ShowNotification(string notification)
+    {
+        var result = await jsinvoke.Eval<int>($"showNotification('{notification}')");
+    }
+    protected async Task StartCheckout()
+    {
+        while (true)
+        {
+            if(signin.IsSignin())
+            {
+                ConcurrentQueue<string> notifications = signin.GetFromSession<ConcurrentQueue<string>>("InputNotificationsQueue");
+                foreach (var notfication in notifications.ToArray())
+                {
+                    ShowNotification(notfication);
+                }
+                notifications.Clear();
+            }
+            await Task.Delay(1000);
+        }
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+    }
+
+    protected override async Task OnAfterRenderAsync( bool first )
+    {
+        if (first)
+        {
+            StartCheckout();
+        }
+    }
+}

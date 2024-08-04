@@ -1,0 +1,33 @@
+﻿<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(App).Assembly">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(Console_Blazor.Shared.MainLayout)">
+                <NotAuthorized>
+                    <PageTitle>Нет доступа</PageTitle>
+                    @inject NavigationManager nav
+                    @code{
+                        int p()
+        {
+                            nav.NavigateTo("/user/signup");
+                            return 1;
+                        }
+                    }
+                    @p()
+                    <div class="alert alert-danger" style="margins: 20px;">
+                        Нет доступа к странице <div><NavLink href="/">выполнить авторизацию</NavLink></div>
+                    </div>
+                </NotAuthorized>
+                <Authorizing>
+                    <div>Выполняется авторизация...</div>
+                </Authorizing>
+            </AuthorizeRouteView>
+            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+        </Found>
+        <NotFound>
+            <PageTitle>Not found</PageTitle>
+            <LayoutView Layout="@typeof(Console_Blazor.Shared.MainLayout)">
+                <p role="alert alert-info">Страница не найдена</p>
+            </LayoutView>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>

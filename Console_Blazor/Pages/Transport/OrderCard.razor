@@ -1,0 +1,70 @@
+﻿@page "/transport/orders/{OrderId:int}"
+@attribute [Authorize(Roles = "transport")]
+@inject IOrdersService orders
+@inject ITransportUser user
+@inject NavigationManager nav
+<div>
+    <h3> Договор на оказание услуг доставки @OrderId </h3>
+    Заказчик осуществлять перевозку каких-либо грузов,
+    которые указываются в заявке (Приложение 1).
+    <br />Каждый заказ оформляется отдельной заявкой и имеет индивидуальную стоимость.
+    <br />Заявка на перевозку предоставляется заказчику не позднее 48 часов до начала осуществления транспортировки.
+    <div style="font-size: 14px;">
+        <div>Определяется </div>
+        <p>
+            Цена договора<br /> - определяется Заказчиком.<br />
+            Стоимость транспортных услуг определяется исполнителем на основе сведений о объёме и весе товаров.<br />
+            Заказчик оплачивает услуги по транспортировке переводом
+        </p>
+
+
+        <ul>
+            <b>Заказчик обязуется:</b>
+            <li>-оплатить транспортные услуги</li>
+            <li>-выдать документы о грузек</li>
+            <li>-выполнить проверку груза на повреждения</li>
+        </ul>
+        <ul>
+            <b>Исполнитель имеет право:</b>
+            <li>-требовать оплату</li>
+            <li>-отказываться от транспортировки товара</li>
+            <li>-выполнить проверку груза на повреждения</li>
+        </ul>
+        <p>
+        <p>Адрес получения товара: @(Order is not null ? Order.Holder.HolderLocation: "")</p>
+            <b>Состав товаров для транспортировки:</b>
+            <ul class="list-group">
+                @foreach (var item in orders.GetOrderItems(OrderId))
+                {
+                    <li class="list-group-item">
+                        @item.Product.ProductName в количестве @item.ProductCount штук
+                    </li>
+                }
+            </ul>
+        </p>
+    </div>
+</div>
+<div>
+    @inject DeliveryDbContext db
+    @if (db.Orders.First(o => o.Id == OrderId).OrderStatus == 2)
+    {
+        <span class="btn btn-primary btn-sm" @onclick='(evt => { user.TakeOrder(OrderId); nav.NavigateTo("/transport/active-list"); })'> в работу </span>
+    }
+    @if (db.Orders.First(o => o.Id == OrderId).OrderStatus == 3)
+    {
+        <span class="btn btn-primary btn-sm" @onclick='(evt => { user.PutOrder(OrderId); nav.NavigateTo("/transport/completed-list"); })'> завершить доставку </span>
+    }
+
+    <span class="btn btn-danger btn-sm" @onclick='(evt => { user.CancelOrder(OrderId); nav.NavigateTo("/transport/cancelled-list"); })'> отменить </span>
+</div>
+@code 
+{
+    [Parameter]
+    public int OrderId { get; set; }
+    public Order Order { get; set; }
+    protected override Task OnInitializedAsync()
+    {
+        return base.OnInitializedAsync();
+        this.Order = orders.GetOrder(OrderId);
+    }
+}

@@ -1,0 +1,52 @@
+﻿ 
+@if(TypeName != null)
+{
+    @if(TargetObject == null)
+    {
+        <CreateForm TypeName="@TypeName" 
+                    OnCreate="@OnCreatedEvent" 
+                    OnCancel="@OnCanceledEvent"></CreateForm>
+
+    } 
+}
+else 
+{ 
+    <div class="alert alert-warning">Установите параметр TypeName</div>
+}
+
+
+@code { 
+
+    [Parameter]
+    public ValidationForm Ref { get; set; }
+
+    [Parameter]
+    public string TypeName { get; set; }
+
+    [Parameter]
+    public object TargetObject { get; set; }
+        public bool Cancelled { get; internal set; }
+        public object Data { get; internal set; }
+
+
+        //[CascadingParameter]
+        //public BlazoredModalInstance ModalInstance { get; set; }
+
+        protected async override Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+    }
+
+    public void OnCreatedEvent(object item)
+    {
+        //await ModalInstance.CloseAsync(ModalResult.Ok<object>(item));        
+    }
+
+    public void OnCanceledEvent()
+    {
+
+        //await ModalInstance.CloseAsync();
+    }
+
+
+}

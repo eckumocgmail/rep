@@ -1,0 +1,22 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@using Microsoft.AspNetCore.Mvc.ModelBinding
+@using Google_LoginApplication.Areas.Identity.Modules.ReCaptcha 
+   
+@inject ReCaptchaOptions recaptcha
+<!-- google recaptcha -->
+<script src="https://www.google.com/recaptcha/api.js" onerror="alert('не загрузить '+this.src)"></script>
+<div>  
+    <div>
+        <div class="input-group" id="recaptchaInputGroup">
+            <div class="g-recaptcha" data-sitekey="@recaptcha.SiteKey"></div>
+        </div>
+        @if (ViewData["State"] != null && ((ModelStateDictionary)(ViewData["State"])).ContainsKey("g-Recaptcha-Response"))
+        {
+            @foreach (var error in ((ModelStateDictionary)(ViewData["State"]))["g-Recaptcha-Response"].Errors)
+            {
+                <span class="text-danger">@error.ErrorMessage</span>                    
+            }
+        }
+
+    </div>
+</div>

@@ -1,0 +1,181 @@
+﻿@page "/user/messages"
+@attribute [Authorize(Roles = "webuser")]
+@inject DbContextUser usersDb
+@inject IUserMessagesService userMessages
+@inject SigninUser signin
+@inject IHttpContextAccessor http
+@if(signin.IsSignin())
+{
+    <p>@signin.Verify().Roles.Select(r=>r.Code).ToJson()</p>
+}
+<div class="card" style="width: 100%; height: 1024px;">
+    <div class="card-header">
+        <h2>Сообщения пользователя</h2>
+    </div>
+    <div class="card-body">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-4">
+                    <ul class="list-group">
+                        
+                        <li class="list-group-item active" @onclick="OnCreateMessageButtonClicked">Новое сообщение</li>
+                        <li class="list-group-item" @onclick="OnInboxButtonClicked">Входящие (@inbox.Count())</li>
+                        <li class="list-group-item" @onclick="OnOutboxButtonClicked">Исходящие (@outbox.Count())</li>
+                    </ul>
+                </div>
+                <div class="col-8">
+                    @switch (view)
+                    {
+                        case "message":
+                            <div class="card">
+                                <div class="card-header">
+                                    <h2>Новое сообщение</h2>
+                                    <div class="form-group">
+                                        <label>От: @usersDb.UserPersons_.Find(usersDb.UserContexts_.Find(signin.Verify().Id).PersonID).GetFullName()</label>
+                                       
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="form-group">
+                                        <label>Текст</label>
+                                        <textarea class="form-control disabled" @oninput="(evt => { StateHasChanged(); })" contenteditable="false">@message</textarea>
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <button class="btn btn-sm btn-primary" @onclick="OnResendMessageButtonClicked">Ответить</button>
+                                </div>
+                            </div>
+
+
+
+                        
+                            break;
+                        case "outbox":
+                            <ul class="list-group">
+                                @foreach (var message in outbox)
+                                {
+                                    <li class="list-group-item" @onclick="(evt => { OnMessageClicked(message); })"> @message.Created @message.Subject </li>
+                                }                                                                
+                            </ul>
+                            break;
+                        case "inbox":
+                            <ul class="list-group">
+                                @foreach (var message in inbox)
+                                {
+                                    <li class="list-group-item" @onclick="(evt => { OnMessageClicked(message); })"> @message.Created @message.Subject </li>
+                                }
+                            </ul>
+                            break;
+                        case "new_message":
+                            <div class="card">
+                                <div class="card-header">
+                                    <h2>Новое сообщение</h2>
+                                    <div class="form-group">
+                                        <label>Кому</label>
+                                        <select class="form-control" @onchange="(evt => { toUserId = int.Parse(evt.Value.ToString()); } )">
+                                            @foreach (var kv in userMessages.GetUsers())
+                                            {
+                                                <option value="@kv.Value">@kv.Key</option>
+                                            }                                            
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <h2>Файлы</h2>
+                                        <input type="file" hidden id="input_file" />
+                                        <span class="btn btn-sm btn-primary" onclick="document.getElementById('input_file').click()">загрузить</span>
+                                        <ul class="list-group">
+                                            @foreach (var file in files.ToList())
+                                            {
+                                                <li class="list-group-item">
+                                                    <span class="btn btn-danger" @onclick="(evt => { files.Remove(file); StateHasChanged();/* удалить этот элемент */ } )"> @file X</span>
+                                                </li>
+                                            }
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="form-group">
+                                        <label>Текст</label>
+                                        <textarea class="form-control" @oninput="(evt => { message = evt.Value.ToString(); StateHasChanged(); })">@message</textarea>
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <button class="btn btn-sm btn-primary" @onclick="OnSendMessageButtonClicked">Отправить</button>
+                                </div>
+                            </div>
+                            break;
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer"></div>
+</div>
+@inject SigninUser signin
+@code 
+{
+
+    List<UserMessage> inbox;
+    List<UserMessage> outbox;
+
+    string view;
+    string subject;
+    string message;
+    List<object> files = new();
+
+    int fromUserId;
+    int toUserId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        this.inbox = userMessages.GetInbox();
+        this.outbox = userMessages.GetOutbox();
+    }
+
+    public void OnResendMessageButtonClicked()
+    {      
+        toUserId = fromUserId;
+        fromUserId = signin.Verify().Id;
+        view = "new_message";
+        message = "";
+        StateHasChanged();
+    }
+
+    public void OnSendMessageButtonClicked()
+    {
+        var from = signin.Verify().Id;
+        userMessages.Send("Тест", message, from, toUserId, null);
+
+        this.inbox = userMessages.GetInbox();
+        this.outbox = userMessages.GetOutbox();
+        view = "inbox";
+        StateHasChanged();
+    }
+    public void OnCreateMessageButtonClicked()
+    {
+        this.view = "new_message";
+        StateHasChanged();
+    }
+    public void OnInboxButtonClicked()
+    {
+        this.view = "inbox";
+        StateHasChanged();
+    }
+    public void OnOutboxButtonClicked()
+    {
+        this.view = "outbox";
+        StateHasChanged();
+    } 
+    public void OnMessageClicked(UserMessage message)
+    {
+        //this.message = message;
+        this.view = "message";
+        this.message = message.Text;
+        this.subject = message.Subject;
+        this.fromUserId = (int)message.FromUserID;
+        this.toUserId = (int)message.ToUserID;
+        
+        StateHasChanged();
+    }
+}

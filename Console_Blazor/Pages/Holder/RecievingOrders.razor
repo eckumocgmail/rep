@@ -1,0 +1,58 @@
+﻿@page "/holder/{HolderId:int}/orders/recieving"
+@inject IHolderService holdersService
+@inject DbContextUser dbu
+@code 
+{
+    [Parameter]
+    public int HolderId { get; set; }
+    public List<Order> Orders { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        this.Orders = holdersService.GetOrderInDelivery(HolderId);
+    }
+    int ctn = 1;
+}
+<div class="card">
+    <div class="card-header">
+        Заказы в ожидании доставки
+    </div>
+    <div class="card-body">
+        <table>
+            <tr>
+                <td>#</td>
+                <td>Дата</td>
+                <td>Номер</td>
+                <td>Курьер. ФИО</td>
+                <td>Курьер. Телеофн</td>
+                <td>Время выдачи курьеру</td>
+                <td>Кол-во товаров</td>                
+            </tr>
+            @if (Orders is null || Orders.Count() > 0)
+            {
+                @foreach (Order order in Orders)
+                {
+                    <tr>
+                        <td>@(ctn++)</td>
+                        <td>@(((DateTime)order.OrderCreated).ToString("d"))</td>
+                        <td>#@(order.Id)</td>
+                        <td>@(holdersService.GetCustomerPerson(order.CustomerID).GetFullName())</td>
+                        <td>@(holdersService.GetCustomerPerson(order.CustomerID).Tel)</td>
+                        <td>@(((DateTime)order.OrderUpdated).ToString("d"))</td>
+                        <td>@(order.OrderItems.Sum( item => item.ProductCount))</td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td> Нет заказов находящся в пути</td>
+                </tr>
+            }
+            
+        </table>
+    </div>
+    <div class="card-footer">
+
+    </div>
+</div>
