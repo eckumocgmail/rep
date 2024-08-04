@@ -83,6 +83,10 @@ namespace Console_Blazor
 
             
             var app = builder.Build();
+            using(var scope = app.Services.CreateScope())
+            {
+                var groupService = scope.ServiceProvider.Get<UserGroupsService>();
+            }
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())

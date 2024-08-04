@@ -39,9 +39,22 @@ public class GroupingUser : BaseGrouping<UserContext, UserGroup, UserGroups>
     {
         try
         {
+            var group = this._model.UserGroups_.FirstOrDefault(g => g.Name.ToUpper() == name.ToUpper());
+            if(group is null)
+            {
+                _model.UserGroups_.Add(new()
+                {
+                    Name = name,
+                    Description = name,
+                    Code = name
+
+                });
+                _model.SaveChanges();
+            };
+            group = this._model.UserGroups_.FirstOrDefault(g => g.Name.ToUpper() == name.ToUpper());
             UserGroups res;
             this._model.Add(res=new UserGroups(){
-                Group = this._model.UserGroups_.FirstOrDefault(g => g.Name.ToUpper()==name.ToUpper()),
+                Group = group,
                 User = item
             });
             this._model.SaveChanges();

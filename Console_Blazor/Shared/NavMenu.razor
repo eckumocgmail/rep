@@ -15,7 +15,7 @@
 @inject ITokenProvider provider
 @inject NavigationManager nav
 @inject SigninUser signin
-@inject AuthStateProvider provider
+@inject MarketerWeb.Authorization.AuthStateProvider provider
 
 @code
 {
@@ -62,6 +62,11 @@
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="/user/profile">
                         <span class="oi oi-browser" aria-hidden="true"></span> Профиль
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="/user/groups">
+                        <span class="oi oi-browser" aria-hidden="true"></span> Группы
                     </NavLink>
                 </div>
                 <div class="nav-item px-3">

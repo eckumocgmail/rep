@@ -10,6 +10,68 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
  
+
+public interface IGroupService
+{
+    public IEnumerable<string> GetMyGroups();
+    public IEnumerable<UserGroup> GetGroups(int page, int size);
+    public IEnumerable<UserGroup> SearchGroups(string query, int page, int size);
+    public IEnumerable<UserPerson> GetPeople(int groupId);
+    public IEnumerable<UserPerson> GetMessages(int groupId);
+    public IEnumerable<UserPerson> GetMessages(int groupId, int page, int size);
+    public IEnumerable<UserPerson> PostMessage(UserGroupMessage message);
+    public IEnumerable<UserPerson> ConnectGroup(string group);
+    public IEnumerable<UserPerson> DisconnectGroup(string group);
+    
+}
+
+class GroupService: IGroupService
+{
+    public IEnumerable<string> GetMyGroups()
+    {
+        throw new NotImplementedException();
+    }
+
+    public IEnumerable<UserGroup> GetGroups(int page, int size)
+    {
+        throw new NotImplementedException();
+    }
+
+    public IEnumerable<UserGroup> SearchGroups(string query, int page, int size)
+    {
+        throw new NotImplementedException();
+    }
+
+    public IEnumerable<UserPerson> GetPeople(int groupId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public IEnumerable<UserPerson> GetMessages(int groupId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public IEnumerable<UserPerson> GetMessages(int groupId, int page, int size)
+    {
+        throw new NotImplementedException();
+    }
+
+    public IEnumerable<UserPerson> PostMessage(UserGroupMessage message)
+    {
+        throw new NotImplementedException();
+    }
+
+    public IEnumerable<UserPerson> ConnectGroup(string group)
+    {
+        throw new NotImplementedException();
+    }
+
+    public IEnumerable<UserPerson> DisconnectGroup(string group)
+    {
+        throw new NotImplementedException();
+    }
+}
 public class UserGroupsService 
 {
     private readonly AuthorizationDbContext _context;
@@ -173,10 +235,18 @@ public class UserGroupsService
         //_notifications.Info($"Вы успешно опубликовали сообщение в группе {GetGroup(groupId).Name}");
     }
 
+    public void PublishIntoGroup(int userId, int groupId, UserGroupMessage message)
+    {        
+        message.GroupID = groupId;
+        _context.UserGroupMessages_.Add(message);
+        _context.SaveChanges();
+        //_notifications.Info($"Вы успешно опубликовали сообщение в группе {GetGroup(groupId).Name}");
+    }
 
 
 
 
-        
+
+
 }
  
