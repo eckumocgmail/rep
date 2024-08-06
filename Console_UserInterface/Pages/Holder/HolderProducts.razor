@@ -1,0 +1,8 @@
+﻿@page "/holder/products/{HolderId:int}"
+<h3>Товары на подразделении</h3>
+<div class="card"></div>
+@code 
+{
+    [Parameter]
+    public int HolderId { get; set; }
+}

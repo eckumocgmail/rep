@@ -1,0 +1,46 @@
+﻿@page "/transport/active-list"
+@attribute [Authorize(Roles = "transport")]
+@inject NavigationManager nav
+@inject ITransportUser user
+<div class="card">
+    <div class="card-header">
+        <h2>Заказы на доставку</h2>
+    </div>
+    <div class="card-body">
+        <ul class="list-group">
+            @if (AvailableOrders is not null)
+            {
+                @if (AvailableOrders.Count() == 0)
+                {
+                    <li class="list-group-item">Нет доступных заказов на доставку</li>
+
+                }
+                else
+                {
+                    @foreach (var order in AvailableOrders.Where(item => item is not null))
+                    {
+                        <li class="list-group-item" id="list_item_@(order.Id)" onmouseover="document.getElementById('list_item_@(order.Id)').classList.add('active')" onmouseleave="document.getElementById('list_item_@(order.Id)').classList.remove('active')" @onclick="(evt => { OnOrderSelected(order.Id);  })">@order.Id @order.Holder.HolderLocation</li>
+                    }
+                }
+            }
+        </ul>
+    </div>
+    <div class="card-footer">
+    </div>
+</div>
+
+@code
+{
+    List<Order> AvailableOrders = new();
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        this.AvailableOrders = user.GetActiveList().ToList();
+    }
+
+    public void OnOrderSelected(int orderId)
+    {
+        user.TakeOrder(orderId);
+        nav.NavigateTo("/transport/orders/" + orderId);
+    }
+}

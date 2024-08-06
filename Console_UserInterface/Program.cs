@@ -66,6 +66,7 @@ namespace Console_UserInterface
             // Add services to the container.
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddRazorPages();
+            builder.Services.AddControllers();
             builder.Services.AddServerSideBlazor();
             builder.Services.AddSingleton<WeatherForecastService>();
             builder.Services.AddScoped<UserService>();
@@ -98,7 +99,7 @@ namespace Console_UserInterface
             app.UseStaticFiles();
 
             app.UseRouting();
-
+            app.MapControllers();
             app.MapBlazorHub();
             app.MapFallbackToPage("/_Host");
 
@@ -108,58 +109,24 @@ namespace Console_UserInterface
         {
             
 
-            var builder = WebApplication.CreateBuilder(args);
-            
-
-            Thread.Sleep(2000);
-            builder.Services.AddHttpContextAccessor();
-            builder.Services.AddSingleton<AppRouterMiddleware>();
+            /*builder.Services.AddSingleton<AppRouterMiddleware>();
 
             builder.Services.AddTransient<MailRuService2>();
             builder.Services.AddTransient<InputModalService>();
             builder.Services.AddTransient<IModalService, ModalService>();
 
 
-            //builder.Services.AddScoped<IAuthenticationService, MyAuthenticationService>();
-            builder.Services.AddScoped<UserService>();
-            builder.Services.AddScoped<UserAuthStateProvider>();
-            builder.Services.AddScoped<AuthenticationStateProvider>(sp => (AuthenticationStateProvider)sp.GetRequiredService<UserAuthStateProvider>());
-            builder.Services.AddAuthenticationCore(options => {
-
-            });
-            builder.Services.AddAuthorizationCore(config =>
-            {
-                //todo configure authorization
-            });
-
             builder.Services.AddInputModal();
+
             builder.Services.AddControllers();
             builder.Services.AddRazorPages();
             builder.Services.AddServerSideBlazor();
 
-            RecaptchaModule.ConfigureServices(builder.Configuration, builder.Services);
-            AuthorizationDbContext.ConfigureServices(builder.Services);
-            AuthorizationModule.ConfigureServices(builder.Services);
-            ModuleUser.ConfigureServices(builder.Configuration, builder.Services);
-            ModuleService.ConfigureServices(builder.Configuration, builder.Services);
-            DeliveryDbContext.ConfigureDeliveryServices(builder.Services, builder.Configuration);
-
-            var app = builder.Build();
 
             UseOdbc(app);
 
-            DeliveryDbContext.UseDeliveryServices(app);
-            app.UseExceptionHandler("/Error");
-
-            app.UseStaticFiles();
-
-            app.UseRouting();
-             
-            app.MapControllers();
-            app.MapBlazorHub();
-            app.MapFallbackToPage("/_Host");
-
-            app.Run();
+            DeliveryDbContext.UseDeliveryServices(app);*/
+           
         }
         public static void DefaultStartup(string[] args)
         {

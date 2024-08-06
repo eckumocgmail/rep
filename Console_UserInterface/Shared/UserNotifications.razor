@@ -1,38 +1,56 @@
 ﻿<h3>UserNotifications</h3>
+@inject ILogger<UserNotifications> logger
 @inject SigninUser signin
+@inject IJSRuntime js
 @code 
 {
     public List<string> Messages { get; set; } = new();
-    public async Task ShowNotification(string notification)
-    {
-        Messages.Add(notification);
-        //var result = await jsinvoke.Eval<int>($"showNotification('{notification}')");
-    }
 
     protected override async Task OnInitializedAsync()
     {
-        await base.OnInitializedAsync();
-       
-        Task.Run(() =>
+        await Task.CompletedTask;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool first)
+    {
+        await Task.CompletedTask;
+        if( first )
         {
-            while (true)
-            {
-                var messages = signin.GetNotifications();
-                foreach (var message in messages)
-                {
-                    ShowNotification(message);
-                }
-                Thread.Sleep(300);
-            }
-        });
+            js.InvokeAsync<int>($"startupNotification", DotNetObjectReference.Create(this));
+        }
+
+    }
+
+    [JSInvokable]
+    public async Task CheckoutForNotifitcations()
+    {                 
+        var messages = signin.GetNotifications();
+        foreach (var message in messages)
+        {
+            Messages.Add(message);
+        }
+        StateHasChanged();
+        await Task.CompletedTask;
+    }   
+
+    public string Shift()
+    {
+        if (Messages.Count() > 0)
+        {
+            string result = Messages[0];
+            Messages.RemoveAt(0);
+            return result;
+        }        
+        return null;
     }
 }
+
 <ul class="list-group">
     
-    @foreach(var message in Messages)
+    @while(Messages.Count()>0)
     {
         <li class="list-grooup-item">
-            <div class="alert alert-info">@message</div>
+            <div class="alert alert-info">@Shift()</div>
         </li>
     }
     

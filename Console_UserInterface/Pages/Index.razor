@@ -31,6 +31,7 @@
         StateHasChanged();
     }
 }
+<button @onclick='(evt => { signin.PushNotifcation("This is a test"); StateHasChanged(); } )'>publish</button>
 <AuthorizeView Roles="transport">
     transport 1,23,
 </AuthorizeView>
