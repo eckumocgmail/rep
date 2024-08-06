@@ -6,7 +6,7 @@
 
 @inject pickpoint_delivery_service.DeliveryDbContext db
 @inject SigninUser signin
-@inject AuthStateProvider auth
+
 <h3>User Cars</h3>
 
 @code
@@ -114,7 +114,7 @@
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        var state = (auth.GetAuthenticationStateAsync().Result);
+        //var state = null;// (auth.GetAuthenticationStateAsync().Result);
         this.Cars = db.Cars.ToList();       
     }
 

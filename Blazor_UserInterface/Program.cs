@@ -38,8 +38,8 @@ namespace Console_BlazorApp
 
 
             builder.Services.AddScoped<IAuthenticationService, MyAuthenticationService>();
-            builder.Services.AddScoped<AuthStateProvider>();
-            builder.Services.AddSingleton<AuthenticationStateProvider>(sp => (AuthenticationStateProvider)sp.GetRequiredService<AuthStateProvider>());
+            //builder.Services.AddScoped<AuthStateProvider>();
+            //builder.Services.AddSingleton<AuthenticationStateProvider>(sp => (AuthenticationStateProvider)sp.GetRequiredService<AuthStateProvider>());
             builder.Services.AddAuthenticationCore( options => {
              
             });

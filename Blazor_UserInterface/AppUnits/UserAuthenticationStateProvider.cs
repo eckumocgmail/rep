@@ -7,7 +7,7 @@ using System.Linq;
 using Console_AuthModel.AuthorizationModel.UserModel;
 
  
-
+/*
 public class AuthStateProvider : AuthenticationStateProvider, IDisposable
 {
     private readonly SigninUser _signin;
@@ -117,13 +117,13 @@ public class AuthStateProvider : AuthenticationStateProvider, IDisposable
     {
         var principal = new ClaimsPrincipal();
         var user = _signin.Signin(username, password).Result;
-       /* var headers = _httpContextAccessor.HttpContext.Request.Headers;
+        /* var headers = _httpContextAccessor.HttpContext.Request.Headers;
         headers["X-Auth-UserId"] = user == null ?
             new Microsoft.Extensions.Primitives.StringValues() :
             new Microsoft.Extensions.Primitives.StringValues(user.Account.Email);
         headers["X-Auth-Roles"] = user == null ?
             new Microsoft.Extensions.Primitives.StringValues() :
-            new Microsoft.Extensions.Primitives.StringValues(user.Roles.Select(r => r.Code).ToArray());*/
+            new Microsoft.Extensions.Primitives.StringValues(user.Roles.Select(r => r.Code).ToArray());* /
         CurrentUser = user;
 
         if (user is not null)
@@ -145,7 +145,7 @@ public class AuthStateProvider : AuthenticationStateProvider, IDisposable
     }
 
     public void Dispose() => AuthenticationStateChanged -= OnAuthenticationStateChangedAsync;
-}
+}*/
 
  /**
 public class UserAuthenticationStateProvider : AuthenticationStateProvider

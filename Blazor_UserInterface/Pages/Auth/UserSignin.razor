@@ -5,7 +5,7 @@
 @inject global::SignupUser signup
 @inject global::SigninUser signin
 @inject NavigationManager nav
-@inject AuthStateProvider provider
+
 <div align="center">
     <h3>Авторизация пользователя</h3>
     <form @onsubmit="@OnFormSubmitted" class="card" style="width: 600px; padding: 20px" align="left">
@@ -42,8 +42,8 @@
                 bool isSignin = signin.IsSignin();
                 if (signinResult.Succeeded)
                 {
-                    await provider.LoginAsync(username,password);
-                    AuthenticationState state = await provider.GetAuthenticationStateAsync();
+                    //await provider.LoginAsync(username,password);
+                    //AuthenticationState state = await provider.GetAuthenticationStateAsync();
                     nav.NavigateTo("/public/search-products");
                 }
                 else

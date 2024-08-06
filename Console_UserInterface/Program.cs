@@ -5,35 +5,32 @@ using Console_UserInterface.Data;
 
 using Google_LoginApplication.Areas.Identity.Modules.ReCaptcha;
 
-using MarketerWeb.Authorization;
-
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Console_AuthModel.AuthorizationModel;
 using Console_AuthModel.AuthorizationServices.Authentication;
- 
+
 using Console_BlazorApp.AppUnits;
 using Console_BlazorApp.AppUnits.DeliveryServices;
 using Console_BlazorApp.Shared;
 using Console_DataConnector.DataModule.DataODBC.Connectors;
 using Google_LoginApplication.Areas.Identity.Modules.ReCaptcha;
 
-using MarketerWeb.Authorization;
- 
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Components.Authorization;
 using Newtonsoft.Json;
 using pickpoint_delivery_service;
 using pickpoint_delivery_service;
- 
+
+using MarketerWeb.Authorization;
+
 namespace Console_UserInterface
 {
     public class Program
     {
-
-        public static void Main(string[] args)
+        public static void UpdateDatabase()
         {
             using (var db = new AuthorizationDbContext())
             {
@@ -59,10 +56,60 @@ namespace Console_UserInterface
                 db.Database.EnsureCreated();
                 db.Products.ToList().ToJsonOnScreen().WriteToConsole();
             }*/
+        }
+        public static void Main(string[] args)
+        {
+            UpdateDatabase();
 
             var builder = WebApplication.CreateBuilder(args);
-            pickpoint_delivery_service.DeliveryDbContext.ConfigureDeliveryServices(builder.Services, builder.Configuration);
-            //pickpoint_delivery_service.DeliveryDbContext.CreateDeliveryData(builder.Services, builder.Configuration);
+
+            // Add services to the container.
+            builder.Services.AddHttpContextAccessor();
+            builder.Services.AddRazorPages();
+            builder.Services.AddServerSideBlazor();
+            builder.Services.AddSingleton<WeatherForecastService>();
+            builder.Services.AddScoped<UserService>();
+            builder.Services.AddScoped<UserAuthStateProvider>();
+            builder.Services.AddScoped<AuthenticationStateProvider>(sp => sp.GetRequiredService<UserAuthStateProvider>());
+            builder.Services.AddAuthorizationCore(config =>
+            {
+                //todo configure authorization
+            });
+            RecaptchaModule.ConfigureServices(builder.Configuration, builder.Services);
+            AuthorizationDbContext.ConfigureServices(builder.Services);
+            AuthorizationModule.ConfigureServices(builder.Services);
+            ModuleUser.ConfigureServices(builder.Configuration, builder.Services);
+            ModuleService.ConfigureServices(builder.Configuration, builder.Services);
+            DeliveryDbContext.ConfigureDeliveryServices(builder.Services, builder.Configuration);
+            DeliveryDbContext.CreateDeliveryData(builder.Services, builder.Configuration);
+
+            var app = builder.Build();
+
+            // Configure the HTTP request pipeline.
+            if (!app.Environment.IsDevelopment())
+            {
+                app.UseExceptionHandler("/Error");
+                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                app.UseHsts();
+            }
+
+            app.UseHttpsRedirection();
+
+            app.UseStaticFiles();
+
+            app.UseRouting();
+
+            app.MapBlazorHub();
+            app.MapFallbackToPage("/_Host");
+
+            app.Run();
+        }
+        public static void Main2(string[] args)
+        {
+            
+
+            var builder = WebApplication.CreateBuilder(args);
+            
 
             Thread.Sleep(2000);
             builder.Services.AddHttpContextAccessor();
@@ -73,9 +120,10 @@ namespace Console_UserInterface
             builder.Services.AddTransient<IModalService, ModalService>();
 
 
-            builder.Services.AddScoped<IAuthenticationService, MyAuthenticationService>();
-            builder.Services.AddScoped<AuthStateProvider>();
-            builder.Services.AddSingleton<AuthenticationStateProvider>(sp => (AuthenticationStateProvider)sp.GetRequiredService<AuthStateProvider>());
+            //builder.Services.AddScoped<IAuthenticationService, MyAuthenticationService>();
+            builder.Services.AddScoped<UserService>();
+            builder.Services.AddScoped<UserAuthStateProvider>();
+            builder.Services.AddScoped<AuthenticationStateProvider>(sp => (AuthenticationStateProvider)sp.GetRequiredService<UserAuthStateProvider>());
             builder.Services.AddAuthenticationCore(options => {
 
             });
@@ -106,7 +154,7 @@ namespace Console_UserInterface
             app.UseStaticFiles();
 
             app.UseRouting();
-
+             
             app.MapControllers();
             app.MapBlazorHub();
             app.MapFallbackToPage("/_Host");
@@ -119,6 +167,7 @@ namespace Console_UserInterface
 
             // Add services to the container.
             builder.Services.AddRazorPages();
+            builder.Services.AddControllers();
             builder.Services.AddServerSideBlazor();
             builder.Services.AddSingleton<WeatherForecastService>();
 
@@ -137,7 +186,7 @@ namespace Console_UserInterface
             app.UseStaticFiles();
 
             app.UseRouting();
-
+            app.MapControllers();
             app.MapBlazorHub();
             app.MapFallbackToPage("/_Host");
 

@@ -1,6 +1,6 @@
 ﻿@inject NavigationManager nav
 @inject SigninUser signin
-@inject AuthStateProvider auth
+@inject UserAuthStateProvider auth
 @code
 {
     public bool IsSignin { get; set; } = false;
@@ -35,20 +35,115 @@
 </div>
 
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
-    <nav class="flex-column">
+    <nav class="flex-column" style="color: white; height: 100%; overflow-y: auto;">
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
+                <span class="oi oi-home" aria-hidden="true"></span> Главная
             </NavLink>
         </div>
+        @if(IsSignin && signin.IsInRole("transport"))
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/transport/available-list">
+                    <span class="oi oi-browser" aria-hidden="true"></span> Заказы на доставку
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/transport/active-list">
+                    <span class="oi oi-browser" aria-hidden="true"></span> Активные заказы
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/transport/completed-list">
+                    <span class="oi oi-browser" aria-hidden="true"></span> Выполнение заказы
+                </NavLink>
+            </div>
+        }
+        @if (IsSignin && signin.IsInRole("customer"))
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/public/search-products">
+                    <span class="oi oi-browser" aria-hidden="true"></span> Товары
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/user/orders">
+                    <span class="oi oi-basket" aria-hidden="true"></span> Заказы
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/user/basket">
+                    <span class="oi oi-basket" aria-hidden="true"></span> Корзина
+                </NavLink>
+            </div>
+        }
         
-        <AuthorizeView Roles="customer">
-            <NavMenuCustomer></NavMenuCustomer>
-        </AuthorizeView>
-        <AuthorizeView Roles="transport">
-            <NavMenuTransport></NavMenuTransport>
-        </AuthorizeView>
-        <NavMenuUser IsSignin="@IsSignin"></NavMenuUser>
+        @if (IsSignin && signin.IsInRole("holder"))
+        {
+            
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/public/create-product">
+                    <span class="oi oi-browser" aria-hidden="true"></span> Новый продукт
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/public/holder-products">
+                    <span class="oi oi-browser" aria-hidden="true"></span> Подразделения
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/public/product-holders">
+                    <span class="oi oi-ban" aria-hidden="true"></span> Склады
+                </NavLink>
+            </div>
+        }
+       
+        @if (IsSignin)
+        {
+            <div class="nav-item px-3" style="color: white;">
+                <NavLink class="nav-link" href="/user/profile">
+                    <span class="oi oi-browser" aria-hidden="true"></span> Профиль
+                </NavLink>
+            </div>
+            <div class="nav-item px-3" style="color: white;">
+                <NavLink class="nav-link" href="/user/groups">
+                    <span class="oi oi-browser" aria-hidden="true"></span> Группы
+                </NavLink>
+            </div>
+            <div class="nav-item px-3" style="color: white;">
+                <NavLink class="nav-link" href="/public/holder-products">
+                    <span class="oi oi-browser" aria-hidden="true"></span> Склады
+                </NavLink>
+            </div>
+            <div class="nav-item px-3" style="color: white;">
+                <NavLink class="nav-link" href="/user/settings">
+                    <span class="oi oi-browser" aria-hidden="true"></span> Настройки
+                </NavLink>
+            </div>
+            <div class="nav-item px-3" style="color: white;">
+                <NavLink class="nav-link" href="/user/messages">
+                    <span class="oi oi-browser" aria-hidden="true"></span> Сообщения
+                </NavLink>
+            </div>
+            <div class="nav-item px-3" style="color: white;">
+                <NavLink class="nav-link" href="/user/signout">
+                    <span class="oi oi-account-logout" aria-hidden="true"></span> Выход
+                </NavLink>
+            </div>
+        }
+        else
+        {
+            <div class="nav-item px-3" style="color: white;">
+                <NavLink class="nav-link" href="/user/signup">
+                    <span class="oi oi-account-login" aria-hidden="true"></span> Регистрация
+                </NavLink>
+            </div>
+            <div class="nav-item px-3" style="color: white;">
+                <NavLink class="nav-link" href="/user/signin">
+                    <span class="oi oi-account-login" aria-hidden="true"></span> Вход
+                </NavLink>
+            </div>
+        }
     </nav>
 </div>
 

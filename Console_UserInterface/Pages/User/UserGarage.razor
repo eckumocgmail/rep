@@ -1,12 +1,11 @@
 ﻿@page "/user/garage"
 @attribute [Authorize(Roles = "webuser")]
 @using MarketerWeb.Authorization;
- 
 @inject IHttpContextAccessor http
-
+@inject UserAuthStateProvider auth
 @inject pickpoint_delivery_service.DeliveryDbContext db
 @inject SigninUser signin
-@inject AuthStateProvider auth
+@inject UserAuthStateProvider provider
 <h3>User Cars</h3>
 
 @code

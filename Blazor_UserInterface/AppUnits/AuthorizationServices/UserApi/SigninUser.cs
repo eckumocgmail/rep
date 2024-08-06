@@ -47,10 +47,14 @@ public sealed class SigninUser : BaseSignin<UserContext, UserAccount, UserPerson
         string token = this._tokenProvider.Get();
         return String.IsNullOrWhiteSpace(token) ? false: this.Validate(token);
     }
+    public UserContext GetBy(UserAccount item)
+    {
+        return GetBy(item.Email);
+    }
 
-    private UserContext GetBy(UserAccount item)
-    {        
-        var user = _model.UserContexts_.Include(ctx => ctx.Wallet).Include(ctx => ctx.Settings).Include(ctx => ctx.Person).Include(ctx => ctx.Account).Include(ctx => ctx.BusinessFunctions).FirstOrDefault(ctx => ctx.Account.Email.ToUpper() == item.Email.ToUpper());
+    public UserContext GetBy(string username)
+    {
+        var user = _model.UserContexts_.Include(ctx => ctx.Wallet).Include(ctx => ctx.Settings).Include(ctx => ctx.Person).Include(ctx => ctx.Account).Include(ctx => ctx.BusinessFunctions).FirstOrDefault(ctx => ctx.Account.Email.ToUpper() == username.ToUpper());
         if(user is not null)
         {
             user.Roles = _model.UserRoles_.Where(r => user.BusinessFunctions.Select(bd => bd.RoleId).Contains(r.Id)).ToList();
@@ -74,24 +78,48 @@ public sealed class SigninUser : BaseSignin<UserContext, UserAccount, UserPerson
         => Signin(new UserAccount(email, password));
     public override MethodResult<UserContext> Signin(UserAccount item)
     {
-        var user = GetBy(item);
-        if( user == null)
-            return MethodResult<UserContext>.OnError(new Exception("Пользователь не зарегистрирован"));
-        if(user!=null && user.Account.Hash!=item.Hash)
-            return MethodResult<UserContext>.OnError(new Exception("Пароль задан неверно"));
-        if ((((AuthorizationUsers)_users).Has(user.SecretKey)))
+        MethodResult<UserContext> result = null;
+        try
         {
-            _users.Remove(user.SecretKey);
+            var user = GetBy(item);
+            if (user == null)
+            {
+                result = MethodResult<UserContext>.OnError(new Exception("Пользователь не зарегистрирован"));
+                throw new Exception();
+            }
+            if (user != null && user.Account.Hash != item.Hash)
+            {
+                result = MethodResult<UserContext>.OnError(new Exception("Пароль задан неверно"));
+                throw new Exception();
+            }
+            if ((((AuthorizationUsers)_users).Has(user.SecretKey)))
+            {
+                _users.Remove(user.SecretKey);
+            }
+            var key = ((AuthorizationUsers)_users).GetByEmail(item.Email);
+            if (key != null)
+                _users.Remove(key);
+            _tokenProvider.Set(user.SecretKey = _users.Put(user));
+            _model.UserContexts_.Find(user.Id).SecretKey = user.SecretKey;
+            user.UserAgent += _httpContextAccessor.HttpContext.Request.Headers.UserAgent;
+            user.LoginCount += 1;
+            _model.SaveChanges();
+            result = MethodResult<UserContext>.OnResult(user);
+
+            if (result.Succeeded)
+            {
+                
+            }
+            else
+            {
+
+            }
+            return result;
         }
-        var key = ((AuthorizationUsers)_users).GetByEmail(item.Email);
-        if (key != null)
-            _users.Remove(key);
-        _tokenProvider.Set(user.SecretKey = _users.Put(user));     
-        _model.UserContexts_.Find(user.Id).SecretKey = user.SecretKey;
-        user.UserAgent += _httpContextAccessor.HttpContext.Request.Headers.UserAgent;
-        user.LoginCount += 1;
-        _model.SaveChanges();
-        return MethodResult<UserContext>.OnResult(user);
+        catch(Exception)
+        {
+            throw;
+        }
 
     }
     private bool Compare(UserAccount stored, UserAccount input) => stored.Password == input.Password;
@@ -111,6 +139,39 @@ public sealed class SigninUser : BaseSignin<UserContext, UserAccount, UserPerson
     {
         var result = key != null && _users.GetMemory().ContainsKey(key);
         return result;
+    }
+
+    public IEnumerable<string> GetRoles(string key)
+    {
+        if (IsSignin() == false)
+        {
+            return new List<string>();
+        }            
+        else
+        {
+            if (Verify().Roles is null)
+                throw new Exception("Пользователь не содержит сведения о ролях UserContext.Roles");
+            return Verify().Roles.Select(role => role.Code).ToList();
+        }        
+    }
+
+    public bool IsInRole(params string[] roles)
+    {        
+        string token = this._tokenProvider.Get();
+        if(String.IsNullOrWhiteSpace(token))
+        {
+            return false;
+        }
+        else
+        {
+            var current = GetRoles(token);
+            foreach( var role in roles ) 
+            {
+                if (current.Contains(role) == false)
+                    return false;
+            }
+        }
+        return true;
     }
 
     public UserContext Verify()
