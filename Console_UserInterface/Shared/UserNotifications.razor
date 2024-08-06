@@ -1,0 +1,39 @@
+﻿<h3>UserNotifications</h3>
+@inject SigninUser signin
+@code 
+{
+    public List<string> Messages { get; set; } = new();
+    public async Task ShowNotification(string notification)
+    {
+        Messages.Add(notification);
+        //var result = await jsinvoke.Eval<int>($"showNotification('{notification}')");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+       
+        Task.Run(() =>
+        {
+            while (true)
+            {
+                var messages = signin.GetNotifications();
+                foreach (var message in messages)
+                {
+                    ShowNotification(message);
+                }
+                Thread.Sleep(300);
+            }
+        });
+    }
+}
+<ul class="list-group">
+    
+    @foreach(var message in Messages)
+    {
+        <li class="list-grooup-item">
+            <div class="alert alert-info">@message</div>
+        </li>
+    }
+    
+</ul>

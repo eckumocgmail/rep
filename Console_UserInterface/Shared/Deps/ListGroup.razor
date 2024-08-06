@@ -1,0 +1,34 @@
+﻿<ul class="list-group" style="overflow-y: auto;">
+    @foreach(var item in Items)
+    {
+        <li id="code_@(GetHashCode())_@(Items.IndexOf(item))" onmouseleave="this.classList.remove('active')" onmouseover="this.classList.add('active')" class="list-group-item" @onclick="OnListGroupItemClicked">
+       </li>
+    } 
+</ul>
+@inject IJSInvoke js
+@code {
+
+    [Parameter]
+    public List<string> Items { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnListGroupItemClickedCallback { get; set; }
+    public async Task OnListGroupItemClicked() { await OnListGroupItemClickedCallback.InvokeAsync(); }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if( firstRender )
+        {
+            RenderText();
+        }
+    }
+
+    public void RenderText()
+    {
+        foreach (var item in Items)
+        {
+            js.Eval<string>("(function(){" + $"document.getElementById('code_{GetHashCode()}_{Items.IndexOf(item)}').innerHTML='{item.Replace("\r\n", "<br>")}';" + "})()");
+        }
+    }
+
+}

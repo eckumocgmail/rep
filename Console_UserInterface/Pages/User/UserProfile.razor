@@ -1,0 +1,35 @@
+﻿@page "/user/profile"
+@attribute [Authorize(Roles = "webuser")]
+@inject DeliveryDbContext db
+@inject NavigationManager nav
+@inject SigninUser signin
+
+<div class="card" style="width: 100%;">
+    У вас на счету @(signin.Verify().WalletId) $
+
+
+    <Console_Blazor.BootstrapPanels.CardContainer width="100%">               
+
+        <div>
+            <div class="list-group">
+                <li class="list-group-item">Аккаунт</li>
+                <li class="list-group-item">Персональная информация</li>
+                <li class="list-group-item">Настройки</li>
+                <li class="list-group-item">Сообщения</li>
+                <li class="list-group-item">Группы</li>
+                <li class="list-group-item">Автомобили</li>
+                <li class="list-group-item">Учетные даные</li>
+                <li class="list-group-item">Корзина</li>
+                <li class="list-group-item">Заказы</li>
+
+            </div>
+            <div>
+                <Index></Index>
+            </div>
+        </div>      
+    </Console_Blazor.BootstrapPanels.CardContainer>
+</div>
+
+@code {
+
+}

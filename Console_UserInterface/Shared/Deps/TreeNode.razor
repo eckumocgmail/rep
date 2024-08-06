@@ -1,0 +1,48 @@
+﻿<div class="form-check">
+    <input class="form-check-input" type="checkbox" checked="@Checked" @onchange="(async evt => { await OnChanged.InvokeAsync(Checked = (bool)evt.Value); CheckEvent(Checked); })" id="defaultCheck1">
+    <label class="form-check-label" for="defaultCheck1">
+        @Name
+    </label>
+</div>
+@foreach(var p in Children)
+{
+    <div style="margin-left: 20px;">
+        <TreeNode Name="@p.Name" Id="@p.Id" Checked="@p.Checked" Children="@p.Children" OnChanged="(evt => { p.Checked=!p.Checked; OnChanged.InvokeAsync(Checked); StateHasChanged();   })"></TreeNode>
+    </div>
+}
+@code 
+{
+    public List<int> GetSelected()
+    {
+        List<int> result = new();
+        if (Checked)
+            result.Add(Id);
+        foreach(var p in Children)
+        {
+            result.AddRange(p.GetSelected());
+        }
+        return result;
+    }
+
+    [Parameter]
+    public int Id { get; set; }
+    [Parameter]
+    public string Name { get; set; }
+    [Parameter]
+    public bool Checked { get; set; } = true;
+    [Parameter]
+    public List<TreeNode> Children { get; set; }
+    [Parameter]
+    public EventCallback<bool> OnChanged { get; set; }
+
+    void CheckEvent(bool vchecked)
+    {
+        Checked = vchecked;
+        foreach (var pchild in Children)
+        {
+            pchild.CheckEvent(vchecked);
+        }
+    }
+
+    
+}

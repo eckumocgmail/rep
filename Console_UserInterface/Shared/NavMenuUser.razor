@@ -1,0 +1,51 @@
+﻿@code 
+{
+    [Parameter]
+    public bool IsSignin { get; set; }
+}
+<div class="nav-item px-3">
+    <NavLink class="nav-link" href="/user/profile">
+        <span class="oi oi-browser" aria-hidden="true"></span> Профиль
+    </NavLink>
+</div>
+<div class="nav-item px-3">
+    <NavLink class="nav-link" href="/user/groups">
+        <span class="oi oi-browser" aria-hidden="true"></span> Группы
+    </NavLink>
+</div>
+<div class="nav-item px-3">
+    <NavLink class="nav-link" href="/public/holder-products">
+        <span class="oi oi-browser" aria-hidden="true"></span> Склады
+    </NavLink>
+</div>
+<div class="nav-item px-3">
+    <NavLink class="nav-link" href="/user/settings">
+        <span class="oi oi-browser" aria-hidden="true"></span> Настройки
+    </NavLink>
+</div>
+<div class="nav-item px-3">
+    <NavLink class="nav-link" href="/user/messages">
+        <span class="oi oi-browser" aria-hidden="true"></span> Сообщения
+    </NavLink>
+</div>
+@if (IsSignin)
+{
+    <div class="nav-item px-3">
+        <NavLink class="nav-link" href="/user/signout">
+            <span class="oi oi-account-logout" aria-hidden="true"></span> Выход
+        </NavLink>
+    </div>
+}
+else
+{
+    <div class="nav-item px-3">
+        <NavLink class="nav-link" href="/user/signup">
+            <span class="oi oi-account-login" aria-hidden="true"></span> Регистрация
+        </NavLink>
+    </div>
+    <div class="nav-item px-3">
+        <NavLink class="nav-link" href="/user/signin">
+            <span class="oi oi-account-login" aria-hidden="true"></span> Вход
+        </NavLink>
+    </div>
+}

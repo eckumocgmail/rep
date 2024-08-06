@@ -1,0 +1,371 @@
+﻿@page "/public/search-products"
+@attribute [Authorize(Roles = "customer")]
+@using Console_BlazorApp.AppUnits.DeliveryServices;
+@using Microsoft.EntityFrameworkCore;
+@using Mvc_Apteka.Entities;
+@using pickpoint_delivery_service;
+@using Console_BlazorApp.AppUnits.DeliveryModel;
+@using Console_BlazorApp.AppUnits.DeliveryApi;
+@inject pickpoint_delivery_service.DeliveryDbContext db
+@inject NavigationManager nav
+@inject IProductsInStockService instock
+@inject SigninUser signin
+ 
+@code 
+{
+    public List<Product> AvailableProducts { get; set; } = new();
+    public List<string> SearchOptions { get; set; } = new() { };
+    public List<Product> SelectedProducts { get; set; } = new();
+    public Order OrderRef { get; set; } = new Order();
+    public int PageNumber { get; set; } = 1;
+    public string SearchQuery { get; set; } = "";
+    public int PagesCount { get; set; } = 1;
+    public bool IsReady { get; set; } = false;
+    public string Message { get; set; } = "";
+
+    TreeNode Root;
+    protected override void OnInitialized()
+    {
+        var p = db.ProductCatalogs.FirstOrDefault(p => p.ParentId == null);
+        if (p is null)
+            throw new Exception($"{nameof(ProductCatalog)} данные не заполнены");
+        Root = new()
+        {
+            Id = p.ID,
+            Name = p.ProductCatalogName,
+        };
+        int rootId = db.ProductCatalogs.FirstOrDefault(p => p.ParentId == null).ID;
+        Func<int?, List<TreeNode>> getChildren = (id) => null;
+        getChildren = (int? id) =>
+        {
+            return db.ProductCatalogs.Where(p => p.ParentId == id).ToList().Select(p => new TreeNode()
+            {
+                Id = p.ID,
+                Name = p.ProductCatalogName,
+                Children = getChildren(p.ID)
+            }).ToList();
+        };
+        Root.Children = getChildren(rootId);
+
+        //this.OnSearch();
+        if (signin.IsSignin())
+        {
+            var user = signin.Verify();
+            var customer = db.Customers.FirstOrDefault(customer => customer.UserId==user.Id);
+            if (customer == null)
+            {
+                db.Customers.Add(customer = new CustomerContext()
+                {
+                    FirstName = user.Person.FirstName,
+                    LastName = user.Person.LastName,
+                    PhoneNumber = user.Person.Tel,
+                    UserId = user.Id
+                });
+                db.SaveChanges();
+            }
+            customer = db.Customers.FirstOrDefault(customer => customer.UserId == user.Id);
+
+            if (customer.CurrentOrderId is null)
+            {
+                var order = new Order() { CustomerID = customer.Id };
+                db.Orders.Add(order);
+                db.SaveChanges();
+                customer.CurrentOrderId = order.Id;
+            }
+            var orderId = customer.CurrentOrderId;
+            if (orderId is not null)
+            {
+                this.OrderRef = db.Orders.Include(o => o.OrderItems).FirstOrDefault(o => o.Id == orderId);                
+            }
+            if (OrderRef.OrderStatus != 0)
+            {
+                var order = new Order() { CustomerID = customer.Id };
+                db.Orders.Add(order);
+                db.SaveChanges();
+                customer.CurrentOrderId = order.Id;
+            }
+            if (OrderRef is null)
+            {                               
+                var order = new Order() { CustomerID = customer.Id };
+                db.Orders.Add(order);
+                db.SaveChanges();
+                customer.CurrentOrderId = order.Id;
+            }
+            db.SaveChanges();
+        } 
+        else
+        {
+            this.OrderRef = new Order() {  };           
+            db.SaveChanges();
+        }
+        IsReady = true;
+        var fasade = new EntityFasade<Product>(db);
+        SearchOptions = fasade.GetOptions(SearchQuery).ToList();
+        OnSearch();
+
+
+    }
+
+
+    int PageSize = 6;
+    public void OnSearch()
+    {
+        try
+        {
+
+            EntityFasade<Product> fasade = null;
+            if (this.UseExternalServices)
+            {
+                //TODO
+            }
+            else
+            {
+                fasade = new EntityFasade<Product>(db);
+            }
+            var Catalogs = Root.GetSelected();
+            var SearchedProducts = db.Products.Where(product => product.ProductName.ToLower().IndexOf(SearchQuery.ToLower()) != -1).ToList();
+            var MaxProductCost = SearchedProducts.Min(p => p.ProductCost) + ((100 - PriceFilter) * ((SearchedProducts.Max(p => p.ProductCost) - SearchedProducts.Min(p => p.ProductCost)) / 100));
+            SearchedProducts = SearchedProducts.Where(p => p.ProductCost>MaxProductCost).ToList();
+            SearchedProducts = SearchedProducts.Where(p => Catalogs.Contains((int)p.ProductCatalogId)).ToList();
+            if(ProductState != "2")
+            {
+                SearchedProducts = SearchedProducts.Where(p => p.IsNew == (ProductState == "1" ? true : false)).ToList();
+            }
+            PagesCount = (SearchedProducts.Count() + SearchedProducts.Count() % PageSize) / PageSize;
+            AvailableProducts = SearchedProducts.Skip((PageNumber - 1) * PageSize).Take(PageSize).ToList();
+            AvailableProducts.ForEach(product => product.ProductImages = db.ProductImages.Where(i => i.ProductID == product.Id).ToList());
+
+
+            switch(sort)
+            {
+                case "price":
+                    AvailableProducts.Sort((p1, p2) => { return (p1.ProductCost - p2.ProductCost) > 0? 1: -1; });
+                    break;
+                case "rating":
+                    AvailableProducts.Sort((p1, p2) => { return (p1.ProductRate - p2.ProductRate) > 0 ? 1 : -1; });
+                    break;
+                default: break;
+            }
+            
+        }
+        catch(Exception ex)
+        {
+            Message = "Ошибка при выполнении поиска: "+ex.Message;
+        }
+    }
+
+    string ProductState;
+    int PriceFilter=100;
+    bool UseExternalServices;
+
+    string sort;
+    public void AddToOrder( int product_id )
+    {
+        var p = AvailableProducts.First(p => p.Id == product_id);
+        AvailableProducts.Remove(p);
+        this.SelectedProducts.Add(p);
+        var item = new OrderItem()
+        {
+            ProductID = product_id,
+            Product = db.Products.Find(product_id),
+            ProductCount = 1,
+            OrderID = OrderRef.Id
+        };
+        db.OrderItems.Add(item);
+
+        db.SaveChanges();
+    }
+    public void OnCheckoutButtonClicked()
+    {
+        db.Orders.Find(OrderRef.Id).OnOrderCreated();
+        db.SaveChanges();
+
+        nav.NavigateTo($"/public/reservation-order/{OrderRef.Id}");
+    }
+    bool ShowLeftSlide = true;
+    public IEnumerable<ProductCatalog> GetChildCatalogs(int parentId)
+    {
+        return db.ProductCatalogs.Where(pc => pc.ParentId == parentId).ToList();
+    }
+    bool ShowBasket = false;
+    bool ShowTree = true;
+    string city;
+} 
+ @inject DeliveryDbContext db
+ <div class="container">
+
+        <div id="waitingView" hidden>waiting</div>
+        <main id="mainView">
+
+            <div class="card">
+                <div class="card-header">
+                    
+                    <div class="d-flex flex-row flex-nowrap" style="width: 100%;">
+                        <h2 style="width: 100%;">Выберите товары</h2>
+                        <div style="width: 350px; align-self: flex-end; margin: auto;" @onclick="(evt => { ShowBasket = !ShowBasket; StateHasChanged(); } )">
+                            <span class="oi oi-basket" aria-hidden="true"></span> Выбрано @OrderRef.OrderItems.Count() товаров на @OrderRef.OrderItems.Sum(p => (p.Product.ProductCost * p.ProductCount)) $
+                        </div>
+                    </div>
+                    @if(ShowBasket)
+                    {
+                        <div class="d-flex flex-column flex-nowrap" style="width: 100%;">
+                            <h5 style="width: 100%;">(#@(OrderRef.Id)) Товары в корзине</h5>
+                            <div class="card">                                   
+                                        <button style="width: 100%; height: 100%;" class="btn btn-primary btn-sm" @onclick="(evt => { OrderRef.OrderItems.Clear(); StateHasChanged(); })"> отчистить </button>
+                                    
+                                        <table class="table table-bordered" style="font-size: 12px;">
+                                            <tr>
+                                                <td>Товар</td>
+                                                <td>Цена</td>
+                                                <td>Кол-во</td>
+                                            </tr>
+                                            @foreach (var item in OrderRef.OrderItems)
+                                            {
+                                                @if (item.Product is not null)
+                                                {
+                                                    <tr>
+                                            <td><b>@item.Product.ProductName @item.Product.ProductCatalogId </b></td>
+                                                        <td><small class="text-muted"> @item.Product.ProductCost $ </small></td>
+                                                        <td><input type="number" class="form-control" value="@item.ProductCount" @onchange="(evt => { item.ProductCount = (int.Parse(evt.Value.ToString())); StateHasChanged(); })" style="width: 100px; height: 20px; font-size: 12px;" /></td>
+                                                    </tr>
+                                                }
+                                            }
+                                            
+                                            <tr>
+                                                <td colspan="3">
+                                                    <span>Всего</span>
+                                                    <strong>@(OrderRef.OrderItems is not null ? OrderRef.OrderItems.Sum(p => (p.Product.ProductCost * p.ProductCount)) : "")</strong>
+                                                </td>
+                                            </tr>
+                                            
+                                        </table>
+                                        <button class="btn btn-sm btn-primary" style="width: 100%;" @onclick="(evt => { OnCheckoutButtonClicked(); })"> оформить заказ </button>
+                                        
+                                    </div>
+                             
+                        </div>
+                    }
+
+                    <div class="d-flex flex-row flex-nowrap">
+                        <form class="card p-2" style="width: 100%;" method="post" @onsubmit="(evt => { OnSearch(); StateHasChanged(); })" @onsubmit:preventDefault>
+                            <div class="input-group">
+                                <button class="btn btn-primary" @onclick="(evt => { ShowLeftSlide=!ShowLeftSlide; StateHasChanged(); } )">
+                                    <span class="oi oi-menu" aria-hidden="true"></span>
+                                </button>
+                                <input style="width: 50%;" list="options" class="form-control" placeholder="Поиск по каталогу" id="SearchQuery" name="SearchQuery" @oninput="(evt=>{ SearchQuery = evt.Value.ToString(); StateHasChanged(); })" value="@SearchQuery">
+
+                            <button type="submit" class="btn btn-primary" @onclick="(evt => { OnSearch(); StateHasChanged(); })">Поиск</button>
+                                <div style="width: 80px;">&nbsp;</div>
+                                <button class="btn btn-sm" style="text-align:right;">сортировка</button>
+                                <select class="form-control" style="width: 120px;" @onchange="(evt => { sort=evt.Value.ToString(); OnSearch(); StateHasChanged(); })">
+                                    <option value="price">по цене</option>
+                                    <option value="raiting">по рейтингу</option>
+                                </select>
+                            </div>
+                            <datalist id="options">
+                                @foreach (var option in SearchOptions)
+                                {
+                                    <option>@option</option>
+                                }
+                            </datalist>
+                        </form>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            @if(ShowLeftSlide)
+                            {
+                                <div class="col-4 card">
+                                    <div style="width: 100%; margin-top: 15px;">
+                                        <h6>Город</h6>
+                                        <select class="form-control" @onchange="(evt => { city = evt.Value.ToString(); OnSearch(); StateHasChanged(); })">
+                                            <option value="0">Не указан</option>
+                                            <option value="1">Санкт-Петербург</option>
+                                            <option value="2">Москва</option>
+                                        </select><hr />
+                                    </div>
+                                    <button style="width: 100%; height: 33px;" class="btn btn-sm btn-primary" @onclick="(evt => { ShowTree = !ShowTree; StateHasChanged(); })">свернуть</button>
+                                    @if (ShowTree)
+                                    {
+                                        <div class="card" style="width: 100%; height: 480px; overflow-y: auto;">
+                                            <Console_Blazor.BootstrapPanels.CardContainer>
+                                                <TreeNode Name="@Root.Name" Id="@Root.Id" Checked="@Root.Checked" OnChanged="(evt => { Root.Checked = evt; OnSearch(); StateHasChanged();  })" Children="@Root.Children"></TreeNode>
+                                            </Console_Blazor.BootstrapPanels.CardContainer>                                            
+                                        </div>
+                                    }
+
+                                     
+                                    <div style="width: 100%; height: 100%;">
+                                         
+                                        <hr/><h6>Состояние</h6>
+                                        <select class="form-control" @onchange="(evt => { ProductState = evt.Value.ToString(); OnSearch(); StateHasChanged(); } )">
+                                            <option value="0">Новые</option>
+                                            <option value="1">БУ</option>
+                                            <option value="0^1">Новый + БУ</option>
+                                        </select><hr />
+                                    
+                                        <h6>Предлагать</h6>
+                                        <select class="form-control" @onchange='(evt => { UseExternalServices = evt.Value.ToString() == "true"? true: false; OnSearch(); StateHasChanged(); })'>
+                                            <option value="false">Собственные магазины</option>
+                                            <option value="true">Все сторонние поставщики</option>
+                                        </select><hr/>
+                                        
+                                        <div class="form-group">
+                                            <label for="formGroupExampleInput">фильтр по цена</label>
+                                            <input type="number" class="form-control" id="formGroupExampleInput" value="@PriceFilter" @onchange="(evt => { PriceFilter = int.Parse(evt.Value.ToString()); OnSearch(); StateHasChanged(); })">
+                                        </div>                                      
+                                    </div>
+                                </div>
+                            }
+                            <div class="col-@(ShowLeftSlide?"8":"12")">
+                                <div>Найдено @(AvailableProducts.Count()) товаров</div>
+                                <div class="d-flex flex-row flex-wrap">
+                                    @foreach (var product in AvailableProducts)
+                                    {
+                                        product.ProductComments = db.ProductComments.Where(pc => pc.ProductId == product.Id).OrderByDescending(pc => pc.CreatedTime).ToList();
+                                        <ProductCard Item="@product" Onaction="@(evt => AddToOrder(product.Id))"></ProductCard>
+                                    
+                                    }
+                                </div>
+                            </div>
+                            
+                    </div>
+                </div>
+                <div class="card-footer">
+                  
+                    @for (int i = 1; i <=PagesCount; i++)
+                    {
+                        var p = i;
+                        <span class="btn @((i==PageNumber)? "btn-primary": "bg-white")" style="width: 80; height: 80; border: 1px; margin: 2px;" @onclick="(evt => OnPageChanged(p))">@i</span>
+                    }
+                </div>
+
+
+            </div>
+    </div>
+
+
+        </main>
+
+    <footer class="my-5 pt-5 text-muted text-center text-small">
+        <ul class="list-inline">
+            <li class="list-inline-item"><a href="#"> Политика </a></li>
+            <li class="list-inline-item"><a href="#"> Терминология </a></li>
+            <li class="list-inline-item"><a href="#"> Поддержка </a></li>
+        </ul>
+    </footer>
+    </div> 
+@code
+{
+    public void OnSubmitChangesClicked()
+    {
+        StateHasChanged();
+    }
+
+    public void OnPageChanged(int page)
+    {
+        this.PageNumber = page;
+        OnSearch();
+    }
+}

@@ -1,0 +1,62 @@
+﻿@page "/user/basket"
+@using Microsoft.EntityFrameworkCore;
+@attribute [Authorize(Roles = "webuser")]
+@inject DeliveryDbContext db
+@inject SigninUser signin
+<div class="card">
+    <div class="card-header" style="font-size: 16px;">
+        Корзина, создана @OrderRef.OrderCreated обновлена @OrderRef.OrderUpdated
+    </div>
+    <div class="card-body">
+        <ul class="list-group">
+            <li class="list-group-item d-flex flex-row flex-wrap">
+                @foreach(var item in OrderRef.OrderItems)
+                {
+                    <div class="card" style="width: 250px; height: 350px; margin: 10px;">
+                        <div class="card-header" >
+
+                            <div style="height: 40px; width: 100%; font-size: 14px; text-align: center;">
+                                <b>@item.Product.ProductName </b>
+                            </div>
+                            <div style="height: 20px; width: 100%; font-size: 14px; text-align: center;">
+                                (осталось: <b>@db.ProductsInStock.Where(instock => instock.ProductID == item.Product.Id).Sum(p => p.ProductCount)</b> шт)
+                            </div>
+
+                        </div>
+
+                        <div class="card-body" @onclick="(evt => { item.Product.IncImageIndex(); StateHasChanged(); })">
+                            <img src="/api/checkout/ProductImage?image_id=@(item.Product.ProductImages.ToList()[item.Product.ImageIndex].Id)" style="width: 200px; height: 200px;" />
+                            <div style="display: none;" id="ProductIndicatorsJson_@item.Product.Id">@item.Product.ProductIndicatorsJson</div>
+                        </div>
+                        <div class="card-footer" style="background-color: lightgray;">
+                            Кол-во: @item.ProductCount Цена: @item.Product.ProductCost $
+                        </div>
+                                         
+                    </div>
+                }
+            </li>
+        </ul>
+    </div>
+</div>
+
+@code 
+{
+    Order OrderRef;
+    protected override void OnInitialized()
+    {
+        var customer = db.Customers.FirstOrDefault(customer => customer.UserId == signin.Verify().Id);
+        var orderId = customer.CurrentOrderId;
+        if (orderId is not null)
+        {
+            this.OrderRef = db.Orders.Include(o => o.OrderItems).First(o => o.Id == orderId);
+        }
+        else
+        {
+            this.OrderRef = new Order() { CustomerID = customer.Id };
+            db.Orders.Add(this.OrderRef);
+            db.SaveChanges();
+            customer.CurrentOrderId = this.OrderRef.Id;
+            db.SaveChanges();
+        }
+    }
+}

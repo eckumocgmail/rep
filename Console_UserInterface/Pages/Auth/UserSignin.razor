@@ -1,0 +1,70 @@
+﻿@page "/signin"
+@page "/user/signin"
+@using MarketerWeb.Authorization;
+@inject global::SignupUser signup
+@inject global::SigninUser signin
+@inject NavigationManager nav
+@inject AuthStateProvider provider
+<div align="center">
+    <h3>Авторизация пользователя</h3>
+    <form @onsubmit="@OnFormSubmitted" class="card" style="width: 600px; padding: 20px" align="left">
+        @if (String.IsNullOrWhiteSpace(Message) == false)
+        {
+            <div class="alert alert-danger">@Message</div>
+        }
+        <div class="form-group">
+            <label for="exampleInputEmail1">Электронная почта</label>
+            <input type="email" @oninput="(evt => {username = evt?.Value?.ToString(); IsValid = Validate(); StateHasChanged();})" value="@username" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">            
+        </div>
+        <div class="form-group">
+            <label for="exampleInputPassword1">Пароль</label>
+            <input type="password" @oninput="(evt => {password = evt?.Value?.ToString(); IsValid = Validate(); StateHasChanged();})" value="@password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+        </div>
+        <button type="submit" class="btn btn-primary @(IsValid? "": "disabled")">Выполнить</button>       
+    </form>
+</div>
+@code 
+{
+    public string username = "customer@gmail.com";
+    public string password = "customer@gmail.com";
+    public string Message = "";
+    public bool IsValid = true;
+    public async Task OnFormSubmitted()
+    {
+        try
+        {
+            if (Validate())
+            {
+                IsValid = true;
+                var signinResult = signin.Signin(username, password);
+                var result = signin.Verify();
+                bool isSignin = signin.IsSignin();
+                if (signinResult.Succeeded)
+                {
+                    await provider.LoginAsync(username,password);
+                    AuthenticationState state = await provider.GetAuthenticationStateAsync();
+                    nav.NavigateTo("/public/search-products");
+                }
+                else
+                {
+                    this.Message = signinResult.Exception;
+                    nav.NavigateTo("/user/signup");
+                }
+            }
+            else
+            {
+                IsValid = false;
+            }
+        }
+        catch(Exception ex)
+        {
+            this.Message = ex.Message;
+        }       
+        StateHasChanged(); 
+    }
+
+    public bool Validate()
+    {
+        return String.IsNullOrWhiteSpace(username) == false && String.IsNullOrWhiteSpace(password) == false;
+    }
+}

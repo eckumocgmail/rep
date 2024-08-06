@@ -1,0 +1,84 @@
+﻿@using System.Collections.Concurrent;
+@inherits LayoutComponentBase
+@inject SigninUser signin
+@inject IHttpContextAccessor http
+@inject DbContextUser db
+@code
+{
+    [Parameter]
+    public Dictionary<string, string> navigation { get; set; } = new Dictionary<string, string>()
+    {
+        { "/user/signin", "Авторизация" },
+        { "/user/signup", "Регистрация" },
+        { "/user/profile", "Профиль" },
+    };
+ 
+    List<string> Messages { get; set; } = new();
+    public async Task ShowNotification(string notification)
+    {
+        Messages.Add(notification);
+        //var result = await jsinvoke.Eval<int>($"showNotification('{notification}')");
+    }
+    protected async Task StartCheckout()
+    {
+        while (true)
+        {
+            if (signin.IsSignin())
+            {
+                ConcurrentQueue<string> notifications = signin.GetFromSession<ConcurrentQueue<string>>("InputNotificationsQueue");
+                foreach (var notfication in notifications.ToArray())
+                {
+                    ShowNotification(notfication);
+                }
+                notifications.Clear();
+            }
+            await Task.Delay(1000);
+        }
+    }
+
+
+    protected override async Task OnAfterRenderAsync(bool first)
+    {
+        await Task.CompletedTask;
+        if (first)
+        {
+            StartCheckout();
+        }
+    }
+
+    bool Opened { get; set; } = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        Task.Run(() =>
+        {
+            while (true)
+            {
+                var messages = signin.GetNotifications();
+                foreach (var message in messages)
+                {
+                    ShowNotification(message);
+                }
+                Thread.Sleep(300);
+            }
+        });
+    }
+}
+
+
+<div class="page">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <main>
+        <div class="top-row px-4">
+            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+        </div>
+
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>

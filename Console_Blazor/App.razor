@@ -1,7 +1,8 @@
-﻿<CascadingAuthenticationState>
+﻿@namespace Console_Blazor
+<CascadingAuthenticationState>
     <Router AppAssembly="@typeof(App).Assembly">
         <Found Context="routeData">
-            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(Console_Blazor.Shared.MainLayout)">
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
                 <NotAuthorized>
                     <PageTitle>Нет доступа</PageTitle>
                     @inject NavigationManager nav
@@ -25,7 +26,7 @@
         </Found>
         <NotFound>
             <PageTitle>Not found</PageTitle>
-            <LayoutView Layout="@typeof(Console_Blazor.Shared.MainLayout)">
+            <LayoutView Layout="@typeof(MainLayout)">
                 <p role="alert alert-info">Страница не найдена</p>
             </LayoutView>
         </NotFound>

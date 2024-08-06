@@ -1,0 +1,99 @@
+﻿
+@code
+{
+    [Parameter]
+    public Product Item { get; set; }
+    public bool IsReady = false;
+    protected override Task OnInitializedAsync()
+    {
+        return base.OnInitializedAsync();
+        IsReady = true;
+    }
+    public int GetHoldersCount()
+    {
+        using(var ddb = new DeliveryDbContext())
+        {
+            return ddb.ProductsInStock.Where(instock => instock.ProductID == Item.Id).Sum(p => p.ProductCount);
+        }
+    }
+
+
+    [Parameter]
+    public EventCallback<object> Onaction { get; set; }
+}
+@inject pickpoint_delivery_service.DeliveryDbContext db
+@inject NavigationManager nav
+
+
+ 
+<div class="card" style="width: 280px; height: 500px; margin: 10px;">
+    <div class="card-header">
+
+        <div style="height: 40px; width: 100%; font-size: 14px; text-align: center;" @onclick='(evt =>{ nav.NavigateTo("/public/product-info/"+Item.Id); StateHasChanged(); })'>
+            <b>
+                <span class="oi oi-info" aria-hidden="true"></span>
+                @Item.ProductName
+            </b>
+            (<b>@GetHoldersCount( )</b> шт)
+
+        </div>
+
+        <div style="font-size: 14px;"> в наличии @(
+        db.ProductsInStock.Where(instock => instock.ProductID == Item.
+        
+        Id).Count()
+        ) мест, Продано @Item.NumberOfSales штук </div>
+        <div style="height: 20px;"><StarsView Value="@((int)Math.Floor(Item.ProductRate))" Editable="false"></StarsView></div>
+
+    </div>
+
+    <div class="card-body" @onclick="(evt => { Item.IncImageIndex(); StateHasChanged(); })">
+        @if (Item.ProductImages is not null && Item.ProductImages.Count()>0)
+        {
+            <img src="/api/checkout/ProductImage?image_id=@(Item.ProductImages.ToList()[Item.ImageIndex].Id)" style="width: 250px; height: 250px;" />
+        }
+
+        <div style="display: none;" id="ProductIndicatorsJson_@Item.Id">@Item.ProductIndicatorsJson</div>
+    </div>
+    <div class="card-footer" style="background-color: lightgray;">
+        <div style="margin: 5px;"><button style="width: 100%; align-self: flex-end; margin: auto;" @onclick='(evt =>{ nav.NavigateTo("/public/product-info/"+Item.Id); StateHasChanged(); })' class="btn btn-primary btn-sm"> оставить комменитарий </button></div>
+        <div style="margin: 5px;"><button style="width: 100%; align-self: flex-end; margin: auto;" @onclick="(evt =>{ Onaction.InvokeAsync(this); StateHasChanged(); })" class="btn btn-primary btn-sm"> купить за @Item.ProductCost $</button></div>
+    </div>
+
+</div>
+ @*
+
+<div class="card" style="width: 280px; height: 500px; margin: 10px;">
+    <div class="card-header">
+
+        <div style="height: 40px; width: 100%; font-size: 14px; text-align: center;" @onclick='(evt =>{ nav.NavigateTo("/public/product-info/"+Item.Id); StateHasChanged(); })'>
+            <b>
+                <span class="oi oi-info" aria-hidden="true"></span>
+                @Item.ProductName
+            </b>
+            (<b>@db.ProductsInStock.Where(instock => instock.ProductID == Item.Id).Sum(p => p.ProductCount)</b> шт)
+
+        </div>
+
+        <div style="font-size: 14px;"> в наличии @(
+        db.ProductsInStock.Where(instock => instock.ProductID == Item.Id).Count()
+        ) мест, Продано @Item.NumberOfSales штук </div>
+        <div style="height: 20px;"><StarsView Value="@((int)Math.Floor(Item.ProductRate))" Editable="false"></StarsView></div>
+
+    </div>
+
+    <div class="card-body" @onclick="(evt => { Item.IncImageIndex(); StateHasChanged(); })">
+        @if(Item.ProductImages is not null)
+        {
+            <img src="/api/checkout/ProductImage?image_id=@(Item.ProductImages.ToList()[Item.ImageIndex].Id)" style="width: 250px; height: 250px;" />
+        }
+
+        <div style="display: none;" id="ProductIndicatorsJson_@Item.Id">@Item.ProductIndicatorsJson</div>
+    </div>
+    <div class="card-footer" style="background-color: lightgray;">
+        <div style="margin: 5px;"><button style="width: 100%; align-self: flex-end; margin: auto;" @onclick='(evt =>{ nav.NavigateTo("/public/product-info/"+Item.Id); StateHasChanged(); })' class="btn btn-primary btn-sm"> оставить комменитарий </button></div>
+        <div style="margin: 5px;"><button style="width: 100%; align-self: flex-end; margin: auto;" @onclick="(evt =>{ AddToOrder(Item.Id); StateHasChanged(); })" class="btn btn-primary btn-sm"> купить за @Item.ProductCost $</button></div>
+    </div>
+
+</div>
+ *@

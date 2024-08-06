@@ -4,9 +4,9 @@ using System;
 
 namespace Console_DataConnector
 {
-    class Program
+    public class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             var api = new SqlServerWebApi();
             api.Info($"GetTableNames()");

@@ -7,11 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Remove="Shared\InputModal\InputModal.razor" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="Shared\InputModal.razor" />
+    <Compile Remove="Pages\**" />
+    <Content Remove="Pages\**" />
+    <EmbeddedResource Remove="Pages\**" />
+    <None Remove="Pages\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,10 +31,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Console_DataConnector\Console_DataConnector.csproj" />
     <ProjectReference Include="..\Console_InputApplication\Console_InputApplication.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Shared\InputModal\" />
   </ItemGroup>
 
 </Project>

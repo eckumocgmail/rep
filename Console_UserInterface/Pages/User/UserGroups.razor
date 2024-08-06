@@ -1,0 +1,74 @@
+﻿@page "/user/groups"
+@attribute [Authorize(Roles = "webuser")]
+@inject NavigationManager nav
+@inject DbContextUser dbu
+@inject SigninUser signin
+@inject GroupingUser grouping
+
+<div class="card">
+    <div class="card-body">
+        <span>вступить</span>
+        <span @onclick="(evt => { OnCreateUserGroupClicked(); })">создать</span>
+        <div>
+            <div class="input-group">
+                <label>Название группы</label>
+                <input type="text" value="@groupName" class="form-control" @oninput="(evt => { groupName = evt.Value.ToString(); StateHasChanged(); } )" />
+            </div>
+            <span class="btn btn-sm btn-primary" @onclick="(evt => { OnCreateUserGroupClicked(); StateHasChanged(); } )">Создать</span>
+        </div>
+        <ul class="list-group">
+            @foreach (var group in Groups)
+            {
+                <li class="list-group-item" @onclick="(evt => OnGroupClicked(group))"> @group </li>
+            }
+        </ul>
+    </div>
+</div>
+
+<SearchListCard TItem="global::UserGroup" Items="@(dbu.UserGroups_.ToList())" >
+    <CardHeader>
+
+    </CardHeader>
+    <Template Context="item"   >
+        
+    </Template>
+    <CardFooter>
+        
+    </CardFooter>
+</SearchListCard>
+
+@code 
+{
+    string groupName;
+    public List<string> Groups { get; set; }
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        this.Groups = grouping.GetGroups().ToList();
+    }
+
+
+    /// <summary>
+    /// По нажатию на карточку группы выполняется переход на страницу с группами (где отображается только одна группаЮ та на которыю нажали)    >
+    /// <param name="group"></param>
+    public void OnGroupClicked(string group)
+    {
+        nav.NavigateTo($"/user/groups?name={group}");
+    }
+
+
+    /// <summary>
+    /// Нажатие на кнопку "создать""
+    /// </summary>
+    public void OnCreateUserGroupClicked()
+    {
+        var userId = signin.Verify().Id;
+        grouping.AddToGroup(signin.Verify(), groupName);
+        groupName = "";
+        var groupIds = dbu.UserGroups_UserGroup.Where(p => p.UserID == userId).Select(p => p.GroupID).ToList();
+        signin.Verify().Groups = dbu.UserGroups_.Where(g => groupIds.Contains(g.Id)).ToList();
+        OnInitialized();
+        StateHasChanged();
+
+    }
+}

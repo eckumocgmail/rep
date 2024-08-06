@@ -1,0 +1,88 @@
+﻿@code
+{
+    [Parameter]
+    public int Value { get; set; } = 0;
+
+    [Parameter]
+    public int Selected { get; set; } = 0;
+
+    [Parameter]
+    public bool Editable { get; set; } = false; 
+}
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    .stars {
+        text-align: center;
+    }
+
+    .star {
+        display: inline-block;
+        vertical-align: top;
+        width: 20px;
+        height: 20px;
+        background: linear-gradient(to bottom, rgba(197, 196, 196, 1) 0%, rgba(180, 179, 178, 1) 100%);
+        position: relative;
+    }
+
+        .star:before {
+            content: '';
+            position: absolute;
+            top: 1px;
+            left: 1px;
+            bottom: 1px;
+            right: 1px;
+            background: linear-gradient(to bottom, rgba(221, 220, 219, 1) 0%, rgba(209, 208, 206, 1) 100%);
+            z-index: 1;
+        }
+
+        .star,
+        .star:before {
+            -webkit-clip-path: polygon(50% 0%, 66% 27%, 98% 35%, 76% 57%, 79% 91%, 50% 78%, 21% 91%, 24% 57%, 2% 35%, 32% 27%);
+            clip-path: polygon(50% 0%, 66% 27%, 98% 35%, 76% 57%, 79% 91%, 50% 78%, 21% 91%, 24% 57%, 2% 35%, 32% 27%);
+        }
+
+            .star:hover {
+                background: linear-gradient(to bottom, rgba(224, 194, 75, 1) 0%, rgba(207, 125, 0, 1) 100%);
+            }
+
+                .star:hover:before {
+                    background: linear-gradient(to bottom, rgba(243, 212, 85, 1) 0%, rgba(238, 164, 0, 1) 100%);
+                }
+
+    .active:before {
+        background: linear-gradient(to bottom, rgba(243, 212, 85, 1) 0%, rgba(238, 164, 0, 1) 100%);
+    }
+</style>
+@if(Editable == false)
+{
+    <div class="stars" id="stars_block">
+        <div class="star @(Value >= 1? "active": "")"></div>
+        <div class="star @(Value >= 2? "active": "")"></div>
+        <div class="star @(Value >= 3? "active": "")"></div>
+        <div class="star @(Value >= 4? "active": "")"></div>
+        <div class="star @(Value >= 5? "active": "")"></div>
+        <div class="star @(Value >= 6? "active": "")"></div>
+        <div class="star @(Value >= 7? "active": "")"></div>
+        <div class="star @(Value >= 8? "active": "")"></div>
+        <div class="star @(Value >= 9? "active": "")"></div>
+        <div class="star @(Value >= 10? "active": "")"></div>
+    </div>
+}
+else
+{
+    <div class="stars" id="stars_block">
+        <div class="star @(Value >= 1? "active": "")" @onclick="(evt => { Selected = 1; StateHasChanged(); })" @onmouseover="(evt => { Value = 1; StateHasChanged(); } )" @onmouseout="(evt => { Value = Selected; StateHasChanged(); } )"></div>
+        <div class="star @(Value >= 2? "active": "")" @onclick="(evt => { Selected = 2; StateHasChanged(); })" @onmouseover="(evt => { Value = 2; StateHasChanged(); } )" @onmouseout="(evt => { Value = Selected; StateHasChanged(); } )"></div>
+        <div class="star @(Value >= 3? "active": "")" @onclick="(evt => { Selected = 3; StateHasChanged(); })" @onmouseover="(evt => { Value = 3; StateHasChanged(); } )" @onmouseout="(evt => { Value = Selected; StateHasChanged(); } )"></div>
+        <div class="star @(Value >= 4? "active": "")" @onclick="(evt => { Selected = 4; StateHasChanged(); })" @onmouseover="(evt => { Value = 4; StateHasChanged(); } )" @onmouseout="(evt => { Value = Selected; StateHasChanged(); } )"></div>
+        <div class="star @(Value >= 5? "active": "")" @onclick="(evt => { Selected = 5; StateHasChanged(); })" @onmouseover="(evt => { Value = 5; StateHasChanged(); } )" @onmouseout="(evt => { Value = Selected; StateHasChanged(); } )"></div>
+        <div class="star @(Value >= 6? "active": "")" @onclick="(evt => { Selected = 6; StateHasChanged(); })" @onmouseover="(evt => { Value = 6; StateHasChanged(); } )" @onmouseout="(evt => { Value = Selected; StateHasChanged(); } )"></div>
+        <div class="star @(Value >= 7? "active": "")" @onclick="(evt => { Selected = 7; StateHasChanged(); })" @onmouseover="(evt => { Value = 7; StateHasChanged(); } )" @onmouseout="(evt => { Value = Selected; StateHasChanged(); } )"></div>
+        <div class="star @(Value >= 8? "active": "")" @onclick="(evt => { Selected = 8; StateHasChanged(); })" @onmouseover="(evt => { Value = 8; StateHasChanged(); } )" @onmouseout="(evt => { Value = Selected; StateHasChanged(); } )"></div>
+        <div class="star @(Value >= 9? "active": "")" @onclick="(evt => { Selected = 9; StateHasChanged(); })" @onmouseover="(evt => { Value = 9; StateHasChanged(); } )" @onmouseout="(evt => { Value = Selected; StateHasChanged(); } )"></div>
+        <div class="star @(Value >= 10? "active": "")" @onclick="(evt => { Selected = 10; StateHasChanged(); })" @onmouseover="(evt => { Value = 10; StateHasChanged(); } )" @onmouseout="(evt => { Value = Selected; StateHasChanged(); } )"></div>
+    </div>
+}
