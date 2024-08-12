@@ -12,7 +12,7 @@ public class DataTypes
     };
 
     
-    public static string InputTypesSelectControlAttribute
+    public static string InputTypesInputSelectAttribute
     {
         get
         {

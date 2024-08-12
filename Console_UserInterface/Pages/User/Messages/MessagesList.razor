@@ -1,0 +1,37 @@
+﻿@using Microsoft.EntityFrameworkCore;
+@inject DbContextUser dbu
+<table>
+    @if (Messages is null || Messages.Count() == 0)
+    {
+        <tr><td>Нет сообщений</td></tr>
+    }
+    else
+    {
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Отправитель</th>
+                <th>Тема/Сообщение</th>
+                <th>Получено</th>                
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(UserMessage Message in Messages)
+            {
+                <tr>
+                    <th></th>
+                    <th>@(dbu.UserContexts_.Include(u=>u.Person).First(u => u.Id==Message.FromUserID).Person.GetFullName())</th>
+                    <th>@Message.Subject / @Message.Text.Substring(0,48)</th>
+                    <th>@Message.Created.ToString("d")</th>
+                </tr>
+            }
+        </tbody>
+    }
+</table>
+
+
+@code 
+{
+    [Parameter]
+    public IEnumerable<UserMessage> Messages { get; set; }
+}

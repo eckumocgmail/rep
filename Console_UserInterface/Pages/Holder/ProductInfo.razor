@@ -1,15 +1,37 @@
 ﻿@page "/holder/holder/{HolderId:int}/product/{ProductId:int}"
+@attribute [Label("Точка выдачи. Карточка товара.")]
+
+@inject DeliveryDbContext db
 @inject IHolderService holderService
 @code 
 {
+    [Parameter]
     public int HolderId { get; set; }
+    [Parameter]
     public int ProductId { get; set; }
+    public string Message { get; set; }
 
     public ProductsInStock ProductInStock { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        this.ProductInStock = holderService.GetProductInStockInfo(HolderId, ProductId);
+        try
+        {
+            this.ProductInStock = holderService.GetProductInStockInfo(HolderId, ProductId);
+        }       
+        catch(Exception ex)
+        {
+            Message = ex.Message;
+        }
     }
+}
+@if(String.IsNullOrWhiteSpace(Message))
+{
+    <ProductCard Item="@(db.Products.Find(ProductId))"> 
+    </ProductCard>
+}
+else
+{
+    <div class="alert alert-danger">@Message</div>
 }

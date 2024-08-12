@@ -32,8 +32,8 @@
         {
             <li class="list-group-item bg-secondary text-white" style="margin: 20px;">
                 <div style="font-size: 16px"    >
-                    <span class="text-warning">Заказ #@(order.Id)</span>
-                    <b class="text text-info" style=" font-size:14px;">@(db.Orders.Find(order.HolderID)).HolderLocation</b>
+                    <span class="text-warning">@order.OrderStatus @(order.GetStatusText()) Заказ #@(order.Id)</span>
+                    <b class="text text-info" style=" font-size:14px;">@(order.HolderID is not null? db.Holders.Find(order.HolderID).HolderLocation: "")</b>
                     <div style="float: right; font-size:13px;">изменён: #@(order.OrderUpdated)</div></div>
                 @if (order.HolderID is not null)
                 {
@@ -72,18 +72,22 @@
 
                 <div class="d-flex flex-row flex-nowrap">
                     <div style="font-size: 12px; width: 100%;">Получатель: @(db.Customers.First(c => c.Id == order.CustomerID).PhoneNumber)</div>
-                    <button class="btn btn-info" style="font-size: 13px; height: 25px; padding: 2px;">
+                    <button class="btn btn-info btn-sm" style="width: 320px; font-size: 13px; height: 25px; padding: 2px;">
                         @switch(order.OrderStatus)
                         {
                             case 1: 
-                                <div>проверить наличие на складе</div>
+                                <div @onclick="(evt => { order.OnOrderStored(); db.SaveChanges(); StateHasChanged(); } )">проверить наличие на складе</div>
                                 break;
                             case 2:
-                                <div>передать на точку</div>
+                                <div @onclick="(evt => { order.OnOrderIsDelivering(); db.SaveChanges(); StateHasChanged(); } )">передать курьеру</div>
                                 break;
                             case 3:
-                                <div>Передать в транспортную службу</div>
+                                <div @onclick="(evt => { order.OnOrderDelivered(); db.SaveChanges(); StateHasChanged(); } )">доставлен на точку выдачи</div>
                                 break;
+                            case 4:
+                                <div @onclick="(evt => { orders.CompleteOrder(order.Id); StateHasChanged(); } )">выдан покупателю</div>
+                                break;
+                        }
                         }
                     </button>
                     

@@ -1,24 +1,23 @@
-﻿
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 
 [Icon("home")]
 [Label("Переменная содержит одно из значений заданных через атрибут")]
 [Description("Конструктор форм использует этот аттрибут для формирования выпадающего списка с выбором значения." +
     "Приложение использует его в процессе выполнения валидации модели для проверки значений переменной. ")]
-public class InputDictionaryAttribute : BaseInputAttribute
+public class InputDictionaryAttribute : ControlAttribute
 {
     public object Options { get; private set; }
 
-    public InputDictionaryAttribute() : base(InputTypes.Custom)
+    public InputDictionaryAttribute() : base()
     {
     }
     public override bool IsValidValue(object value)
     {
-        throw new System.NotImplementedException();
+        return true;
     }
 
-    public InputDictionaryAttribute(string exp) : base(InputTypes.Custom)
+    public InputDictionaryAttribute(string exp) : base()
     {
     }
      
@@ -32,5 +31,13 @@ public class InputDictionaryAttribute : BaseInputAttribute
         return $"{nameof(InputSelectAttribute)} утверждает что свойству {property} может быть задано только одно из следующих значений {this.Options.ToJson()}.";
     }
 
+    public override ViewItem CreateControl(InputFormField field)
+    {
+        throw new System.NotImplementedException();
+    }
 
+    public override ViewItem CreateControl(FormField field)
+    {
+        throw new System.NotImplementedException();
+    }
 }

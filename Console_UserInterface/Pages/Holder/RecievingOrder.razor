@@ -1,1 +1,34 @@
-﻿
+﻿@page "/holder/{HolderId:int}/orders/{OrderId:int}/recieving"
+@attribute [Label("Точка выдачи. Приём товара.")]
+
+@using Microsoft.EntityFrameworkCore;
+@inject DeliveryDbContext db
+@inject IHolderService holder
+@code
+{
+    [Parameter]
+    public int HolderId { get; set; }
+    [Parameter]
+    public int OrderId { get; set; }
+    public string Message { get; set; }
+    public Order Order { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        try
+        {
+            this.Order = db.Orders.Include(o => o.OrderItems).FirstOrDefault(o => o.Id == OrderId);
+        }
+        catch(Exception ex)
+        {
+            Message = ex.Message;
+        }
+    }
+
+}
+<div class="card">
+    <div class="card-header">Заказы</div>
+    <div class="card-body">
+        <Console_UserInterface.Pages.Transport.OrderCard></Console_UserInterface.Pages.Transport.OrderCard>
+    </div>
+</div>

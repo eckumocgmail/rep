@@ -1,0 +1,47 @@
+﻿<div style="width: 800px; height: 600px;" class="content-box">
+    Wizzard
+    @CurrentView
+
+    <ContentBox Model="@CurrentView"></ContentBox>
+</div>
+@code {
+
+    [Newtonsoft.Json.JsonIgnore()]
+    [Parameter]
+    public List<ViewItem> WizzardItems { get; set; } = new List<ViewItem>();
+    public ViewItem CurrentView { get; set; }
+    public int Step { get; set; } = 0;
+
+    public Wizzard() : base()
+    {
+
+        //WizzardItems.Add(CurrentView= new global::Form(new ApplicationDb.Entities.UserPerson()));
+    }
+
+    public void SetNextDialog(ViewItem next)
+    {
+        WizzardItems.Add(next);
+    }
+
+    public void Start()
+    {
+        if (WizzardItems.Count() == 0)
+        {
+            throw new Exception("Элементы мастера не заданы");
+        }
+        Step = 1;
+        CurrentView  = WizzardItems.ToArray()[Step];
+    }
+
+
+    public void Next()
+    {
+        Step++;
+        CurrentView = WizzardItems.ToArray()[Step];
+    }
+
+    public void Complete()
+    {
+        Step++;
+    }
+}

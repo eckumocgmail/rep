@@ -1,12 +1,11 @@
 ﻿@page "/signin"
 @page "/user/signin"
-@using MarketerWeb.Authorization;
-@using MarketerWeb.Authorization;
 @inject global::SignupUser signup
 @inject global::SigninUser signin
 @inject IHttpContextAccessor accessor
 @inject NavigationManager nav
 @inject UserAuthStateProvider provider
+<PageTitle>ЕвроАвто/Авторизация</PageTitle>
 <div align="center">
     <h3>Авторизация пользователя</h3>
     <form @onsubmit="@OnFormSubmitted" class="card" style="width: 600px; padding: 20px" align="left">

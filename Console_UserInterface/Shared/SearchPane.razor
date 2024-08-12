@@ -1,0 +1,43 @@
+﻿@code
+{
+    [Parameter]
+    public string SearchQuery { get; set; }
+    [Parameter]
+    public List<string> SearchOptions { get; set; }
+    [Parameter]
+    public string SortRule { get; set; }
+    [Parameter]
+    public bool ShowLeft { get; set; }
+    [Parameter]
+    public EventCallback<SearchPane> OnSearchSubmit { get; set; }
+
+    public async Task OnSearch()
+    {
+        await OnSearchSubmit.InvokeAsync(this);
+    }
+}
+<form class="card p-2" style="width: 100%;" method="post" @onsubmit="(evt => { OnSearch(); StateHasChanged(); })" @onsubmit:preventDefault>
+    <div class="input-group">
+        <button class="btn btn-primary" @onclick="(evt => { ShowLeft=!ShowLeft; StateHasChanged(); } )">
+            <span class="oi oi-menu" aria-hidden="true"></span>
+        </button>
+        <input style="width: 50%;" list="options" class="form-control" placeholder="Поиск по каталогу" id="SearchQuery" name="SearchQuery" @oninput="(evt=>{ SearchQuery = evt.Value.ToString(); StateHasChanged(); })" value="@SearchQuery">
+
+        <button type="submit" class="btn btn-primary" @onclick="(evt => { OnSearch(); StateHasChanged(); })">Поиск</button>
+        <div style="width: 80px;">&nbsp;</div>
+        <button class="btn btn-sm" style="text-align:right;">сортировка</button>
+        <select class="form-control" style="width: 120px;" @onchange="(evt => { SortRule=evt.Value.ToString(); OnSearch(); StateHasChanged(); })">
+            <option value="price">цена по возрастанию</option>
+            <option value="price desc">цена по убыванию</option>
+            <option value="raiting">рейтинг по возрастанию</option>
+            <option value="raiting desc">рейтинг по убыванию</option>
+        </select>
+    </div>
+    <datalist id="options">
+        @foreach (var option in SearchOptions)
+        {
+            <option>@option</option>
+        }
+    </datalist>
+</form>
+

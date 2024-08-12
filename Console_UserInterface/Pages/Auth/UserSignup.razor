@@ -2,6 +2,8 @@
 @using static AuthorizationDbContext;
 @inject DbContextUser db
 @inject NavigationManager nav
+<PageTitle>ЕвроАвто/Регистрация</PageTitle>
+
 @if(account is not null && person is not null)
 {
     
@@ -23,7 +25,6 @@
     <div class="form-group">
         <label >Электронная почта</label>
         <input type="email" value="@account.Email" @oninput="(evt => {account.Email = evt.Value.ToString(); StateHasChanged();})" class="form-control">
-        <small class="form-text text-muted">We'll never share your email with anyone else.</small>
     </div>
     <div class="form-group">
         <label>Пароль</label>
@@ -45,7 +46,7 @@
         <input type="text" value="@person.Tel" @oninput="(evt => {person.Tel = evt.Value.ToString(); StateHasChanged();})" class="form-control">
     </div>
     <div align="center">
-        <a asp-page="/User/Signin">
+        <a @onclick='(evt => { nav.NavigateTo("/User/Signin"); })'>
             Перейти к странице авторизации
         </a>
     </div>

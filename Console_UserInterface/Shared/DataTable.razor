@@ -1,0 +1,65 @@
+﻿@typeparam DataType
+@using Console_InputApplication
+@code 
+{
+    [Parameter]
+    public bool DataCheckable { get; set; }
+
+    [Parameter]
+    public IEnumerable<DataType> DataItems { get; set; }
+    public HashSet<DataType> CheckedItems { get; set; } = new();
+
+    [Parameter]
+    public List<string> DisplayColumns { get; set; }  
+    
+    protected override async Task OnInitializedAsync()
+    {
+        this.DisplayColumns = this.DisplayColumns is null ? typeof(DataType).GetInputProperties() : this.DisplayColumns;
+    }
+
+    public List<string> GetColumnsLabels()
+    {
+        return typeof(DataType).GetInputProperties().Select(property => typeof(DataType).GetPropertyLabel(property)).ToList();
+    }
+
+    public List<string> GetColumnsLabels(params string[] properties)
+    {
+        return properties.Select(property => typeof(DataType).GetPropertyLabel(property)).ToList();
+    }
+}
+@if(DataItems is null || DataItems.Count()==0)
+{
+    <div class="alert alert-info">Нет данных</div>
+}
+else
+{
+    <table class="table table-bordered table-borderless">
+        <thead>
+            <tr>
+                @if(DataCheckable)
+                {
+                    <th style="width: 50px;"></th>
+                }
+                @foreach (string DisplayColumn in GetColumnsLabels(DisplayColumns.ToArray()))
+                {
+                    <td>@DisplayColumn</td>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(DataType Item in DataItems)
+            {
+                <tr>
+                    @if (DataCheckable)
+                    {
+                        <td style="width: 50px;"><CheckBox Checked="@CheckedItems.Contains(Item)" OnChange="(evt => { if(CheckedItems.Contains(Item))CheckedItems.Remove(Item); else CheckedItems.Add(Item); StateHasChanged(); })"></CheckBox></td>
+                    }
+                    @foreach(string DisplayColumn in DisplayColumns)
+                    {
+                        <td>@Item.GetValue(DisplayColumn)</td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+}

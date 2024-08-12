@@ -28,7 +28,13 @@
     {
         var p = db.ProductCatalogs.FirstOrDefault(p => p.ParentId == null);
         if (p is null)
+        {
             throw new Exception($"{nameof(ProductCatalog)} данные не заполнены");
+        }
+        else
+        {
+            
+        }
         Root = new()
         {
             Id = p.ID,
@@ -127,31 +133,39 @@
             SearchedProducts = SearchedProducts.Where(product => $"{product.ProductName}".ToLower().IndexOf($"{SearchQuery}".ToLower()) != -1).ToList();
             var MaxProductCost = SearchedProducts.Min(p => p.ProductCost) + ((100 - PriceFilter) * ((SearchedProducts.Max(p => p.ProductCost) - SearchedProducts.Min(p => p.ProductCost)) / 100));
             SearchedProducts = SearchedProducts.Where(p => p.ProductCost>MaxProductCost).ToList();
-            SearchedProducts = SearchedProducts.Where(p => Catalogs.Contains((int)p.ProductCatalogId)).ToList();
-            if(ProductState != "2")
+            SearchedProducts = SearchedProducts.Where(p => p.ProductCatalogId is null? true: Catalogs.Contains((int)p.ProductCatalogId)).ToList();            
+            if (ProductState == "1")
             {
-                SearchedProducts = SearchedProducts.Where(p => p.IsNew == (ProductState == "1" ? true : false)).ToList();
+                SearchedProducts = SearchedProducts.Where(p => p.IsNew == true).ToList();
             }
+            Message = $"Найдено {SearchedProducts.Count()} товаров";
             PagesCount = (SearchedProducts.Count() + SearchedProducts.Count() % PageSize) / PageSize;
+            
             AvailableProducts = SearchedProducts.Skip((PageNumber - 1) * PageSize).Take(PageSize).ToList();
             AvailableProducts.ForEach(product => product.ProductImages = db.ProductImages.Where(i => i.ProductID == product.Id).ToList());
-
-
             switch(sort)
             {
                 case "price":
                     AvailableProducts.Sort((p1, p2) => { return (p1.ProductCost - p2.ProductCost) > 0? 1: -1; });
                     break;
+                case "price desc" :
+                
+                    AvailableProducts.Sort((p1, p2) => { return (p2.ProductCost - p1.ProductCost) > 0 ? 1 : -1; });
+                    break;
                 case "rating":
                     AvailableProducts.Sort((p1, p2) => { return (p1.ProductRate - p2.ProductRate) > 0 ? 1 : -1; });
                     break;
+                case "rating desc":
+                    AvailableProducts.Sort((p1, p2) => { return (p2.ProductRate - p1.ProductRate) > 0 ? 1 : -1; });
+                    break;
                 default: break;
             }
-            
+
         }
         catch(Exception ex)
         {
             Message = "Ошибка при выполнении поиска: "+ex.Message;
+            StateHasChanged();
         }
     }
 
@@ -225,7 +239,7 @@
                                                 @if (item.Product is not null)
                                                 {
                                                     <tr>
-                                            <td><b>@item.Product.ProductName @item.Product.ProductCatalogId </b></td>
+                                                        <td><b>@item.Product.ProductName @item.Product.ProductCatalogId </b></td>
                                                         <td><small class="text-muted"> @item.Product.ProductCost $ </small></td>
                                                         <td><input type="number" class="form-control" value="@item.ProductCount" @onchange="(evt => { item.ProductCount = (int.Parse(evt.Value.ToString())); StateHasChanged(); })" style="width: 100px; height: 20px; font-size: 12px;" /></td>
                                                     </tr>
@@ -259,8 +273,10 @@
                                 <div style="width: 80px;">&nbsp;</div>
                                 <button class="btn btn-sm" style="text-align:right;">сортировка</button>
                                 <select class="form-control" style="width: 120px;" @onchange="(evt => { sort=evt.Value.ToString(); OnSearch(); StateHasChanged(); })">
-                                    <option value="price">по цене</option>
-                                    <option value="raiting">по рейтингу</option>
+                                    <option value="price">цена по возрастанию</option>
+                                    <option value="price desc">цена по убыванию</option>
+                                    <option value="raiting">рейтинг по возрастанию</option>
+                                    <option value="raiting desc">рейтинг по убыванию</option>
                                 </select>
                             </div>
                             <datalist id="options">
@@ -290,9 +306,11 @@
                                     @if (ShowTree)
                                     {
                                         <div class="card" style="width: 100%; height: 480px; overflow-y: auto;">
-                                            <Console_Blazor.BootstrapPanels.CardContainer>
+                                            <CardContainer>
+                                                <CardBody>
                                                 <TreeNode Name="@Root.Name" Id="@Root.Id" Checked="@Root.Checked" OnChanged="(evt => { Root.Checked = evt; OnSearch(); StateHasChanged();  })" Children="@Root.Children"></TreeNode>
-                                            </Console_Blazor.BootstrapPanels.CardContainer>                                            
+                                                </CardBody>
+                                            </CardContainer>                                            
                                         </div>
                                     }
 
@@ -320,7 +338,7 @@
                                 </div>
                             }
                             <div class="col-@(ShowLeftSlide?"8":"12")">
-                                <div>Найдено @(AvailableProducts.Count()) товаров</div>
+                                <div>@Message</div>                                
                                 <div class="d-flex flex-row flex-wrap">
                                     @foreach (Product product in AvailableProducts)
                                     {

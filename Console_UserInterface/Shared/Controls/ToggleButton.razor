@@ -1,0 +1,17 @@
+﻿<button class="btn btn-primary"> @Label </button>
+
+@code {
+
+    [Parameter]
+    public string Label { get; set; }
+
+    [Parameter]
+    public bool IsActive { get; set; }
+
+    [Parameter]
+    public bool Enabled { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> OnToggle { get; set; }
+
+}

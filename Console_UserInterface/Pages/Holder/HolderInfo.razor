@@ -1,0 +1,30 @@
+﻿@page "/holder/{HolderId:int}/info"
+@attribute [Label("Точка выдачи")]
+@inject DeliveryDbContext db
+@inject NavigationManager nav
+@code 
+{
+    [Parameter]
+    public int HolderId { get; set; }
+    public Holder Holder { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        this.Holder = db.Holders.Find(HolderId);
+    }
+}
+@if (Holder is not null)
+{    
+    <div class="card">
+        <div class="card-header">
+            @Holder.HolderLocation
+
+        </div>
+        <div class="card-body">
+            <HolderActions HolderId="@HolderId"></HolderActions>
+            <span class="btn btn-sm btn-primary" style="margin: 10px;" @onclick='(evt => { nav.NavigateTo($"/holder/{HolderId}/products"); })'>товары</span>
+            <span class="btn btn-sm btn-primary" style="margin: 10px;" @onclick='(evt => { nav.NavigateTo($"/holder/{HolderId}/orders/recieving"); })'>поступление</span>
+        </div>
+    </div>
+}

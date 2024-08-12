@@ -1,7 +1,7 @@
 ﻿@page "/public/product-info/{Id:int}"
 @attribute [Authorize(Roles = "webuser")]
-@using Blazor_UserInterface.Shared;
 @using Console_BlazorApp.AppUnits.DeliveryModel;
+@using Console_UserInterface.Shared.Deps;
 @using Microsoft.EntityFrameworkCore;
 @using Newtonsoft.Json;
 @using Newtonsoft.Json.Linq;
@@ -10,7 +10,6 @@
 @inject DeliveryDbContext db
 @code 
 {
-
     [Parameter]
     public int Id { get; set; }
     public Product product { get; set; }

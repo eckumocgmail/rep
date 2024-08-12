@@ -1,0 +1,52 @@
+﻿@inject NavigationManager nav
+@inject SigninUser signin
+@inject UserAuthStateProvider auth
+@code
+{
+    [Parameter]
+    public Dictionary<string,string> Model { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+       
+    }
+}
+<div class="page">
+    <div class="sidebar">
+ 
+
+        <div class="navbar-dark" @onclick="ToggleNavMenu">
+            <nav class="flex-column">
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                        <span class="oi oi-home" aria-hidden="true"></span> Главная
+                    </NavLink>
+                </div>
+
+                @foreach (var kv in Model)
+                {
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="@kv.Value">
+                            <span class="oi oi-browser" aria-hidden="true"></span> @kv.Key
+                        </NavLink>
+                    </div>
+                }
+
+            </nav>
+        </div>
+    </div>
+ 
+</div>
+
+
+@code {
+    private bool collapseNavMenu = true;
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+}

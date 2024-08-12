@@ -1,0 +1,98 @@
+﻿@page "/test"
+
+@inject SigninUser signin
+@inject UserAuthStateProvider auth
+@inject IHttpContextAccessor accessor
+@code
+{
+
+    public async Task OnLoginClicked()
+    {
+        await auth.LoginAsync();
+        StateHasChanged();
+    }
+
+
+    public AuthenticationState AuthState { get; set; }
+    public UserContext User { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        if (signin.IsSignin())
+        {
+            this.User = signin.Verify();
+        }
+    }
+    public async Task OnLoginButtonClicked()
+    {
+        await auth.LoginAsync("customer@gmail.com", "customer@gmail.com");
+        this.AuthState = await auth.GetAuthenticationStateAsync();
+        await OnInitializedAsync();
+        StateHasChanged();
+    }
+}
+<button @onclick='(evt => { signin.PushNotifcation("This is a test"); StateHasChanged(); } )'>publish</button>
+<AuthorizeView Roles="transport">
+    transport 1,23,
+</AuthorizeView>
+<AuthorizeView Roles="admin">
+    Administration 1,23,
+</AuthorizeView>
+<PageTitle>Index</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+<button class="btn btn-sm btn-primary" @onclick="@OnLoginClicked">login</button>
+<SurveyPrompt Title="How is Blazor working for you?" />
+
+<PageTitle>Главная страница</PageTitle>
+<button @onclick="@OnLoginButtonClicked">login</button>
+@if (User is not null)
+{
+    <div class="card">
+        <div class="card-header">@User.Person.GetFullName()</div>
+        <ul class="list-group">
+            @if (User.Roles is not null)
+            {
+                @foreach (var role in User.Roles)
+                {
+                    <li class="list-group-item">
+                        @role.Code
+                    </li>
+                }
+            }
+            else
+            {
+                <li class="list-group-item">Роли не назначены</li>
+            }
+        </ul>
+        @if (AuthState is not null && AuthState.User is not null && AuthState.User.Claims is not null)
+        {
+            foreach (var claim in AuthState.User.Claims)
+            {
+                <p>@claim.Type : @claim.Value</p>
+            }
+        }
+
+        <AuthorizeView>
+            This is a tranport transport
+
+        </AuthorizeView>
+        <AuthorizeView Roles="customer">
+            This is a tranport customer
+        </AuthorizeView>
+        <AuthorizeView Roles="webuser">
+            This is a tranport webuser
+        </AuthorizeView>
+        <AuthorizeView Roles="holder">
+            This is a tranport holder
+
+        </AuthorizeView>
+
+    </div>
+}
+
+
+
+<SurveyPrompt Title="How is Blazor working for you?" />

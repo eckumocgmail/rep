@@ -29,7 +29,7 @@
             PagesCount = (SearchedProducts.Count() + SearchedProducts.Count() % 10) / 10;
             Available = SearchedProducts.Skip((PageNumber - 1) * 10).Take(10).ToList();
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             UserMessage = ex.Message;
         }
@@ -66,7 +66,7 @@
         </ul>
     </div>
     <div class="card-footer">
-        @for (int i=1; i < PagesCount; i++)
+        @for (int i = 1; i < PagesCount; i++)
         {
             <span class="btn @((i==PageNumber)? "btn-primary": "bg-white")" style="width: 80; height: 80; border: 1px; margin: 2px;" @onclick="(GetCallback(i))">@i</span>
         }
@@ -85,7 +85,7 @@
         int p = i;
         return evt =>
         {
-           PageNumber = p; OnSearch(); StateHasChanged();
+            PageNumber = p; OnSearch(); StateHasChanged();
         };
     }
 }

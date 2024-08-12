@@ -1,8 +1,70 @@
-﻿@page "/holder/products/{HolderId:int}"
-<h3>Товары на подразделении</h3>
-<div class="card"></div>
+﻿@page "/holder/{HolderId:int}/products"
+@attribute [Label("Точка выдачи. Товары.")]
+@using Microsoft.EntityFrameworkCore;
+@inject DeliveryDbContext db
+@inject IHolderService holder
+@inject NavigationManager nav
+@if(IsReady)
+{
+    <div class="card">
+        <div class="card-header">
+            <h3>Товары на подразделении</h3>
+            <div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="d-flex flex-row flex-wrap">
+                @foreach(Product Item in Products)
+                {
+                    
+                    <div class="card" style="width: 280px; height: 500px; margin: 5px;">
+                        <div class="card-header">
+
+                            <div class="d-flex flex-row" style="height: 20px; width: 100%; font-size: 14px; text-align: center;" @onclick='(evt =>{ nav.NavigateTo("/public/product-info/"+Item.Id); StateHasChanged(); })'>
+                                <b>
+                                    <span class="oi oi-info" aria-hidden="true"></span>
+                                    @Item.ProductName
+                                </b>                               
+                            </div>
+                            <div style="font-size: 14px;"> в наличии @(holder.GetProductCount(HolderId, Item.Id)), продано @Item.NumberOfSales штук </div>
+                            <div style="height: 20px;"><StarsView Value="@((int)Math.Floor(Item.ProductRate))" Editable="false"></StarsView></div>
+
+                        </div>
+
+                        <div class="card-body" @onclick="(evt => { Item.IncImageIndex(); StateHasChanged(); })">
+                            @if (Item.ProductImages is not null && Item.ProductImages.Count()>0)
+                            {
+                                <img src="/api/checkout/ProductImage?image_id=@(Item.ProductImages.ToList()[Item.ImageIndex].Id)" style="width: 250px; height: 250px;" />
+                            }  
+
+                            <div style="display: none;" id="ProductIndicatorsJson_@Item.Id">@Item.ProductIndicatorsJson</div>
+                        </div>
+                        <div class="card-footer" style="background-color: lightgray;">
+                            <div style="margin: 5px;"><button style="width: 100%; align-self: flex-end; margin: auto;" @onclick='(evt =>{ nav.NavigateTo("/public/product-info/"+Item.Id); StateHasChanged(); })' class="btn btn-primary btn-sm"> оставить комменитарий </button></div>                            
+                        </div>
+
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="card-footer"></div>
+    </div>
+}
+else
+{
+    <div class="alert alert-info">Подождите пожалуйста</div>
+}
 @code 
 {
     [Parameter]
     public int HolderId { get; set; }
+    private bool IsReady { get; set; } = false;
+    private IEnumerable<Product> Products { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        var productIds = db.ProductsInStock.Where(instock => instock.HolderID == HolderId).Select(instock => instock.ProductID);
+        this.Products = db.Products.Include(p => p.ProductImages).Where(p => productIds.Contains(p.Id)).ToList();
+        IsReady = true;
+    }
 }

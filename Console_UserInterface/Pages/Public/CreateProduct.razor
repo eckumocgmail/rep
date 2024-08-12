@@ -1,6 +1,7 @@
 ﻿@page "/public/create-product"
 @attribute [Authorize(Roles = "webuser")]
 @using Console_BlazorApp.AppUnits.DeliveryModel;
+@using System.Data.Common;
 @inject DeliveryDbContext db
 @code
 {
@@ -19,18 +20,8 @@
                         loadedDatas.Add(new ProductImage()
                         {
                             ContentType = file.ContentType,
-                            ImageData = data                            
-                        });
-                        var image = new ProductImage()
-                        {
-                            ImageData = data,
-                            ContentType = file.ContentType,
-                            ProductID = product.Id
-                        };
-                        db.ProductImages.Add(image);
-                        db.SaveChanges();
-                        data.ToJsonOnScreen().WriteToConsole();
-                        product.ProductImages = db.ProductImages.Where(image => image.ProductID == product.Id).ToList();
+                            ImageData = data
+                        });                      
                     }
 
                 }
@@ -53,10 +44,10 @@
 <h3>Создать описание товара</h3>
 <div>
     <code class="text-danger">
-        @foreach(var kv in validationMessages)
+        @foreach (var kv in validationMessages)
         {
             <b style="font-size: 16px;">@kv.Key</b>
-            @foreach(var message in kv.Value)
+            @foreach (var message in kv.Value)
             {
                 <div style="margin-left: 10px;" class="text-danger">@message</div>
             }
@@ -67,16 +58,19 @@
         <div class="form-group">
             <label for="exampleInputEmail1">Наименование</label>
             <input type="text" style="width: 100%;" class="form-control" value="@product.ProductName" placeholder="Наименование" @onchange="(evt => { product.ProductName = evt.Value.ToString(); validationMessages = product.Validate();  StateHasChanged(); })">
-            <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
         </div>
         <div class="form-group">
             <label>Цена</label>
             <input type="number" style="width: 100%;" class="form-control" placeholder="Цена" value="@product.ProductCost" @onchange="(evt => { product.ProductCost = float.Parse(evt.Value.ToString());validationMessages = product.Validate();  StateHasChanged(); })">
         </div>
         <div class="form-group">
-          
+            <label>Описание</label>
+            <textarea class="form-control" style="width: 100%;" placeholder="Описание" @onchange="(evt => { product.ProductDesc = evt.Value.ToString(); validationMessages = product.Validate(); StateHasChanged(); })">@product.ProductDesc</textarea>
+        </div>
+        <div class="form-group" style="margin:20px 0px 20px 0px;">
+
             <InputFile OnChange="@OnFileChanged" multiple style="width: 100%;" class="form-control"
-                oninput="for(let i=0; i<this.files.length; i++){
+                       oninput="for(let i=0; i<this.files.length; i++){
                 while(document.getElementById('images').children.length>0)
                 {
                     document.getElementById('images').removeChild(document.getElementById('images').children[document.getElementById('images').children.length-1]);
@@ -86,63 +80,45 @@
                 reader.onload=function(){
                     let img = document.createElement('img');
                     img.src = reader.result;
+                    img.style = 'width: 360px; height: 360px; border: 1px solid var(--bs-primary)';
                     document.getElementById('images').appendChild(img);
                     console.info(reader.result);
                 }}"></InputFile>
-            
+
         </div>
-        <div>
-            <b style="font-size: 16px;">Характеристики</b>
-            <table>
+        <div class="card" style="margin: 20px 0px 20px 0px; padding: 20px;">
+            <div><b style="font-size: 16px;">Характеристики</b></div><hr style="margin: 0px; padding: 0px;"/>
+            <div style="margin-bottom: 20px"><span class="btn btn-sm btn-info" @onclick="(evt => { options.Add(new()); StateHasChanged(); })">добавить</span></div>
+            <table class="table table-bordered table-hover">
                 <tr>
+                    <td>#</td>
                     <td>Опция</td>
                     <td>Значение</td>
+                    <td></td>
                 </tr>
-                @foreach (var tuple in options)
+                @foreach (var tuple in options.ToList())
                 {
-                    <tr>
-                        <td><input type="text" value="@tuple.Item1"/></td>
-                        <td><input type="text" value="@tuple.Item2" /></td>
+                    <tr style="height: 20px;">
+                        <td>@(options.IndexOf(tuple) + 1)</td>
+                        <td><input type="text" style="height: 20px;" value="@tuple.Item1" @onchange="(evt => { tuple.Item1 = evt.Value.ToString(); StateHasChanged(); })" /></td>
+                        <td><input type="text" style="height: 20px;" value="@tuple.Item2" @onchange="(evt => { tuple.Item2 = evt.Value.ToString(); StateHasChanged(); })" /></td>
+                        <td><span @onclick="(evt => { options.Remove(tuple); StateHasChanged(); })">удалить</span></td>
                     </tr>
                 }
             </table>
         </div>
         <div id="images">
-
-        </div>
-        @*<div>
-            @if (isLoading)
-            {
-                <div class="spinner-border" role="status">
-                    <span class="sr-only">Загрузка...</span>
-                </div>
-            }
-            else
-            {
-                <ul class="list-group">
-                    @foreach (var file in loadedFiles)
-                    {
-                        <li class="list-group-item">
-                            <p>Файл: <b>@file.Name</b></p>
-                            <p>Размер: <b>@file.Size</b> </p>
-                        </li>
-                    }
-                </ul>
-            }
-        </div>*@
-        <div class="form-check">
-            <label>Описание</label>
-            <textarea class="form-control" placeholder="Описание" @onchange="(evt => { product.ProductDesc = evt.Value.ToString(); validationMessages = product.Validate(); StateHasChanged(); })">@product.ProductDesc</textarea>
-        </div>
+        </div>        
+        
         <button type="submit" class="btn btn-primary">Зарегистрировать</button>
     </form>
- 
-    
+
+
 </div>
 
 @inject NavigationManager nav
 @inject SigninUser signin
-@code 
+@code
 {
     public class MyTuple
     {
@@ -156,8 +132,8 @@
     };
 
     List<MyTuple> options { get; set; } = new();
-    
 
+    string Message = null;
     private List<ProductImage> loadedDatas = new();
     private List<IBrowserFile> loadedFiles = new();
     private int maxAllowedFiles = 3;
@@ -165,15 +141,43 @@
 
     public async Task OnFormSubmited()
     {
-        db.Products.Add(product);
-        db.SaveChanges();
-        foreach(var data in loadedDatas)
+        try
         {
-            data.ProductID = product.Id;
-            db.ProductImages.Add(data);
+            var list = options.Select(option => new KeyValuePair<string, string>(option.Item1, option.Item2.ToString())).ToList();
+            var p = product;
+            product = new();
+            product.ProductName = p.ProductName;
+            product.ProductDesc = p.ProductDesc;
+            product.ProductCost = p.ProductCost;            
+            product.ProductIndicatorsJson = Newtonsoft.Json.JsonConvert.SerializeObject(new Dictionary<string, string>(list));
+            
+
+            Dictionary<string, List<string>> validation = product.Validate();
+            if (validation.Count() > 0)
+            {
+                this.validationMessages = validation;
+                StateHasChanged();
+                return;
+            }
+
+            db.Products.Add(product);
             db.SaveChanges();
+            foreach (var data in loadedDatas)
+            {
+                data.ProductID = product.Id;
+                db.ProductImages.Add(data);
+                db.SaveChanges();
+            }
+            nav.NavigateTo("/public/search-products");
         }
-        nav.NavigateTo("/public/search-product");
+        catch(Microsoft.EntityFrameworkCore.DbUpdateException ex)
+        {
+            Message = ex.Message;
+        }
+        catch (Exception ex)
+        {
+            Message = ex.Message;
+        }
         await Task.CompletedTask;
     }
 
@@ -188,39 +192,25 @@
         {
             try
             {
-                using(var ms = new MemoryStream())
+                using (var ms = new MemoryStream())
                 {
                     using (var stream = file.OpenReadStream())
                     {
                         var data = new byte[stream.Length];
-                        await stream.ReadAsync(data);
+                        await stream.ReadAsync(data);                        
                         loadedDatas.Add(new ProductImage()
                         {
                             ImageData = data,
-                            ContentType = file.ContentType,                            
-                        });
-                    var image = new ProductImage()
-                        {
-                            ImageData = data,
-                            ContentType = "",
-                            ProductID = product.Id
-                        };
-                        db.ProductImages.Add(image);
-                        db.SaveChanges();
-                        data.ToJsonOnScreen().WriteToConsole();
-                        product.ProductImages = db.ProductImages.Where(image => image.ProductID == product.Id).ToList();
+                            ContentType = file.ContentType,
+                        });                                                                         
+                        //product.ProductImages = db.ProductImages.Where(image => image.ProductID == product.Id).ToList();
                     }
-
                 }
-
-
                 loadedFiles.Add(file);
-
-
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"File: {file.Name} \n Exception: {ex.Message} \n Stack: {ex.StackTrace}" );
+                Console.WriteLine($"File: {file.Name} \n Exception: {ex.Message} \n Stack: {ex.StackTrace}");
             }
         }
 
@@ -229,15 +219,17 @@
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        this.product = new Product()
+
+        this.product = signin.GetFromSession<Product>(nav.Uri);
+        options.Add(new MyTuple()
         {
-            ProductName = "новый товар",
-            ProductDesc = "новый товар",
-            ProductCost = 1,
-            ProductRate = 1            
-        };
-        db.Products.Add(this.product);
-        db.SaveChanges();
-        product.ProductComments = db.ProductComments.Where(pc => pc.ProductId == product.Id).OrderByDescending(pc => pc.CreatedTime).ToList();
+            Item1 = "Вес",
+            Item2 = "1"
+        });
+        product.ProductName = "Новый товар";
+        product.ProductDesc = "Очень хороший товар";
+        product.ProductCost = 1000;        
+        product.ProductComments = new();
+        product.ProductImages = new();
     }
 } 

@@ -1,6 +1,6 @@
 ﻿@page "/user/garage"
 @attribute [Authorize(Roles = "webuser")]
-@using MarketerWeb.Authorization;
+@using Console_UserInterface.AppUnits.AuthorizationBlazor;
 @inject IHttpContextAccessor http
 @inject UserAuthStateProvider auth
 @inject pickpoint_delivery_service.DeliveryDbContext db

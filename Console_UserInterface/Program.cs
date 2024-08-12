@@ -1,30 +1,10 @@
 using Console_AuthModel.AuthorizationModel;
-using Console_AuthModel.AuthorizationServices.Authentication;
-using Console_BlazorApp.Shared;
-using Console_UserInterface.Data;
-
 using Google_LoginApplication.Areas.Identity.Modules.ReCaptcha;
-
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Components.Web;
-using Console_AuthModel.AuthorizationModel;
-using Console_AuthModel.AuthorizationServices.Authentication;
-
-using Console_BlazorApp.AppUnits;
-using Console_BlazorApp.AppUnits.DeliveryServices;
-using Console_BlazorApp.Shared;
 using Console_DataConnector.DataModule.DataODBC.Connectors;
-using Google_LoginApplication.Areas.Identity.Modules.ReCaptcha;
-
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Components.Authorization;
 using Newtonsoft.Json;
 using pickpoint_delivery_service;
-using pickpoint_delivery_service;
-
-using MarketerWeb.Authorization;
+using Console_UserInterface.AppUnits.AuthorizationBlazor;
 
 namespace Console_UserInterface
 {
@@ -38,24 +18,12 @@ namespace Console_UserInterface
                 db.Database.EnsureCreated();
                 db.UserContexts_.ToList().ToJsonOnScreen().WriteToConsole();
             }
-            /*using (var db = new DbContextUser())
+            using (var db = new DbContextUser())
             {
                 db.Database.EnsureDeleted();
                 db.Database.EnsureCreated();
                 db.UserContexts_.ToList().ToJsonOnScreen().WriteToConsole();
-            }*/
-            using (var db = new DbContextService())
-            {
-                db.Database.EnsureDeleted();
-                db.Database.EnsureCreated();
-                db.ServiceContexts.ToList().ToJsonOnScreen().WriteToConsole();
-            }
-            /*using (var db = new DeliveryDbContext())
-            {
-                db.Database.EnsureDeleted();
-                db.Database.EnsureCreated();
-                db.Products.ToList().ToJsonOnScreen().WriteToConsole();
-            }*/
+            }            
         }
         public static void Main(string[] args)
         {
@@ -68,7 +36,6 @@ namespace Console_UserInterface
             builder.Services.AddRazorPages();
             builder.Services.AddControllers();
             builder.Services.AddServerSideBlazor();
-            builder.Services.AddSingleton<WeatherForecastService>();
             builder.Services.AddScoped<UserService>();
             builder.Services.AddScoped<UserAuthStateProvider>();
             builder.Services.AddScoped<AuthenticationStateProvider>(sp => sp.GetRequiredService<UserAuthStateProvider>());
@@ -82,8 +49,8 @@ namespace Console_UserInterface
             ModuleUser.ConfigureServices(builder.Configuration, builder.Services);
             ModuleService.ConfigureServices(builder.Configuration, builder.Services);
             DeliveryDbContext.ConfigureDeliveryServices(builder.Services, builder.Configuration);
-            DeliveryDbContext.CreateDeliveryData(builder.Services, builder.Configuration);
-
+            //DeliveryDbContext.CreateDeliveryData(builder.Services, builder.Configuration);
+            DbContextUserInitializer.CreateUserData(builder.Services, builder.Configuration);
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -136,7 +103,6 @@ namespace Console_UserInterface
             builder.Services.AddRazorPages();
             builder.Services.AddControllers();
             builder.Services.AddServerSideBlazor();
-            builder.Services.AddSingleton<WeatherForecastService>();
 
             var app = builder.Build();
 

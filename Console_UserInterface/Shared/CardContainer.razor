@@ -1,0 +1,24 @@
+﻿@inherits Microsoft.AspNetCore.Components.LayoutComponentBase
+@code
+{
+    [Parameter] public RenderFragment CardHeader { get; set; }
+    [Parameter] public RenderFragment CardFooter { get; set; }
+    [Parameter] public RenderFragment CardBody { get; set; }
+    [Parameter] public string Width { get; set; } = "100%";
+    [Parameter] public string Height { get; set; } = "100%";
+}
+<div class="card" style="width: @Width; height: @Height;">
+    <div class="card-header">
+        @if(CardHeader is not null) 
+            @CardHeader
+    </div>
+    <div class="card-body">
+            @CardBody
+    </div>
+    <div class="card-footer">
+        @if (CardFooter is not null)
+            @CardFooter
+    </div>
+</div>
+
+

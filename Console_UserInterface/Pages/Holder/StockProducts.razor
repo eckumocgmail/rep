@@ -1,24 +1,26 @@
-﻿@page "/holder/stock/{Id:int}/products"
+﻿@page "/holder/stock/{HolderId:int}/products"
+@attribute [Label("Точка выдачи. Сведения по товарам.")]
+
 @inject NavigationManager nav
 @inject IHolderService holdersService
 @inject DeliveryDbContext db
 @code 
 {
     [Parameter]
-    public int Id { get; set; }
+    public int HolderId { get; set; }
 
     public IEnumerable<ProductsInStock> instock { get; set; }
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        this.instock = holdersService.GetProductsInStock(Id);  
+        this.instock = holdersService.GetProductsInStock(HolderId);  
 
     }
     int ctn = 1;
 }
 <div class="card">
     <div class="card-header">
-        <h3>Товары в наличии на складе @(db.Holders.Find(Id).HolderLocation)</h3>
+        <h3>Товары в наличии на складе @(db.Holders.Find(HolderId).HolderLocation)</h3>
     </div>
     <style>
         td
@@ -46,7 +48,7 @@
             </tr>
             @foreach(var instock in instock)
             {
-                <tr class="highlight-on-hover" @onclick='(evt => nav.NavigateTo($"/holder/holder/{Id}/product/{instock.ProductID}"))'>
+                <tr class="highlight-on-hover" @onclick='(evt => nav.NavigateTo($"/holder/holder/{HolderId}/product/{instock.ProductID}"))'>
                     <td>@(ctn++)</td>
                     <td>@(instock.ProductID)</td>
                     <td>@((db.Products.First(p => p.Id == instock.ProductID)).ProductName)</td>

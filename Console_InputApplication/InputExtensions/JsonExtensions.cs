@@ -115,7 +115,7 @@ public static class JsonExtensions
         {
             return value.ToString() + "%";
         }
-        else if (attrs.ContainsKey("SelectControlAttribute"))
+        else if (attrs.ContainsKey("InputSelectAttribute"))
         {
             return value.ToString();
         }

@@ -1,0 +1,45 @@
+﻿
+@code {
+
+    [Parameter]
+    public global::ContextMenu Model { get; set; }
+
+}
+
+
+<ContextMenu Id="myMenu">
+    @if (Model != null && Model.Items != null && Model.Items.Count() > 0)
+    {
+        @foreach (var item in Model.Items)
+        {
+            <Item OnClick="@(()=>{ if(item.OnClick!=null)item.OnClick(item); })">
+                @if (item.Icon != null)
+                {
+                    <MatIcon>@item.Icon</MatIcon>
+                }
+                @item.Label
+                @if (item.Items != null && item.Items.Count() > 0)
+                {
+                    <SubMenu>
+                        @foreach (var subitem in Model.Items)
+                        {
+                            <Item OnClick="@(()=>{ if(subitem.OnClick!=null)subitem.OnClick(subitem); })">@subitem.Label</Item>
+                        }
+
+                    </SubMenu>
+                }
+            </Item>
+        }
+    }
+
+
+</ContextMenu>
+
+<ContextMenuTrigger MenuId="@("ContextMenu"+(Model!=null?Model.GetHashCode():""))">
+    @ChildContent
+</ContextMenuTrigger>
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+}

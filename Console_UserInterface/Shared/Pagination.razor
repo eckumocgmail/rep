@@ -1,0 +1,24 @@
+﻿<div>
+    @for (int i = 1; i <= PagesCount; i++)
+    {
+        var p = i;
+        <span class="btn @((i==PageNumber)? "btn-primary": "bg-white")" style="width: 80; height: 80; border: 1px; margin: 2px;" @onclick="(evt => OnPageChanged(p))">@i</span>
+    }
+</div>
+
+@code 
+{
+    [Parameter]
+    public int PagesCount { get; set; }
+
+    [Parameter]
+    public int PageNumber { get; set; }
+
+    [Parameter]
+    public EventCallback<int> OnChanged { get; set; }
+
+    public async Task OnPageChanged(int page)
+    {
+        await OnChanged.InvokeAsync(page);
+    }
+}

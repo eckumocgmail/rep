@@ -179,6 +179,7 @@ public static class Typing
     }
     public static string ParseCollectionType(Type type)
     {
+        
         string text = type.AssemblyQualifiedName;
         text = text.Substring(text.IndexOf("[[") + 2);
         text = text.Substring(0, text.IndexOf(","));

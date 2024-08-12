@@ -1,0 +1,75 @@
+﻿@code
+{
+    [Parameter]
+    [NotNullNotEmpty]
+    public Type ItemType { get; set; }
+    public InputFormModel ItemForm { get; set; }
+    public object ItemRef { get; set; }
+
+    [Parameter]
+    public List<object> Items { get; set; }
+    public List<string> ItemList { get; set; } = new();
+}
+<CardContainer>
+    <CardHeader>
+        <div>
+            <span class="btn btn-sm btn-primary" @onclick="(evt => { OnAddButtonClicked(); })">добавить</span>
+            <span class="btn btn-sm btn-primary" @onclick="(evt => { OnRemoveButtonClicked(); })">удалить</span>
+            <span class="btn btn-sm btn-primary" @onclick="(evt => { OnEditButtonClicked(); })">редактировать</span>
+        </div>
+    </CardHeader>
+    <CardBody>
+        @if (ItemForm is not null)
+        {           
+            <FormEditor Model="@ItemForm"></FormEditor>
+        }
+        else
+        {
+            <CheckList ListItems="ItemList"></CheckList>
+        }
+    </CardBody>
+    <CardFooter>
+        <Pagination PagesCount="@PagesCount" PageNumber="@PageNumber" OnChanged="OnPageChanged"></Pagination>
+    </CardFooter>
+</CardContainer>
+@code
+{
+    protected override void OnInitialized()
+    {
+        this.ItemList = Items is null? new(): Items.Select(item => $"{item}"/* item.GetDisplayText()*/).ToList();
+    }
+}
+@code
+{
+    public int PageSize = 10;
+    public int PagesCount = 1;
+    public int PageNumber = 1;
+}
+@functions
+{
+    public void OnAddButtonClicked()
+    {
+        if (ItemType is not null)
+        {
+            ItemForm = new InputFormModel(ItemRef = ItemType.New());
+        }
+        else
+        {
+            throw new ArgumentException("ItemType не задан");
+        }
+
+    }
+    public void OnRemoveButtonClicked()
+    {
+
+    }
+    public void OnEditButtonClicked()
+    {
+
+    }
+
+    public void OnPageChanged(int page)
+    {
+        
+    }
+}

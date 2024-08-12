@@ -1,0 +1,67 @@
+﻿@code
+{    
+    /// <summary>
+    /// Заполнитель пустого поля
+    /// </summary>
+    [Parameter]
+    public string Placeholder { get; set; } = "Поиск";
+
+    /// <summary>
+    /// Текст в строке поиска
+    /// </summary>
+    [Parameter]
+    public string SearchQuery { get; set; } = "";
+
+    /// <summary>
+    /// Значения для автоподстановки
+    /// </summary>
+    [Parameter]
+    public string[] SearchOptions { get; set; } = new string[0];
+
+}
+
+@code
+{
+    /// <summary>
+    /// Событие при вводе
+    /// </summary>
+    [Parameter]
+    public EventCallback<string> OnInput { get; set; }
+
+    /// <summary>
+    /// Событие при выполнении поиска
+    /// </summary>
+    [Parameter]
+    public EventCallback<string> OnSearch { get; set; }
+}
+
+<div @onsubmit="@OnSearchSubmit"
+     style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: baseline; justify-content: flex-start;">
+    <input type="text" class="form-control" list="SearchOptions-@GetHashCode()"
+           style="top: 0px; left: 0px; width: 100%;"
+           placeholder="@Placeholder"
+           @bind-value="@SearchQuery"
+           @oninput="@OnSearchInput">
+    <button class="btn btn-primary my-2 my-sm-0" type="submit" @onclick="@OnSearchSubmit">@Placeholder</button>
+    <datalist id="SearchOptions-@GetHashCode()">
+        <ForEach TItem="System.String"
+                 Items="@SearchOptions"
+                 Context="SearchOption">
+            <option value="@SearchOption">@SearchOption</option>
+        </ForEach>
+    </datalist>
+</div>
+
+@functions
+{
+    public async Task OnSearchSubmit()
+    {
+        await this.OnInput.InvokeAsync(this.SearchQuery);
+    }
+
+    public async Task OnSearchInput( ChangeEventArgs evt)
+    {
+        await this.OnInput.InvokeAsync( this.SearchQuery );
+    }
+
+}

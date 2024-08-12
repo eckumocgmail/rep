@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 using System;
 using System.Collections.Generic;
@@ -51,6 +53,16 @@ public static class DbContextExtensions
         }
         return entities;
     }
+    public static IEnumerable<INavigation> GetNavigationPropertiesForType(this DbContext dbContext, Type type)
+    {
+        foreach(var nav in dbContext.Entry(type).Navigations)
+        {
+            
+        }
+        return new List<INavigation>();
+    }
+
+
     public static dynamic GetDbSet(this DbContext dbContext, string entity)
     {
         Type type = dbContext.GetType();

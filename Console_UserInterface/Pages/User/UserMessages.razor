@@ -4,105 +4,95 @@
 @inject IUserMessagesService userMessages
 @inject SigninUser signin
 @inject IHttpContextAccessor http
-@if(signin.IsSignin())
+@code
 {
-    <p>@signin.Verify().Roles.Select(r=>r.Code).ToJson()</p>
+    public int inboxNotReaded { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        try
+        {
+            toUserId = userMessages.GetUsers().First().Value;
+            this.inbox = userMessages.GetInbox();
+            this.inboxNotReaded = userMessages.GetInboxNotReaded();
+            this.outbox = userMessages.GetOutbox();
+            OnInboxButtonClicked();
+        }
+        catch(Exception ex)
+        {
+            message = ex.Message;
+        }
+
+    }
+}
+@code
+{
+    private List<UserMessageFile> files { get; set; } = new();
+    private bool isLoading = false;
+
+    public async Task OnFileChanged(InputFileChangeEventArgs evt)
+    {
+        isLoading = true;
+        files.Clear();
+        foreach (var file in evt.GetMultipleFiles(3))
+        {
+            try
+            {
+                using (var ms = new MemoryStream())
+                {
+                    using (var stream = file.OpenReadStream())
+                    {
+                        var data = new byte[stream.Length];
+                        await stream.ReadAsync(data);
+                        files.Add(new UserMessageFile()
+                        {
+                            ContentType = file.ContentType,
+                            FileData = data,
+                            FileName  = file.Name                            
+                        });
+                    }
+
+                }                 
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"File: {file.Name} \n Exception: {ex.Message} \n Stack: {ex.StackTrace}");
+            }
+        }
+
+        isLoading = false;
+    }
 }
 <div class="card" style="width: 100%; height: 1024px;">
     <div class="card-header">
         <h2>Сообщения пользователя</h2>
+        <nav class="navbar navbar-light" style="background-color: #e3f2fd;">
+            <ul class="list-group d-flex flex-row">
+
+                <li class="list-group-item @(view == "new_message"? "active": "")" @onclick="OnCreateMessageButtonClicked">Новое сообщение</li>
+                <li class="list-group-item @(view == "inbox"? "active": "")" @onclick="OnInboxButtonClicked">Входящие (@inbox.Count())</li>
+                <li class="list-group-item @(view == "outbox"? "active": "")" @onclick="OnOutboxButtonClicked">Исходящие (@outbox.Count())</li>
+            </ul>
+        </nav>
     </div>
     <div class="card-body">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-4">
-                    <ul class="list-group">
-                        
-                        <li class="list-group-item active" @onclick="OnCreateMessageButtonClicked">Новое сообщение</li>
-                        <li class="list-group-item" @onclick="OnInboxButtonClicked">Входящие (@inbox.Count())</li>
-                        <li class="list-group-item" @onclick="OnOutboxButtonClicked">Исходящие (@outbox.Count())</li>
-                    </ul>
-                </div>
-                <div class="col-8">
+               
+                <div class="col-12">
                     @switch (view)
                     {
                         case "message":
-                            <div class="card">
-                                <div class="card-header">
-                                    <h2>Новое сообщение</h2>
-                                    <div class="form-group">
-                                        <label>От: @usersDb.UserPersons_.Find(usersDb.UserContexts_.Find(signin.Verify().Id).PersonID).GetFullName()</label>
-                                       
-                                    </div>
-                                </div>
-                                <div class="card-body">
-                                    <div class="form-group">
-                                        <label>Текст</label>
-                                        <textarea class="form-control disabled" @oninput="(evt => { StateHasChanged(); })" contenteditable="false">@message</textarea>
-                                    </div>
-                                </div>
-                                <div class="card-footer">
-                                    <button class="btn btn-sm btn-primary" @onclick="OnResendMessageButtonClicked">Ответить</button>
-                                </div>
-                            </div>
-
-
-
-                        
+                            <MessageCard></MessageCard>
                             break;
                         case "outbox":
-                            <ul class="list-group">
-                                @foreach (var message in outbox)
-                                {
-                                    <li class="list-group-item" @onclick="(evt => { OnMessageClicked(message); })"> @message.Created @message.Subject </li>
-                                }                                                                
-                            </ul>
+                            <MessagesList Messages="@outbox"></MessagesList>
                             break;
                         case "inbox":
-                            <ul class="list-group">
-                                @foreach (var message in inbox)
-                                {
-                                    <li class="list-group-item" @onclick="(evt => { OnMessageClicked(message); })"> @message.Created @message.Subject </li>
-                                }
-                            </ul>
+                            <MessagesList Messages="@inbox"></MessagesList>                      
                             break;
                         case "new_message":
-                            <div class="card">
-                                <div class="card-header">
-                                    <h2>Новое сообщение</h2>
-                                    <div class="form-group">
-                                        <label>Кому</label>
-                                        <select class="form-control" @onchange="(evt => { toUserId = int.Parse(evt.Value.ToString()); } )">
-                                            @foreach (var kv in userMessages.GetUsers())
-                                            {
-                                                <option value="@kv.Value">@kv.Key</option>
-                                            }                                            
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <h2>Файлы</h2>
-                                        <input type="file" hidden id="input_file" />
-                                        <span class="btn btn-sm btn-primary" onclick="document.getElementById('input_file').click()">загрузить</span>
-                                        <ul class="list-group">
-                                            @foreach (var file in files.ToList())
-                                            {
-                                                <li class="list-group-item">
-                                                    <span class="btn btn-danger" @onclick="(evt => { files.Remove(file); StateHasChanged();/* удалить этот элемент */ } )"> @file X</span>
-                                                </li>
-                                            }
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div class="card-body">
-                                    <div class="form-group">
-                                        <label>Текст</label>
-                                        <textarea class="form-control" @oninput="(evt => { message = evt.Value.ToString(); StateHasChanged(); })">@message</textarea>
-                                    </div>
-                                </div>
-                                <div class="card-footer">
-                                    <button class="btn btn-sm btn-primary" @onclick="OnSendMessageButtonClicked">Отправить</button>
-                                </div>
-                            </div>
+                            <CreateMessage></CreateMessage>
                             break;
                     }
                 </div>
@@ -121,17 +111,11 @@
     string view;
     string subject;
     string message;
-    List<object> files = new();
 
     int fromUserId;
     int toUserId;
 
-    protected override async Task OnInitializedAsync()
-    {
-        await base.OnInitializedAsync();
-        this.inbox = userMessages.GetInbox();
-        this.outbox = userMessages.GetOutbox();
-    }
+    
 
     public void OnResendMessageButtonClicked()
     {      

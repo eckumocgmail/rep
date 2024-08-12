@@ -7,9 +7,42 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Blazor_UserInterface\Blazor_UserInterface.csproj" />
+    <Compile Remove="Shared\ViewModels\**" />
+    <Content Remove="Shared\ViewModels\**" />
+    <EmbeddedResource Remove="Shared\ViewModels\**" />
+    <None Remove="Shared\ViewModels\**" />
+  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Blazored.Modal" Version="7.3.1" />
+		<PackageReference Include="MailKit" Version="4.6.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Authorization" Version="8.0.6" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.1" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="6.0.1" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.1" />
+		<PackageReference Include="NSwag.CodeGeneration.CSharp" Version="14.1.0" />
+		<PackageReference Include="NSwag.MSBuild" Version="14.1.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="xunit" Version="2.9.0" />
+	</ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Console_DataConnector\Console_DataConnector.csproj" />
     <ProjectReference Include="..\Console_InputApplication\Console_InputApplication.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Update="wwwroot\js\camera.js">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shared\Forms\FormControl.razor" />
+    <None Include="Shared\Forms\InputForm.razor" />
+    <None Include="Shared\Forms\ValidationForm.razor" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Shared\Attributes\" />
   </ItemGroup>
 
 </Project>

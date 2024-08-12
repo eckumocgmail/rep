@@ -1,7 +1,6 @@
 ﻿@inherits LayoutComponentBase
- 
 <div class="page">
-    <div class="sidebar">
+    <div class="sidebar" style="overflow-y: auto;">
         <NavMenu></NavMenu>
     </div>
 
@@ -11,7 +10,7 @@
             <UserNotifications></UserNotifications>
         </div>
         <div class="top-row px-4">            
-            <Blazor_UserInterface.BootstrapPanels.Breadcrumb></Blazor_UserInterface.BootstrapPanels.Breadcrumb>            
+            <Breadcrumb links="@links"></Breadcrumb>
         </div>
 
         <article class="content px-4">
@@ -19,3 +18,11 @@
         </article>
     </main>
 </div>
+@code
+{
+    Dictionary<string, string> links = new Dictionary<string, string>()
+    {
+        { "Заказы","/user/orders" },
+        { "Выход","/user/signout" },
+    };
+}

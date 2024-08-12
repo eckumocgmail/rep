@@ -1,4 +1,6 @@
 ﻿@page "/holder/{HolderId:int}/orders/recieving"
+@attribute [Label("Точка выдачи. Заказы на доставку.")]
+
 @inject IHolderService holdersService
 @inject DbContextUser dbu
 @code 
@@ -9,35 +11,46 @@
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        this.Orders = holdersService.GetOrderInDelivery(HolderId);
+        try
+        {
+            this.Orders = holdersService.GetOrderInDelivery(HolderId);
+        }
+        catch(Exception ex)
+        {
+            this.Message = ex.Message;
+        }
+
     }
     int ctn = 1;
+    public string Message { get; set; }
 }
+@inject NavigationManager nav
 <div class="card">
     <div class="card-header">
         Заказы в ожидании доставки
     </div>
     <div class="card-body">
         <table>
-            <tr>
-                <td>#</td>
-                <td>Дата</td>
-                <td>Номер</td>
-                <td>Курьер. ФИО</td>
-                <td>Курьер. Телеофн</td>
-                <td>Время выдачи курьеру</td>
-                <td>Кол-во товаров</td>                
-            </tr>
+            
             @if (Orders is null || Orders.Count() > 0)
             {
+                <tr>
+                    <td>#</td>
+                    <td>Дата</td>
+                    <td>Номер</td>
+                    @*<td>Курьер. ФИО</td>
+                    <td>Курьер. Телеофн</td>*@
+                    <td>Время выдачи курьеру</td>
+                    <td>Кол-во товаров</td>
+                </tr>
                 @foreach (Order order in Orders)
                 {
-                    <tr>
+                    <tr @onclick='(evt => { nav.NavigateTo($"/holder/{HolderId}/orders/{order.Id}/recieving"); })'>
                         <td>@(ctn++)</td>
                         <td>@(((DateTime)order.OrderCreated).ToString("d"))</td>
                         <td>#@(order.Id)</td>
-                        <td>@(holdersService.GetCustomerPerson(order.CustomerID).GetFullName())</td>
-                        <td>@(holdersService.GetCustomerPerson(order.CustomerID).Tel)</td>
+                       @* <td>@(holdersService.GetCustomerPerson(order.CustomerID).GetFullName())</td>
+                <td>@(holdersService.GetCustomerPerson(order.CustomerID).Tel)</td>*@
                         <td>@(((DateTime)order.OrderUpdated).ToString("d"))</td>
                         <td>@(order.OrderItems.Sum( item => item.ProductCount))</td>
                     </tr>

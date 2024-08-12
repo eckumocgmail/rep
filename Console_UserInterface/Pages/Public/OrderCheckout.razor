@@ -1,0 +1,32 @@
+﻿@page "/order/{OrderId:int}/checkout"
+@inject DeliveryDbContext db
+<CardContainer>
+    <CardHeader>
+        <h2>Оформление заказа</h2>
+    </CardHeader>
+    <CardBody>
+        <SelectBox Options="@("Самовывоз,Доставка".Split(",").ToList())" OnChange="(evt => { OrderType = evt.Value.ToString(); StateHasChanged(); })"></SelectBox>
+        @switch (OrderType
+        )
+        {
+            case "Самовывоз":
+                {
+                    <SearchListCard TItem="Holder" Items="db.Holders.ToList()"></SearchListCard>
+                    break;
+                }
+            case "Доставка":
+                {
+                    <SearchListCard TItem="Holder" Items="db.Holders.ToList()"></SearchListCard>
+                    break;
+                }
+        }
+    </CardBody>
+    <CardFooter>
+        
+    </CardFooter>
+</CardContainer>
+
+@code 
+{
+    public string OrderType { get; set; }
+}

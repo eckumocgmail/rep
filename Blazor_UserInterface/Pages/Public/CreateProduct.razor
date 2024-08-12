@@ -53,10 +53,10 @@
 <h3>Создать описание товара</h3>
 <div>
     <code class="text-danger">
-        @foreach(var kv in validationMessages)
+        @foreach (var kv in validationMessages)
         {
             <b style="font-size: 16px;">@kv.Key</b>
-            @foreach(var message in kv.Value)
+            @foreach (var message in kv.Value)
             {
                 <div style="margin-left: 10px;" class="text-danger">@message</div>
             }
@@ -73,7 +73,7 @@
             <label>Цена</label>
             <input type="number" style="width: 100%;" class="form-control" placeholder="Цена" value="@product.ProductCost" @onchange="(evt => { product.ProductCost = float.Parse(evt.Value.ToString());validationMessages = product.Validate();  StateHasChanged(); })">
         </div>
-        <div class="form-group">
+        <div class="form-group" style="margin: 20px;">
           
             <InputFile OnChange="@OnFileChanged" multiple style="width: 100%;" class="form-control"
                 oninput="for(let i=0; i<this.files.length; i++){
@@ -91,18 +91,23 @@
                 }}"></InputFile>
             
         </div>
-        <div>
-            <b style="font-size: 16px;">Характеристики</b>
+        <div class="card" style="margin: 20px; padding: 20px;">
+            <div><b style="font-size: 16px;">Характеристики</b></div>
+            <div><span @onclick="(evt => { options.Add(new()); StateHasChanged(); })">добавить</span></div>
             <table>
                 <tr>
+                    <td>#</td>
                     <td>Опция</td>
                     <td>Значение</td>
+                    <td></td>
                 </tr>
-                @foreach (var tuple in options)
+                @foreach (var tuple in options.ToList())
                 {
                     <tr>
-                        <td><input type="text" value="@tuple.Item1"/></td>
-                        <td><input type="text" value="@tuple.Item2" /></td>
+                        <td>@(options.IndexOf(tuple)+1)</td>
+                        <td><input type="text" value="@tuple.Item1" @onchange="(evt => { tuple.Item1 = evt.Value.ToString(); StateHasChanged(); })" /></td>
+                        <td><input type="text" value="@tuple.Item2" @onchange="(evt => { tuple.Item2 = evt.Value.ToString(); StateHasChanged(); })" /></td>
+                        <td><span @onclick="(evt => { options.Remove(tuple); StateHasChanged(); })">удалить</span></td>
                     </tr>
                 }
             </table>
@@ -156,7 +161,7 @@
     };
 
     List<MyTuple> options { get; set; } = new();
-    
+
 
     private List<ProductImage> loadedDatas = new();
     private List<IBrowserFile> loadedFiles = new();
@@ -199,7 +204,7 @@
                             ImageData = data,
                             ContentType = file.ContentType,                            
                         });
-                    var image = new ProductImage()
+                        var image = new ProductImage()
                         {
                             ImageData = data,
                             ContentType = "",
@@ -229,15 +234,9 @@
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        this.product = new Product()
-        {
-            ProductName = "новый товар",
-            ProductDesc = "новый товар",
-            ProductCost = 1,
-            ProductRate = 1            
-        };
-        db.Products.Add(this.product);
-        db.SaveChanges();
-        product.ProductComments = db.ProductComments.Where(pc => pc.ProductId == product.Id).OrderByDescending(pc => pc.CreatedTime).ToList();
+        
+        this.product = signin.GetFromSession<Product>(nav.Uri);
+        product.ProductComments = new();
+        product.ProductImages= new();
     }
 } 

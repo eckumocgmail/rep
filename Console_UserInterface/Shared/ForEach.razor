@@ -1,0 +1,35 @@
+﻿@typeparam TItem
+@code {
+    [Parameter]
+    public RenderFragment HeaderTemplate { get; set; }
+
+    [Parameter]
+    public IEnumerable<TItem> Items { get; set; }
+
+    [Parameter]
+    public RenderFragment<TItem> ChildContent { get; set; }
+}
+@if (Items == null)
+{
+    <div>Загрузка..</div>
+}
+else
+{
+    var type = Items.GetType();
+    if (type.IsArray )
+    {
+        foreach (var item in (dynamic)Items)
+        {
+            @ChildContent(item)
+        }
+    }
+    else
+    {
+        <div class="alert alert-danger">
+            Параметр Items компонента ForEach должен фактически должен
+            принимать либо коллекцию, либо массив, а не @type.Name
+        </div>
+    }
+}
+
+

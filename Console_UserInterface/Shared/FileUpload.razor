@@ -1,0 +1,53 @@
+﻿<InputFile OnChange="OnFilesLoaded"></InputFile>
+
+@code 
+{
+    public class FileItem
+    {
+        public string ContentType { get; set; }
+        public string FileName { get; set; }
+        public byte[] FileData { get; set; }
+    }
+
+
+
+    [Parameter]
+    public EventCallback<IEnumerable<FileItem>> OnChanged { get; set; }
+    public List<FileItem> Files { get; set; } = new();
+    public bool IsLoading { get; set; } = false;
+
+    public async Task OnFilesLoaded(InputFileChangeEventArgs evt)
+    {
+        IsLoading = true;
+        StateHasChanged();
+        Files.Clear();
+        foreach (var file in evt.GetMultipleFiles(3))
+        {
+            try
+            {
+                using (var ms = new MemoryStream())
+                {
+                    using (var stream = file.OpenReadStream())
+                    {
+                        var data = new byte[stream.Length];
+                        await stream.ReadAsync(data);
+                        Files.Add(new FileItem()
+                        {
+                            ContentType = file.ContentType,
+                            FileData = data,
+                            FileName = file.Name
+                        });
+                    }
+
+                }                
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"File: {file.Name} \n Exception: {ex.Message} \n Stack: {ex.StackTrace}");
+            }
+        }
+
+        IsLoading = false;
+        StateHasChanged();
+    }
+}

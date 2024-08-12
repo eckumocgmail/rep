@@ -25,7 +25,7 @@ public class SummaryOfType: FromAttributes
 
 
     public string Name { get; set; }
-    public string EntityIcon { get; set; } = "home";
+    public string InputIcon { get; set; } = "home";
     public string EntityLabel { get; set; } = "";
     public string HelpMessage { get; set; } = "";
     public string ClassDescription { get; set; } = "";

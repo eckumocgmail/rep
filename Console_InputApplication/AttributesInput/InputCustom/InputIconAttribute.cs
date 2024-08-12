@@ -23,7 +23,7 @@ public class InputIconAttribute : BaseInputAttribute
         throw new NotImplementedException();
     }
 
-    public InputIconAttribute( ) : base(InputTypes.Icon)
+    public InputIconAttribute(string name ="home") : base(InputTypes.Icon)
     {
 
     }

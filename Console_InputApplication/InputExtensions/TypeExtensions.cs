@@ -17,6 +17,26 @@ using System.Threading.Tasks;
 /// </summary>
 public static class StringExtensions
 {
+    
+    public static string GetDisplayText(this object p)
+    {
+        var type = p.GetType();
+        string display = "";
+        foreach(var property in type.GetOwnPropertyNames().Where(property => type.GetPropertyAttributes(property).ContainsKey(nameof(DisplayColumnAttribute))))
+        {
+            display += $"{p.GetValue(property)} ";
+        }
+        return display;
+    }
+    public static List<string> GetOwnPropertyNames(this Type type)
+    {
+        if (type is Type)
+            return (from p in new List<PropertyInfo>(((Type)type).GetProperties()) where p.DeclaringType == ((Type)type) select p.Name).ToList();
+        else
+            return (from p in new List<PropertyInfo>(type.GetType().GetProperties()) where p.DeclaringType == type.GetType() select p.Name).ToList();
+    }
+
+
     [Label("Кол-во символов в строке")]
     public static int CountOfChar(this string text, char ch)
     {

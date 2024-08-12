@@ -1,20 +1,35 @@
-﻿@page "/holder/delivery-preorder"
+﻿@page "/holder/{HolderId:int}/delivery-preorder"
+<PageTitle>ЕвроАвто/ПВЗ/Заказ</PageTitle>
+@attribute [Label("ПВЗ. Заказ.")]
+@inject DeliveryDbContext db
+@inject IHolderService holderService
+@code
+{
+    [Parameter]
+    public int HolderId { get; set; }
+    private Dictionary<int, int> ProductCounts { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        this.ProductCounts = holderService.CreateOrder(HolderId);
+    }
+}
 <div class="card">
     <div class="card-header">
         <h2>Предварительный заказ доставки товаров на склад </h2>
     </div>
     <div class="card-body">
+        <b> Адресс </b>
+            <div>@db.Holders.Find(HolderId).HolderLocation</div>
         <b> Товары в заказе </b>
         <ul>
-            <li></li>
-        </ul>
-        <b> Адресс </b>
-        <b> Цена </b>
-        <div>
-            Предложения для заказа
-        </div>
+            @foreach (var kv in ProductCounts)
+            {
+                <li>@(db.Products.Find(kv.Key).ProductName) @kv.Value</li>
+            }            
+        </ul>        
     </div>
     <div class="card-footer">
-
+        <button class="btn btn-sm btn-primary">подтвердить заказ</button>        
     </div>
-</div>ыф
+</div>

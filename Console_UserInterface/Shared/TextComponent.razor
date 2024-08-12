@@ -1,0 +1,18 @@
+﻿@inherits LayoutComponentBase
+@code
+{
+    //[InputSelect("info,warn,success,danger,warning,primary,secondary")]
+    public string Color { get; set; }
+
+    //[InputSelect("info,warn,success,danger,warning,primary,secondary")]
+    public string Background { get; set; }
+
+    //[InputSelect("start,end,center")]
+    public string Align { get; set; }
+
+    [InputNumber]
+    [InputPositiveInt]   
+    public string FontSize { get; set; }
+
+}
+<div class="text text-@(Color)">@Body</div>

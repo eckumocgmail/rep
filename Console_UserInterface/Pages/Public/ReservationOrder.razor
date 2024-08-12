@@ -25,7 +25,7 @@
                 @foreach (var holder in Holders)
                 {
                     <li class="list-group-item" @onclick="(evt => { OnHolderSelected(holder.Id); StateHasChanged(); })" onmouseleave="this.classList.remove('active')" onmouseover="this.classList.add('active')">
-                        <b>@(Available.Contains(holder) ? "забрать с адреса: " : "доставить по адресу: ")</b>
+                        <b>@(Reservations.Contains(holder) ? "забрать с адреса: " : "доставить по адресу: ")</b>
                         <div>@holder.HolderLocation</div>
                     </li>
                 }
@@ -58,6 +58,7 @@
     public List<Holder> All { get; set; }
     public List<Holder> Holders { get; set; }
     public List<Holder> Available { get; set; }
+    public List<Holder> Reservations { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -65,7 +66,8 @@
         try
         {
             All = db.Holders.ToList();
-            Available = service.GetReservationStocks(OrderId).ToList();
+            Reservations = service.GetReservationStocks(OrderId).ToList();
+            Available = All;
             Holders = All.Skip((PageNumber - 1) * PageSize).Take(PageSize).ToList();
             PagesCount = (int)((All.Count() + (All.Count() % PageSize)) / PageSize);
         }

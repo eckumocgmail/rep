@@ -1,0 +1,155 @@
+﻿@inherits ComponentBase
+@code 
+{        
+    [Parameter]
+    [NotNullNotEmpty]
+    public string TypeName { get; set; }
+
+    [Parameter]
+    public object Target { get; set; }
+    public bool IsReady { get; set; } = false;
+
+    private Dictionary<string, List<string>> Errors { get; set; }
+    public Dictionary<string, bool> Visible { get; set; } = new();
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        this.Errors = this.Validate();
+        if (this.Errors.Count() == 0)
+        {
+            if (TypeName.Contains(".")) 
+                TypeName = TypeName.Substring(TypeName.LastIndexOf(".") + 1);
+            if (this.Target is null)
+                this.Target = TypeName.New();
+            Visible = new Dictionary<string, bool>();
+            
+            this.IsReady = true;
+        }  
+        
+    }
+
+   
+}
+<CardContainer>
+    <CardBody>
+        @if (IsReady == false)
+        {
+            @foreach (var kv in this.Errors)
+            {
+                <CardContainer>
+                    <CardHeader>
+                        @kv.Key
+                    </CardHeader>
+                    <CardBody>
+                        @foreach (var error in kv.Value)
+                        {
+                            <div class="alert alert-danger">@error</div>
+                        }
+                    </CardBody>
+                </CardContainer>
+            }
+        }
+        else
+        {
+            <div class="card">
+                @foreach (var kv in this.Errors)
+                {
+                    <CardContainer>
+                        <CardHeader>
+                            @kv.Key
+                        </CardHeader>
+                        <CardBody>
+                            @foreach (var error in kv.Value)
+                            {
+                                <div class="alert alert-danger">@error</div>
+                            }
+                        </CardBody>
+                    </CardContainer>
+                }
+                <code>
+                    @Target.ToJsonOnScreen()
+                </code>
+                @foreach (var property in Target.GetInputProperties())
+                {   
+                    
+                    <div class="input-group">
+                        
+                        @switch (Target.GetType().GetProperty(property).PropertyType.GetTypeName())
+                        {
+                            case "Nullable<DateTime>":
+                            case "DateTime":
+                                <label>@Target.GetType().GetPropertyLabel(property)</label>
+                                <input type="datetime" value="@Target.GetValue(property)"  class="form-control w-100" @oninput="(evt => { Target.SetValue(property, evt.Value); this.Errors = Target.Validate(); StateHasChanged(); } )" />
+                                break;
+                            case "bool":
+                            case "Nullable<Boolean>":
+                            case "Boolean":
+                                <input class="form-check-input" type="checkbox" checked="@Target.GetValue(property)" id="@property" name="@property">
+                                <label>@Target.GetType().GetPropertyLabel(property)</label>
+                                break;
+                            case "Int32":
+                            case "int":
+                            case "double":  
+                            case "float": 
+                            case "decimal":
+                                <label style="padding-left: 20px;">@Target.GetType().GetPropertyLabel(property)</label>
+                                <input type="number" value="@Target.GetValue(property)" class="form-control w-100" @oninput="(evt => { Target.SetValue(property, evt.Value); this.Errors = Target.Validate(); StateHasChanged(); } )" />
+                                break;
+                            case "string":
+                            case "String":
+                                <label>@Target.GetType().GetPropertyLabel(property)</label>
+                                <input type="text" value="@Target.GetValue(property)"  class="form-control w-100" @oninput="(evt => { Target.SetValue(property, evt.Value); this.Errors = Target.Validate(); StateHasChanged(); } )" />
+                                break;
+                            case "byte[]":
+                                <label>@Target.GetType().GetPropertyLabel(property)</label>
+                                <FileUpload OnChange="(evt => { Target.SetValue(property, evt); DoValidation(); StateHasChanged(); })"></FileUpload>
+                                break;
+                            default:
+                                @code
+                                {
+                                    public Action<object> ToggleVisible(string property)
+                                    {
+                                        var p = property;
+                                        return (evt) => { Visible[p] = !Visible[p]; };
+                                    }
+                                }
+                                <CheckBox OnChange="(evt => { ToggleVisible(property)(evt); })"></CheckBox> <p>Редактировать данные</p>
+                                @if(Visible.ContainsKey(property)==false)
+                                {
+                                    Visible[property] = false;
+                                }
+                                if (Visible[property])
+                                {
+                                    <div>
+                                        <InputForm TypeName="@Target.GetType().GetProperty(property).PropertyType.GetTypeName()" Value="@Target.GetValue(property)">
+
+                                            <button class="btn btn-sm btn-primary" @onclick="(evt => { ToggleVisible(property)(evt); })">сохранить</button>
+                                            <button class="btn btn-sm btn-danger" @onclick="(evt => { ToggleVisible(property)(evt); })">отменить</button>
+                                        </InputForm>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <p class="alert alert-warning">Элемент ввода не поддерживается @Target.GetType().GetProperty(property).PropertyType.GetTypeName()</p>
+                                }
+                                
+                                break;
+                        }
+                        @if (Errors.ContainsKey(property))
+                        {
+                            @foreach (var error in Errors[property])
+                            {
+                                <small class="text text-danger">@error</small>
+                            }
+                        }
+
+                    </div>
+                }
+            </div>
+        }
+    </CardBody>
+    <CardFooter>
+        <button class="btn btn-primary">сохранить</button>
+        <button class="btn btn-danger">отмена</button>
+    </CardFooter>
+</CardContainer>

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using System;
 using System.Collections.Generic;
@@ -37,9 +38,17 @@ public static class TextFactoryExtensions
     /// </summary>
     public static object New(this string text)
     {
-        if (text == null)
-            throw new ArgumentNullException("text");
-        return ReflectionService.CreateWithDefaultConstructor<object>(text.ToType());
+        try
+        {
+            if (text == null)
+                throw new ArgumentNullException("text");
+            return ReflectionService.CreateWithDefaultConstructor<object>(text.ToType());
+        }
+        catch(Exception ex) 
+        {
+            text.Error("Не удалось создать экземпляр типа "+text+" "+ex.Message);
+            throw;
+        }
     }
 
 

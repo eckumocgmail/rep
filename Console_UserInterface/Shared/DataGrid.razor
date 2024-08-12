@@ -1,0 +1,91 @@
+﻿@using Microsoft.EntityFrameworkCore;  
+@typeparam DataType
+@inject IServiceProvider serviceProvider
+<CardContainer>
+    <CardHeader>
+        <SearchPane SearchOptions="@SearchOptions" SearchQuery="@SearchQuery" ShowLeft="@ShowLeft" SortRule="@SortRule" OnSearchSubmit="OnSearchSubmit"></SearchPane>
+    </CardHeader>
+    <CardBody>
+        <div class="d-flex flex-row flex-nowrap">
+            @if (ShowLeft)
+            {
+                <CheckList ListItems="typeof(DataType).GetInputProperties()" OnChanged="(evt => { DisplayColumns = evt; StateHasChanged(); })"></CheckList>
+            }
+            <DataTable DataCheckable="@DataCheckable" DataType="DataType" DataItems="@DataItems" DisplayColumns="@DisplayColumns"></DataTable>
+        </div>
+    </CardBody>
+    <CardFooter>
+        <Pagination PagesCount="@PagesCount" PageNumber="@PageNumber" OnChanged="OnPageChanged"></Pagination>
+    </CardFooter>
+</CardContainer>
+@code
+{
+    public int PageSize = 10;
+    public int PagesCount = 1;
+    public int PageNumber = 1;
+
+    [Parameter]
+    public bool DataCheckable { get; set; }
+
+    [Parameter]
+    public List<string> DisplayColumns { get; set; }
+
+    public string SearchQuery { get; set; } = "";
+    public List<string> SearchOptions { get; set; } = new();
+    public string SortRule { get; set; } = "";
+    public bool ShowLeft { get; set; } = false;
+
+    private DbContext DbContext { get; set; }
+    private IEntityFasade<DataType> Fasade { get; set; }
+    public IEnumerable<DataType> AllItems { get; set; } = new List<DataType>();
+    public IEnumerable<DataType> DataItems { get; set; } = new List<DataType>();
+
+    public string Message { get; set; }
+
+    public void OnPageChanged(int page)
+    {
+        this.PageNumber = page;
+        DoSearch();
+        StateHasChanged();
+    }
+
+    public void OnSearchSubmit(SearchPane search)
+    {
+        this.SearchQuery = search.SearchQuery;
+        this.SearchOptions = search.SearchOptions;
+        this.ShowLeft = search.ShowLeft;
+        this.SortRule = search.SortRule;
+        DoSearch();
+        StateHasChanged();
+    }
+
+    public void DoSearch()
+    {
+        try
+        {
+            this.SearchOptions = this.Fasade.GetOptions(this.SearchQuery).ToList();
+            this.AllItems = Fasade.Search(SearchQuery);
+            this.PagesCount = (AllItems.Count() - AllItems.Count() % PageSize) / PageSize;
+            this.PagesCount = AllItems.Count() % PageSize > 0 ? (this.PagesCount + 1) : this.PagesCount;
+            this.DataItems = AllItems.Skip(PageSize * (PageNumber - 1)).Take(PageSize).ToList();
+        }
+        catch(Exception ex)
+        {
+            Message = ex.Message;
+        }
+        StateHasChanged();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        var dbs = GetType().Assembly.GetTypes<DbContext>().Select(ptype => (DbContext)serviceProvider.GetService(ptype)).ToList<DbContext>();
+        this.DbContext = dbs.FirstOrDefault(db => {
+            var etypes = db.GetEntitiesTypes().Select(t => t.GetTypeName().Replace("DbSet<", "").Replace(">", "")).ToList();
+            var dataTypeName = typeof(DataType).GetTypeName();
+            return etypes.Contains(dataTypeName);
+        });
+        this.Fasade = new EntityFasade<DataType>(this.DbContext);
+        DoSearch();
+    }
+}

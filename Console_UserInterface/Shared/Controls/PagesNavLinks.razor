@@ -1,0 +1,19 @@
+﻿@*page "/developer/pages-nav-links"
+@inject INavMenuService navMenuService
+@code {
+
+}
+
+<div>
+    @foreach (var navLink in navMenuService.GetPageLinks())
+    {
+        <NavLink class="nav-link" href="@navLink.Href">
+            <span class="oi oi-@navLink.Icon" aria-hidden="true"></span>
+            @navLink.Label
+        </NavLink>
+    }
+</div>
+
+
+
+*@

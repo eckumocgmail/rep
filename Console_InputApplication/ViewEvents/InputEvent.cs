@@ -15,5 +15,6 @@ namespace Console_InputApplication.ViewEvents
         public string Property { get; set; }
 
         public object Value { get; set; }
+        public string Type { get; set; }
     }
 }
