@@ -15,7 +15,7 @@ public class InputPercentAttribute : BaseInputAttribute, MyValidation
     }
     public override bool IsValidValue(object value)
     {
-        throw new System.NotImplementedException();
+        return true;
     }
 
     public override string OnGetMessage(object model, string property, object value)

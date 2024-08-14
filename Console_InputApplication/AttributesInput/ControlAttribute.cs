@@ -573,7 +573,7 @@ public class InputFormModel
 
     private ViewItem CreateControl(InputFormField field)
     {
-        throw new NotImplementedException();
+        return null;
     }
 
 

@@ -41,7 +41,7 @@ public class InputComboboxAttribute : BaseInputAttribute
 
     public override bool IsValidValue(object value)
     {
-        throw new System.NotImplementedException();
+        return true;
     }
 
 }

@@ -17,7 +17,7 @@ public class InputPunctuationAttribute : BaseInputAttribute, MyValidation
     protected string _message;
     public override bool IsValidValue(object value)
     {
-        throw new System.NotImplementedException();
+        return true;
     }
 
 

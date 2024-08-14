@@ -12,17 +12,17 @@ public class InputWeekAttribute: BaseInputAttribute
     }
     public override bool IsValidValue(object value)
     {
-        throw new System.NotImplementedException();
+        return true;
     }
 
     public override string OnValidate(object model, string property, object value)
     {
-        throw new NotImplementedException();
+        return null;
     }
 
     public override string OnGetMessage(object model, string property, object value)
     {
-        throw new NotImplementedException();
+        return null;
     }
 }
 

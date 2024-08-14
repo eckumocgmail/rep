@@ -8,7 +8,7 @@ public class InputUrlAttribute : BaseInputAttribute
 {
     public override bool IsValidValue(object value)
     {
-        throw new System.NotImplementedException();
+        return true;
     }
 
    

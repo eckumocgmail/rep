@@ -5,6 +5,8 @@ using Console_DataConnector.DataModule.DataODBC.Connectors;
 using Newtonsoft.Json;
 using pickpoint_delivery_service;
 using Console_UserInterface.AppUnits.AuthorizationBlazor;
+using Console_BlazorApp;
+using Blazored.Modal;
 
 namespace Console_UserInterface
 {
@@ -27,9 +29,12 @@ namespace Console_UserInterface
         }
         public static void Main(string[] args)
         {
+            //new DeliveryServicesUnit().DoTest(false).ToDocument().WriteToConsole();
             UpdateDatabase();
 
             var builder = WebApplication.CreateBuilder(args);
+           
+            builder.Services.AddBlazorBootstrap();
 
             // Add services to the container.
             builder.Services.AddHttpContextAccessor();
@@ -52,6 +57,7 @@ namespace Console_UserInterface
             //DeliveryDbContext.CreateDeliveryData(builder.Services, builder.Configuration);
             DbContextUserInitializer.CreateUserData(builder.Services, builder.Configuration);
             var app = builder.Build();
+
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())

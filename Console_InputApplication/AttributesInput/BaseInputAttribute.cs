@@ -13,7 +13,7 @@ public class InputAttribute<T> : BaseInputAttribute
 
     public override bool IsValidValue(object value)
     {
-        throw new NotImplementedException();
+        return true;
     }
 }
 public abstract class BaseInputAttribute : DataTypeAttribute, MyValidation
@@ -95,7 +95,7 @@ public abstract class BaseInputAttribute : DataTypeAttribute, MyValidation
 
     private static bool IsExtendedFrom(Type t, string name)
     {
-        throw new NotImplementedException();
+        return t.IsExtends(name.ToType());
     }
 
     public BaseInputAttribute(string InputType): base(GetDataType(InputType))

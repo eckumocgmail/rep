@@ -14,7 +14,7 @@ public class InputSelectAttribute : BaseInputAttribute {
     }
     public override bool IsValidValue(object value)
     {
-        throw new System.NotImplementedException();
+        return true;
     }
 
     public InputSelectAttribute(int IndexIsActive, params string[] OptionsForSelection) : base(InputTypes.Custom) {

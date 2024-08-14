@@ -17,11 +17,11 @@ public class InputDurationAttribute : BaseInputAttribute
     }
     public override bool IsValidValue(object value)
     {
-        throw new System.NotImplementedException();
+        return true;
     }
 
     public override string OnGetMessage(object model, string property, object value)
     {
-        throw new System.NotImplementedException();
+        return "";
     }
 } 

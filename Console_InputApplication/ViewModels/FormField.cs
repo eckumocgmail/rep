@@ -1,4 +1,4 @@
-﻿using NetCoreConstructorAngular.Application.ActionEvent.Property;
+﻿using Console_InputApplication.ViewEvents.Property;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;

@@ -5,7 +5,7 @@
         <h2>Оформление заказа</h2>
     </CardHeader>
     <CardBody>
-        <SelectBox Options="@("Самовывоз,Доставка".Split(",").ToList())" OnChange="(evt => { OrderType = evt.Value.ToString(); StateHasChanged(); })"></SelectBox>
+        <SelectBox Options="@("Самовывоз,Доставка".Split(",").ToList())" OnChange="(evt => { OrderType = evt.ToString(); StateHasChanged(); })"></SelectBox>
         @switch (OrderType
         )
         {

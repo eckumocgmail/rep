@@ -16,11 +16,11 @@ public class InputIconAttribute : BaseInputAttribute
 
     public override bool IsValidValue(object value)
     {
-        throw new System.NotImplementedException();
+        return true;
     }
     private static object GetValueMarkedByAttribute(object target, string v)
     {
-        throw new NotImplementedException();
+        return null;
     }
 
     public InputIconAttribute(string name ="home") : base(InputTypes.Icon)

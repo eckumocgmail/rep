@@ -34,23 +34,25 @@ public class AttributesInputTest : TestingElement
 
     public class TextModel : MyValidatableObject
     {
+
+
         public string Name { get; set; }
 
-        [InputAriphmetic()] string Ariphmetic { get; set; }
-        [InputEmail()] string Email { get; set; } = "gmail";
-        [InputEngText()] string EngText { get; set; }
-        [InputEngWord()] string EngWord { get; set; }
-        [InputMultilineText()] string MultilineText { get; set; }
-        [InputPassword()] string Password { get; set; }
-        [InputConfirmation("Password")] string Confirmation { get; set; }
-        [InputPhone()] string Phone { get; set; }
-        [InputPunctuation()] string Punctuation { get; set; }
-        [InputRusText()] string InputRusText { get; set; }
-        [InputRusWord()] string RusWord { get; set; }
-        [InputTcpIp4Address()] string TcpIp4Address { get; set; }
-        [InputText()] string Text { get; set; }
-        [InputUrl()] string Url { get; set; }
-        [InputXml()] string Xml { get; set; }
+        [InputAriphmetic()] public string Ariphmetic { get; set; }
+        [InputEmail()] public string Email { get; set; } = "gmail";
+        [InputEngText()] public string EngText { get; set; }
+        [InputEngWord()] public string EngWord { get; set; }
+        [InputMultilineText()] public string MultilineText { get; set; }
+        [InputPassword()] public string Password { get; set; }
+        [InputConfirmation("Password")] public string Confirmation { get; set; }
+        [InputPhone()] public string Phone { get; set; }
+        [InputPunctuation()] public string Punctuation { get; set; }
+        [InputRusText()] public string InputRusText { get; set; }
+        [InputRusWord()] public string RusWord { get; set; }
+        [InputTcpIp4Address()] public string TcpIp4Address { get; set; }
+        [InputText()] public string Text { get; set; }
+        [InputUrl()] public string Url { get; set; }
+        [InputXml()] public string Xml { get; set; }
 
         public TextModel() : base()
         {
@@ -62,44 +64,64 @@ public class AttributesInputTest : TestingElement
 
     public class NumberModel : MyValidatableObject
     {
-        [InputPositiveInt] int PositiveInt { get; set; }
-        [InputInt] int Int { get; set; }
-        [InputPercent] int Percent { get; set; }
-        [InputDecimal] int Decimal { get; set; }
+        [InputPositiveInt] public int PositiveInt { get; set; }
+        [InputInt] public int Int { get; set; }
+        [InputPercent] public int Percent { get; set; }
+        [InputDecimal] public int Decimal { get; set; }
+        public NumberModel()
+        {
+
+        }
     }
     public class NumberTextModel : MyValidatableObject
     {
-        [InputPositiveInt] string PositiveInt { get; set; }
-        [InputPositiveInt] string Int { get; set; }
-        [InputPercent] string Percent { get; set; }
-        [InputDecimal] string Decimal { get; set; }
+        [InputPositiveInt] public string PositiveInt { get; set; }
+        [InputPositiveInt] public string Int { get; set; }
+        [InputPercent] public string Percent { get; set; }
+        [InputDecimal] public string Decimal { get; set; }
+        public NumberTextModel()
+        {
+
+        }
     }
     public class DateModel : MyValidatableObject
     {
-        [InputYear] int Year { get; set; }
-        [InputMonth] int Month { get; set; }
-        [InputDate] int Date { get; set; }
-        [InputTime] int Time { get; set; }
-        [InputWeek] int Week { get; set; }
-        [InputDateTime] int DateTime { get; set; }
+        [InputYear] public int Year { get; set; }
+        [InputMonth] public int Month { get; set; }
+        [InputDate] public int Date { get; set; }
+        [InputTime] public int Time { get; set; }
+        [InputWeek] public int Week { get; set; }
+        [InputDateTime] public int DateTime { get; set; }
+        public DateModel()
+        {
+
+        }
     }
     public class CustomModel : MyValidatableObject
     {
-        [InputBoolAttribute] bool Bool { get; set; }
-        [InputColor] string Color { get; set; }
-        [InputCreditCard] string CreditCard { get; set; }
-        [InputCurrency] float Currency { get; set; }
-        [InputWeek] int Week { get; set; }
-        [InputFile] byte[] File { get; set; }
-        [InputFilePath] string FilePath { get; set; }
-        [InputHidden] string Hidden { get; set; }
-        [InputIcon] string Icon { get; set; }
+        [InputBoolAttribute] public bool Bool { get; set; }
+        [InputColor] public string Color { get; set; }
+        [InputCreditCard] public string CreditCard { get; set; }
+        [InputCurrency] public float Currency { get; set; }
+        [InputWeek] public int Week { get; set; }
+        [InputFile] public byte[] File { get; set; }
+        [InputFilePath] public string FilePath { get; set; }
+        [InputHidden] public string Hidden { get; set; }
+        [InputIcon] public string Icon { get; set; }
         [InputImage] byte[] Image { get; set; }
+        public CustomModel()
+        {
+
+        }
     }
     public class CollectionModel : MyValidatableObject
     {
         public List<string> ListString { get; set; }
         [InputStructureCollection(nameof(DateModel))] public List<DateModel> ListDateModel { get; set; }
+        public CollectionModel()
+        {
+
+        }
     }
 }
  

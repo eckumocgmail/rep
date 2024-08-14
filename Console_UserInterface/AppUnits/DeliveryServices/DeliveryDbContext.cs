@@ -21,6 +21,7 @@ using Microsoft.EntityFrameworkCore;
 using Mvc_Apteka.Entities;
 using Blazor_UserInterface.AppUnits.DeliveryModel;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Console_UserInterface.AppUnits.DeliveryModel;
 
 public interface IKeywordsParserService
 {
@@ -237,7 +238,8 @@ namespace pickpoint_delivery_service
 
     public partial class DeliveryDbContext : DbContext
     {
-
+        
+        public virtual DbSet<ProductVideo> ProductVideos { get; set; }
         public virtual DbSet<Order> Orders { get; set; }
         public virtual DbSet<HolderStorage> HolderStorages { get; set; }
         

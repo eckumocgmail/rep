@@ -15,7 +15,7 @@ public class InputPhoneAttribute : BaseInputAttribute
     }
     public override bool IsValidValue(object value)
     {
-        throw new System.NotImplementedException();
+        return true;
     }
 
     private bool isNumber( char ch )

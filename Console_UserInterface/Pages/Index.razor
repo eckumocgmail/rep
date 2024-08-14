@@ -1,23 +1,11 @@
 ﻿@page "/"
-@using Console_UserInterface.Shared.Forms
-@using Microsoft.EntityFrameworkCore;
-@using static Console_UserInterface.Shared.Forms.ValidationForm;
 @inject IServiceProvider provider
 @code
 {
-    public class P
-    {
-        public P() { }
-
-        [InputDictionary($"{nameof(Product)},{nameof(Product.ProductName)}")]
-        public int ProductId { get; set; }
-    }
     public List<string> InputTypes { get; set; } = new();
     public List<string> DbContextTypes { get; set; } = new();
+    public Dictionary<string, object> TargetObjects = new();
 }
-<FormEditor Model="@(new InputFormModel(new P(), new string[]{"ProductId"}))"></FormEditor>
-<FormEditor Model="@(new InputFormModel(new CustomerCar()))"></FormEditor>
-
 <PageTitle>Главная страница</PageTitle>
 <CardContainer>
     <CardHeader>Выберите контекст данных</CardHeader>
@@ -42,7 +30,11 @@
         <CardHeader>Сущность @type</CardHeader>
         <CardBody>
             @*<InputForm TypeName="@type"></InputForm>*@
-            <FormEditor Model="@(new InputFormModel(type.New()))"></FormEditor>
+            
+            <FormEditor Model="@(TargetObjects.ContainsKey(type)? TargetObjects[type]: (TargetObjects[type]=type.New()))">
+                <button class="btn btn-sm btn-primary" @onclick="(evt => { Console.WriteLine(TargetObjects[type].ToJsonOnScreen()); StateHasChanged(); } )">сохранить</button>
+                <p>@(TargetObjects.ContainsKey(type) == false ? "" : TargetObjects[type].ToJsonOnScreen())</p>
+            </FormEditor>
         </CardBody>
     </CardContainer>
 

@@ -16,7 +16,7 @@ public class InputTextAttribute : BaseInputAttribute, MyValidation
     private string _message;
     public override bool IsValidValue(object value)
     {
-        throw new System.NotImplementedException();
+        return true;
     }
 
     public InputTextAttribute() : base(InputTypes.MultilineText) { }

@@ -60,7 +60,7 @@ namespace NetCoreConstructorAngular.Data.DataAttributes
 
         private T FromJson<T>(string responseText)
         {
-            throw new NotImplementedException();
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<T>(responseText);
         }
 
         public string GetMessage(object model, string property, object value)

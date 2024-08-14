@@ -2,15 +2,12 @@
 
 @code 
 {
-    public class FileItem
-    {
-        public string ContentType { get; set; }
-        public string FileName { get; set; }
-        public byte[] FileData { get; set; }
-    }
+    
 
 
 
+    [Parameter]
+    public string FileExts { get; set; } = "*.*";
     [Parameter]
     public EventCallback<IEnumerable<FileItem>> OnChanged { get; set; }
     public List<FileItem> Files { get; set; } = new();
@@ -46,7 +43,7 @@
                 Console.WriteLine($"File: {file.Name} \n Exception: {ex.Message} \n Stack: {ex.StackTrace}");
             }
         }
-
+        await OnChanged.InvokeAsync(Files);
         IsLoading = false;
         StateHasChanged();
     }

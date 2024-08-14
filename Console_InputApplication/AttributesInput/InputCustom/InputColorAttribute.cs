@@ -7,7 +7,7 @@ public class InputColorAttribute : BaseInputAttribute, MyValidation
 {
     public override bool IsValidValue(object value)
     {
-        throw new System.NotImplementedException();
+        return true;
     }
     protected string _error;
     public InputColorAttribute() : base(InputTypes.Color) { }

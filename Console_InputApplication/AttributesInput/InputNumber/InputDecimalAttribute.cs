@@ -10,7 +10,7 @@ public class InputDecimalAttribute : BaseInputAttribute
     private readonly int length;
     public override bool IsValidValue(object value)
     {
-        throw new System.NotImplementedException();
+        return true;
     }
 
     public InputDecimalAttribute(  ) : base( InputTypes.Number )

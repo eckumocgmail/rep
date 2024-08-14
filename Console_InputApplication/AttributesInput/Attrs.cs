@@ -395,7 +395,7 @@ public class Attrs: Utils
 
     private static object ControlTypeAttribute()
     {
-        throw new NotImplementedException();
+        return null;
     }
 
     public static string GetControlType(Type type, string property)

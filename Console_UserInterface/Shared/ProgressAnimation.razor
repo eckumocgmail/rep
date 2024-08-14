@@ -1,0 +1,22 @@
+﻿@code
+{
+    [Parameter]
+    public bool While { get; set; }
+
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+}
+@if (While)
+{
+    <div align="center" class="front-pane">
+        <h2>Запуск приложения</h2>
+        <div class="spinner-border" role="status" style="border-width: 35px; width: 128px; height:128px">
+            <span class="sr-only">Пожалуйста подождите</span>
+        </div>
+    </div>
+}
+else
+{
+    @ChildContent
+}

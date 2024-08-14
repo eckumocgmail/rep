@@ -6,6 +6,8 @@
     public InputFormModel ItemForm { get; set; }
     public object ItemRef { get; set; }
 
+    public List<string> SelectedItems { get; set; } = new();
+
     [Parameter]
     public List<object> Items { get; set; }
     public List<string> ItemList { get; set; } = new();
@@ -14,8 +16,7 @@
     <CardHeader>
         <div>
             <span class="btn btn-sm btn-primary" @onclick="(evt => { OnAddButtonClicked(); })">добавить</span>
-            <span class="btn btn-sm btn-primary" @onclick="(evt => { OnRemoveButtonClicked(); })">удалить</span>
-            <span class="btn btn-sm btn-primary" @onclick="(evt => { OnEditButtonClicked(); })">редактировать</span>
+            <span class="btn btn-sm btn-danger @(SelectedItems is not null &&  SelectedItems.Count()>0?"":"disabled")" @onclick="(evt => { OnRemoveButtonClicked(); })">удалить</span>
         </div>
     </CardHeader>
     <CardBody>
@@ -25,11 +26,11 @@
         }
         else
         {
-            <CheckList ListItems="ItemList"></CheckList>
+            <CheckList ListItems="ItemList" OnChanged="(evt => { SelectedItems = evt; StateHasChanged(); })"></CheckList>
         }
     </CardBody>
     <CardFooter>
-        <Pagination PagesCount="@PagesCount" PageNumber="@PageNumber" OnChanged="OnPageChanged"></Pagination>
+        <PaginationView PagesCount="@PagesCount" PageNumber="@PageNumber" OnChanged="OnPageChanged"></PaginationView>
     </CardFooter>
 </CardContainer>
 @code

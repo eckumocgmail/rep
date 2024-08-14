@@ -26,8 +26,16 @@ namespace Console_BlazorApp.AppUnits.DeliveryModel
     /// </summary>
     public class Transport : BaseEntity
     {
+        [NotNullNotEmpty]
+        [Label("Широта")]
         public float Latitude { get; set; }
+
+        [NotNullNotEmpty]
+        [Label("Долгота")]
         public float Longitude { get; set; }
+
+        [NotNullNotEmpty]
+        [Label("Пользователь")]
         public int UserId { get; set; }
     }
 

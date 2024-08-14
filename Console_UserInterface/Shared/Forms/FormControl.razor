@@ -71,7 +71,6 @@
     }
 }
 
-<div>@Model.ToJsonOnScreen()</div>
 @if (Model == null)
 {
     <div class="alert alert-danger">Отсутсвует ссылка в свойстве Model</div>
@@ -129,141 +128,161 @@ else
                       id="@Model.GetInputId()"
                       @oninput:preventDefault
                       @oninput="@((e) => OnInputValue(Model.Name)(e))"
-                          class="form-control is-@Model.State input-sm">@Model.GetHtmlInputValue()</textarea>
-        }
-        else if (Model.Type == "icon")
-        {
+                class="form-control is-@Model.State input-sm">@Model.GetHtmlInputValue()</textarea>
+            }
+            else if (Model.Type == "icon")
+            {
 
-        }
-        else if (Model.Type == "bool" || Model.Type == "checkbox")
-        {
-            <div class="form-check">
-                <label class="form-check-label" for="flexCheckDefault">
-                    @Model.Label
-                </label>
-                    <input style="width: 25px;"
-                           value="@Model.GetHtmlInputValue()"
-                    @oninput:preventDefault
-                    @oninput="@((e) => OnInputValue(Model.Name)(e))" class="form-check-input input-sm" type="checkbox" checked="@Model.Value" id="@Model.GetInputId()" name="@Model.GetInputName()">
-                </div>
+            }
+            else if (Model.Type == "file")
+            {
+                <FileUpload OnChanged="(evt => { Model.Value = evt.Count()>0?evt.First().FileData: new byte[0]; StateHasChanged(); })"></FileUpload>                
+            }
+            else if (Model.Type == "filedata")
+            {
+                <FileUpload OnChanged="(evt => { Model.Value = evt.Count()>0?evt.First().FileData: new byte[0]; StateHasChanged(); })"></FileUpload>
+            }
+            else if (Model.Type == "fileitem")
+            {
+                <p>@(Model.Value is null ? "null" : Model.Value.GetTypeName())</p>
+                <p>@(Model.Value is null ? "null" : Model.Value)</p>
+                <FileUpload OnChanged="(evt => { Model.Value = evt; StateHasChanged(); })"></FileUpload>
+            }
+            else if (Model.Type == "bool" || Model.Type == "checkbox")
+            {
+                <div class="form-check">
+                    <label class="form-check-label" for="flexCheckDefault">
+                        @Model.Label
+                    </label>
+                        <input style="width: 25px;"
+                               value="@Model.GetHtmlInputValue()"
+                        @oninput:preventDefault
+                        @oninput="@((e) => OnInputValue(Model.Name)(e))" class="form-check-input input-sm" type="checkbox" checked="@Model.Value" id="@Model.GetInputId()" name="@Model.GetInputName()">
+                    </div>
           
 
-        }
+            }
 
-        else if (Model.Type.ToLower() == "selectcontrol")
-        {
-                <select class="form-control input-sm" style="width: 100%;"
-                    name="@Model.GetInputName()"
-                    id="@Model.GetInputId()"
-                    @onchange:preventDefault
-                    @oninput="@((e) => OnInputValue(Model.Name)(e))">
-                @foreach (var option in (((Select)Model.Control).Options))
-                {
-                    @if (option.Value.ToString() == Model.Value.ToString())
+            else if (Model.Type.ToLower() == "selectcontrol")
+            {
+                    <select class="form-control input-sm" style="width: 100%;"
+                        name="@Model.GetInputName()"
+                        id="@Model.GetInputId()"
+                        @onchange:preventDefault
+                        @oninput="@((e) => OnInputValue(Model.Name)(e))">
+                    @foreach (var option in (((Select)Model.Control).Options))
                     {
-                        <option selected value="@option.Value">@option.Key</option>
-                    }
-                    else
-                    {
-                        <option value="@option.Value">@option.Key</option>
+                        @if (option.Value.ToString() == Model.Value.ToString())
+                        {
+                            <option selected value="@option.Value">@option.Key</option>
+                        }
+                        else
+                        {
+                            <option value="@option.Value">@option.Key</option>
+                        }
+
                     }
 
-                }
-
-            </select>
-        }
-        else if (Model.Type == "custom")
-        {
+                </select>
+            }
+            else if (Model.Type == "custom")
+            {
 
             
-            <div class="form-check">
-                <input @oninput:preventDefault @oninput="@((e) => { Model.Visible = !Model.Visible; StateHasChanged(); })" class="form-check-input input-sm" type="checkbox" value="" id="flexCheckDefault">
-                <label class="form-check-label" for="flexCheckDefault">
-                    @Model.Label
-                </label>
-            </div>
-            @if(Model.Visible)
-            {
-                @if (Model.IsCollection)
+                <div class="form-check">
+                    <input @oninput:preventDefault @oninput="@((e) => { Model.Visible = !Model.Visible; StateHasChanged(); })" class="form-check-input input-sm" type="checkbox" value="" id="flexCheckDefault">
+                    <label class="form-check-label" for="flexCheckDefault">
+                        @Model.Label
+                    </label>
+                </div>
+                @if(Model.Visible)
                 {
-                    @if(Model.ValueType is null)
+                    @if (Model.IsCollection)
                     {
-                            <div class="alert alert-warning">Не установлено значение ValueType для FormField</div>
+                        @if(Model.ValueType is null)
+                        {
+                                <div class="alert alert-warning">Не установлено значение ValueType для FormField</div>
+                        }
+                        else
+                        {
+                                <ListEditor ItemType="@Model.ValueType.ToType()" Items="@(ToListObjects(Model.Value))"></ListEditor>
+                        }
+                    
+                    
                     }
                     else
                     {
-                            <ListEditor ItemType="@Model.ValueType.ToType()" Items="@(ToListObjects(Model.Value))"></ListEditor>
+                        @if (Model.Value is null)
+                        {
+                            <div class="alert alert-warning">Не установлено значение Value для FormField</div>
+                        }
+                        else
+                        {
+                            <FormEditor Model="@(new InputFormModel(Model.Value))" Title="@Model.Label">
+                                <span class="btn btn-sm btn-primary" @onclick="(evt => { AfterInput.InvokeAsync(new InputEvent(){ Value = Model.Value }); Model.Visible = false; StateHasChanged(); })">сохранить</span>
+                            </FormEditor>
+                        }                     
                     }
-                    
-                    
-                }
-                else
-                {
-                    @if (Model.Value is null)
-                    {
-                        <div class="alert alert-warning">Не установлено значение Value для FormField</div>
-                    }
-                    else
-                    {
-                        <FormEditor Model="@(new InputFormModel(Model.Value))" Title="@Model.Label"></FormEditor>
-                    }                     
-                }
                 
-            }
-
-            @*code
-                {
-                //[Parameter]
-                //public ModalComponent RefModal { get; set; }
-            }
-            <ButtonContainer OnClicked="@(async ()=> { await RefModal.PopupDialog();  })">@Model.Name</ButtonContainer>
-            <ModalComponent @ref="@(RefModal)">
-                <ContentBox Model="@(Model.Control)"></ContentBox>
-            </ModalComponent>*@
-        }
-        else if (Model.Type == "image")
-        {
-            @inject IJSRuntime js
-            @code
-            {
-                 
-                public async Task OnImageClicked()
-                {
-                    await js.InvokeAsync<string>("alert(1);");
                 }
+
+                @*code
+                    {
+                    //[Parameter]
+                    //public ModalComponent RefModal { get; set; }
+                }
+                <ButtonContainer OnClicked="@(async ()=> { await RefModal.PopupDialog();  })">@Model.Name</ButtonContainer>
+                <ModalComponent @ref="@(RefModal)">
+                    <ContentBox Model="@(Model.Control)"></ContentBox>
+                </ModalComponent>*@
             }
-            <div>
-                <input type="hidden" name="@Model.Name" id="@Model.Name" value="@Model.Value" />
-
-                <img style="width: 222px; height: 222px;" @onclick="@OnImageClicked" />
-            </div>
-        }
-        else if (Model.Type == "inputdictionary")
-        {            
-
-            <select class="form-control input-sm" style="width: 100%;">
-                <option value="null">Не выбрано</option>
-                @foreach (var item in GetDataDictionary(Model.TextValue))
+            else if (Model.Type == "image")
+            {
+                @inject IJSRuntime js
+                @code
                 {
-                    <option value="@item.Key">@item.Value</option>
-                }                                    
-            </select>
-        }
-        else
-        {
-            <div class="alert alert-warning">Тип поля ввода @Model.Type не зарегистрирован в @GetType().Name</div>
-        }
+                 
+                    public async Task OnImageClicked()
+                    {
+                        await js.InvokeAsync<string>("alert(1);");
+                    }
+                }
+                <div>
+                    <input type="hidden" name="@Model.Name" id="@Model.Name" value="@Model.Value" />
 
-        @if (string.IsNullOrEmpty(Model.Help) == false)
-        {
+                    <img style="width: 222px; height: 222px;" @onclick="@OnImageClicked" />
+                </div>
+            }
+            else if (Model.Type == "inputdictionary")
+            {               
+                <select @oninput="(evt => { Model.Value = evt.Value; StateHasChanged(); })" class="form-control input-sm" style="width: 100%;">
+                    <option value="null">Не выбрано</option>
+                    @foreach (var item in GetDataDictionary(Model.TextValue))
+                    {
+                        <option value="@item.Key">@item.Value</option>
+                    }                                    
+                </select>
+            }
+            else if (Model.Type == "selectlist")
+            {
+                    <SearchListCard TItem="KeyValuePair<int,string>" Items="GetDataDictionary(Model.TextValue).ToList()"></SearchListCard>
+            }
+            else
+            {
+                <div class="alert alert-warning">Тип поля ввода @Model.Type не зарегистрирован в @GetType().Name</div>
+            }
 
-            <small class="form-text text-info">@Model.Help</small>
-        }
-        @foreach (var error in Model.Errors)
-        {
-            <div><small class="form-text text-danger">@error</small></div>
-        }
+            @if (string.IsNullOrEmpty(Model.Help) == false)
+            {
+
+                <small class="form-text text-info">@Model.Help</small>
+            }
+            @foreach (var error in Model.Errors)
+            {
+                <div><small class="form-text text-danger">@error</small></div>
+            }
     }
+   
 </div>
 }
 @inject IServiceProvider sp
@@ -274,27 +293,34 @@ else
         Dictionary<int, string> result = new();
         if (String.IsNullOrWhiteSpace(exp) || exp.Contains(",") == false)
             throw new ArgumentException("exp", "Строка должна содержать имя сущности и свойство для отобраажени я через запятую");
-        var entity = exp.Split(",")[0];
-        var property = exp.Split(",")[1];
-        foreach (Type dbtype in GetType().Assembly.GetTypes<DbContext>())
+        try
         {
-            DbContext dbc = (DbContext)sp.GetService(dbtype);
-            var types = dbc.GetEntitiesTypes().Select(p => p.GenericTypeArguments[0].GetTypeName()).ToList();
-            if (types.Contains(entity))
+            var entity = exp.Split(",")[0];
+            var property = exp.Split(",")[1];
+            foreach (Type dbtype in GetType().Assembly.GetTypes<DbContext>())
             {
-                var pdbset = dbc.GetType().GetProperties().First(p => p.PropertyType == typeof(DbSet<>).MakeGenericType(entity.ToType()));
-                var pdbsetref = pdbset.GetValue(dbc);
-                foreach (object item in (dynamic)pdbsetref)
+                DbContext dbc = (DbContext)sp.GetService(dbtype);
+                var types = dbc.GetEntitiesTypes().Select(p => p.GenericTypeArguments.Count() > 0 ? p.GenericTypeArguments[0].GetTypeName() : p.GetTypeName()).ToList();
+                if (types.Contains(entity))
                 {
-                    var id = item.GetValue("ID");
-                    if(id is null)
+                    var pdbset = dbc.GetType().GetProperties().First(p => p.PropertyType == typeof(DbSet<>).MakeGenericType(entity.ToType()));
+                    var pdbsetref = pdbset.GetValue(dbc);
+                    foreach (object item in (dynamic)pdbsetref)
                     {
-                        id = item.GetValue("Id");
+                        var id = item.GetValue("ID");
+                        if (id is null)
+                        {
+                            id = item.GetValue("Id");
+                        }
+                        var label = item.GetValue(property);
+                        result[int.Parse(id.ToString())] = label.ToString();
                     }
-                    var label = item.GetValue(property);
-                    result[int.Parse(id.ToString())] = label.ToString();
                 }
             }
+        }
+        catch(Exception ex)
+        {
+            this.Error("Не удалось получить справочник "+exp);
         }
         return result;
     }

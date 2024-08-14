@@ -10,7 +10,7 @@ public class InputPrimitiveCollectionAttribute : BaseInputAttribute
     }
     public override bool IsValidValue(object value)
     {
-        throw new System.NotImplementedException();
+        return true;
     }
 
     public override string OnValidate(object model, string property, object value)

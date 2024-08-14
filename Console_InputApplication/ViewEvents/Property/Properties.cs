@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace NetCoreConstructorAngular.Application.ActionEvent.Property
+namespace Console_InputApplication.ViewEvents.Property
 {
-    public class Properties: ConcurrentDictionary<string, Property<PropertyValue>>
+    public class Properties : ConcurrentDictionary<string, Property<PropertyValue>>
     {
     }
 }

@@ -23,12 +23,13 @@ namespace Console_BlazorApp.AppUnits.DeliveryServices
             var order = _deliveryDbContext.Orders.Include(order => order.OrderItems).FirstOrDefault(order => order.Id == orderId);
             if (order is null)
                 throw new ArgumentException("orderId");
-            var products = order.OrderItems.Select(item => item.ProductID).ToList();
+            var products = new Dictionary<int, int>(order.OrderItems.Select(item => new KeyValuePair<int,int>(item.ProductID,item.ProductCount)));
             List<int> results = new List<int>();
             var instock = _deliveryDbContext.ProductsInStock.Where(instock =>
-                products.Contains(instock.ProductID) && order.OrderItems.First(item => item.ProductID == instock.ProductID).ProductCount <= instock.ProductCount
-            );
-            foreach(var id in instock.Select(p => p.HolderID).Distinct())
+                products.Keys.Contains(instock.ProductID) &&
+                order.OrderItems.FirstOrDefault(item => item.ProductID == instock.ProductID).ProductCount <= instock.ProductCount
+            ).ToList();
+            foreach(var id in instock.Select(p => p.HolderID).ToHashSet())
             {
                 var store = instock.Where(p => p.HolderID == id);
                 foreach(var item in order.OrderItems)

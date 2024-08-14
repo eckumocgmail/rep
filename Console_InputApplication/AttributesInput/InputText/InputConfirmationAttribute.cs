@@ -11,7 +11,7 @@ public class InputConfirmationAttribute: BaseInputAttribute
     private readonly string _property;
     public override bool IsValidValue(object value)
     {
-        throw new System.NotImplementedException();
+        return true;
     }
 
     public InputConfirmationAttribute(  ) : base(InputTypes.Password){}

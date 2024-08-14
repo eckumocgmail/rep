@@ -8,7 +8,7 @@ public class InputStructureCollectionAttribute : BaseInputAttribute
     public Type ItemType { get; }
     public override bool IsValidValue(object value)
     {
-        throw new System.NotImplementedException();
+        return true;
     }
     public Type ProviderType { get; }
 
@@ -35,26 +35,22 @@ public class InputStructureCollectionAttribute : BaseInputAttribute
             {
                 throw new Exception($"Тип {typeOptionsProvider} поставщика свойств элемент коллекции не найден");
             }
-            if (IsExtendsFrom(typeof(InputStructureCollectionAttribute.IOptionsProvider))==false)
+            /*if (IsExtendsFrom(typeof(InputStructureCollectionAttribute.IOptionsProvider))==false)
             {
                 throw new Exception($"Тип {typeOptionsProvider} поставщика должен реализовать интерфейс "+nameof(InputStructureCollectionAttribute.IOptionsProvider));
 
-            }
+            }*/
         }
         catch (Exception ex)
         {
             throw new ArgumentException("type", ex);
         }
     }
-
-    private bool IsExtendsFrom(Type type)
-    {
-        throw new NotImplementedException();
-    }
+     
 
     private Type TypeForName(string type)
     {
-        throw new NotImplementedException();
+        return null;
     }
 
     /// <summary>
@@ -67,11 +63,11 @@ public class InputStructureCollectionAttribute : BaseInputAttribute
 
     public override string OnValidate(object model, string property, object value)
     {
-        throw new NotImplementedException();
+        return null;
     }
 
     public override string OnGetMessage(object model, string property, object value)
     {
-        throw new NotImplementedException();
+        return null;
     }
 }

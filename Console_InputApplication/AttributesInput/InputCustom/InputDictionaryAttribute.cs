@@ -23,8 +23,7 @@ public class InputDictionaryAttribute : ControlAttribute
      
     public override string OnValidate(object model, string property, object value)
     {
-        return (value != null && value is bool) ? null :
-            "Тип данных свойства ввода задан некорректно";
+        return null;
     }
     public override string OnGetMessage(object model, string property, object value)
     {
@@ -33,11 +32,11 @@ public class InputDictionaryAttribute : ControlAttribute
 
     public override ViewItem CreateControl(InputFormField field)
     {
-        throw new System.NotImplementedException();
+        return null;
     }
 
     public override ViewItem CreateControl(FormField field)
     {
-        throw new System.NotImplementedException();
+        return null;
     }
 }
