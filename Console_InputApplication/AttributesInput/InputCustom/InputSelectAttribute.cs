@@ -1,4 +1,6 @@
 ﻿
+using AngleSharp.Text;
+
 using System.Collections;
 using System.Collections.Generic;
 
@@ -26,8 +28,8 @@ public class InputSelectAttribute : BaseInputAttribute {
     }
     public override string OnValidate(object model, string property, object value)
     {
-        return (value != null && value is bool) ? null:
-            "Тип данных свойства ввода задан некорректно";
+        return (value != null && Options is not null && Options.Contains(value.ToString()) == false) ? 
+            "Значение не определено": null;
     }
     public override string OnGetMessage(object model, string property, object value)
     {

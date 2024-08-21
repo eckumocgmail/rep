@@ -205,35 +205,33 @@ public static class Typing
 
 
 
-    public static bool IsDateTime(PropertyInfo property)
+    public static bool IsDateTime( PropertyInfo property)
     {
         if (property == null)
             throw new ArgumentNullException("property");
         var ptype = property.PropertyType;
-        return IsDateTime(ptype);
+        return ptype.IsDateTime();
     }
 
-    public static bool IsDateTime(Type ptype)
+    public static bool IsDateTime(Type property)
     {
-        string propertyType = ParsePropertyType(ptype);
-        if (propertyType == "System.DateTime" || propertyType == "DateTime" || propertyType == "Nullable<DateTime>" || propertyType == "Nullable<System.DateTime>")
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        if (property == null)
+            throw new ArgumentNullException("property");
+        var ptype = property;
+        return ptype.IsDateTime();
     }
 
-    public static bool IsNullable(PropertyInfo property)
+
+
+
+    public static bool IsNullable(this PropertyInfo property)
     {
         var ptype = property.PropertyType;
 
         return IsNullable(ptype);
     }
 
-    public static bool IsNullable(Type ptype)
+    public static bool IsNullable(this Type ptype)
     {
         string propertyType = ParsePropertyType(ptype);
         return propertyType.StartsWith("Nullable");
@@ -368,7 +366,7 @@ public static List<MyMessageProperty> ParseActions(Type type)
         return TEXT_TYPES.Contains(ParsePropertyType(propertyInfo.PropertyType));
     }
 
-    public static bool IsText(Type ptype)
+    public static bool IsText(this  Type ptype)
     {
         return TEXT_TYPES.Contains(ParsePropertyType(ptype));
     }
@@ -394,6 +392,10 @@ public static List<MyMessageProperty> ParseActions(Type type)
     {
         return LOGICAL_TYPES.Contains(ParsePropertyType(propertyInfo.PropertyType));
     }
+    public static bool IsBoolean(this Type propertyInfo)
+    {
+        return LOGICAL_TYPES.Contains(ParsePropertyType(propertyInfo));
+    }
 
     public static bool ReferenceIsDictionary(object properties)
     {
@@ -403,7 +405,7 @@ public static List<MyMessageProperty> ParseActions(Type type)
 /// <summary>
 /// Реализует методы работы с типами
 /// </summary>
-public class CommonUtils
+public static class CommonUtils
 {
 
     public static object BindingsFor(string entity)
@@ -1403,20 +1405,23 @@ public class CommonUtils
         }
         return actionMetadata;
     }
-    public List<string> GetEventListeners()
+    public static List<string> GetEventListeners(this Type p)
     {
         List<string> listeners = new List<string>();
-        foreach (EventInfo evt in GetType().GetEvents())
+        foreach (EventInfo evt in p.GetEvents())
         {
             listeners.Add(evt.Name.ToLower());
         }
         return listeners;
     }
-    public static bool IsNumber(PropertyInfo propertyInfo)
+    public static bool IsNumber(this PropertyInfo propertyInfo)
     {
         return NUBMER_TYPES.Contains(ParsePropertyType(propertyInfo.PropertyType));
     }
-
+    public static bool IsNumber(this Type propertyInfo)
+    {
+        return NUBMER_TYPES.Contains(ParsePropertyType(propertyInfo));
+    }
     public static bool IsText(PropertyInfo propertyInfo)
     {
         return TEXT_TYPES.Contains(ParsePropertyType(propertyInfo.PropertyType));

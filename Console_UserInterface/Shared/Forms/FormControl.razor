@@ -92,7 +92,7 @@ else
         }
 
 
-        @if (Model.Type == "number" || Model.Type == "email" || Model.Type == "text" || Model.Type == "date" || Model.Type == "datetime" || Model.Type == "password" || Model.Type == "color" || Model.Type == "text")
+            @if (Model.Type == "rusword" || Model.Type == "rusword" || Model.Type == "rustext" || Model.Type == "engword" || Model.Type == "engtext" || Model.Type == "decimal" || Model.Type == "int" || Model.Type == "positiveint" || Model.Type == "number" || Model.Type == "email" || Model.Type == "text" || Model.Type == "date" || Model.Type == "datetime" || Model.Type == "password" || Model.Type == "color" || Model.Type == "text")
         {
             <input type="@Model.Type.ToLower()"
                    value="@Model.GetHtmlInputValue()"
@@ -104,6 +104,66 @@ else
                    @onfocus="@((e) => OnFocused(Model.Name)(e))"
                        class="form-control is-@Model.State input-sm" />
 
+        }
+        else if (Model.Type == "confirmation")
+        {
+            <input type="password"
+                   value="@Model.GetHtmlInputValue()"
+                   name="@Model.GetInputName()"
+                   id="@Model.GetInputId()"
+                   style="width: 100%;"
+                   @oninput:preventDefault
+                   @oninput="@((e) => OnInputValue(Model.Name)(e))"
+                   @onfocus="@((e) => OnFocused(Model.Name)(e))"
+                       class="form-control is-@Model.State input-sm" />
+        }
+        else if (Model.Type == "year")
+        {
+            <input type="date"
+                   value="@Model.GetHtmlInputValue()"
+                   name="@Model.GetInputName()"
+                   id="@Model.GetInputId()"
+                   style="width: 100%;"
+                   @oninput:preventDefault
+                   @oninput="@((e) => OnInputValue(Model.Name)(e))"
+                   @onfocus="@((e) => OnFocused(Model.Name)(e))"
+                       class="form-control is-@Model.State input-sm" />
+        }
+        else if (Model.Type == "month")
+        {
+            <input type="month"
+                   value="@Model.GetHtmlInputValue()"
+                   name="@Model.GetInputName()"
+                   id="@Model.GetInputId()"
+                   style="width: 100%;"
+                   @oninput:preventDefault
+                   @oninput="@((e) => OnInputValue(Model.Name)(e))"
+                   @onfocus="@((e) => OnFocused(Model.Name)(e))"
+                       class="form-control is-@Model.State input-sm" />
+        }
+        else if (Model.Type == "time")
+        {
+            <input type="time"
+                   value="@Model.GetHtmlInputValue()"
+                   name="@Model.GetInputName()"
+                   id="@Model.GetInputId()"
+                   style="width: 100%;"
+                   @oninput:preventDefault
+                   @oninput="@((e) => OnInputValue(Model.Name)(e))"
+                   @onfocus="@((e) => OnFocused(Model.Name)(e))"
+                       class="form-control is-@Model.State input-sm" />
+        }
+        else if (Model.Type == "week")
+        {
+            <input type="week"
+                   value="@Model.GetHtmlInputValue()"
+                   name="@Model.GetInputName()"
+                   id="@Model.GetInputId()"
+                   style="width: 100%;"
+                   @oninput:preventDefault
+                   @oninput="@((e) => OnInputValue(Model.Name)(e))"
+                   @onfocus="@((e) => OnFocused(Model.Name)(e))"
+                       class="form-control is-@Model.State input-sm" />
         }
         else if (Model.Type == "phone")
         {
@@ -122,17 +182,28 @@ else
         }
         else if (Model.Type == "multilinetext")
         {
-                    <textarea type="text"
-                              name="@Model.GetInputName()"
-                              style="width: 100%; resize: none; height: 128px;"
-                              id="@Model.GetInputId()"
-                              @oninput:preventDefault
-                              @oninput="@((e) => OnInputValue(Model.Name)(e))"
-                               class="form-control is-@Model.State input-sm">@Model.GetHtmlInputValue()</textarea>
+                <textarea type="text"
+                            name="@Model.GetInputName()"
+                            style="width: 100%; resize: none; height: 128px;"
+                            id="@Model.GetInputId()"
+                            @oninput:preventDefault
+                            @oninput="@((e) => OnInputValue(Model.Name)(e))"
+                            class="form-control is-@Model.State input-sm">@Model.GetHtmlInputValue()</textarea>
             }
             else if (Model.Type == "icon")
             {
-
+                <select class="form-control" value="@Model.GetHtmlInputValue()"
+                        name="@Model.GetInputName()"
+                        id="@Model.GetInputId()"
+                        style="width: 100%;"
+                        @oninput:preventDefault
+                        @oninput="@((e) => OnInputValue(Model.Name)(e))"
+                        @onfocus="@((e) => OnFocused(Model.Name)(e))">
+                    @foreach (var val in Enum.GetValues(typeof(IconName)))
+                    {
+                        <option value="@val">@val</option>
+                    }                    
+                </select>
             }
             else if (Model.Type == "file")
             {
@@ -205,11 +276,31 @@ else
                     {
                         @if(Model.ValueType is null)
                         {
-                                <div class="alert alert-warning">Не установлено значение ValueType для FormField</div>
+                            <div class="alert alert-warning">Не установлено значение ValueType для FormField</div>
                         }
                         else
                         {
+                            if(Model.IsPrimitive)
+                            {
+                                List<dynamic> items = new();
+                                foreach (var item in (dynamic)Model.Value)
+                                {
+                                    items.Add(item);
+                                }
+                                @if (Model.Property is null)
+                                {
+                                    <div> Model.Property не установлен </div>
+                                }
+
+                                <ListPrimitiveEditor Label="@Model.Label" InputType="@Model.Type" ControlType="@(Attrs.GetControlType(Model.Target.GetType(), Model.Name))" PropertyModel='@Model.Property' Attributes="Model.Attributes" ItemType="@Model.ValueType.ToType()" Items="@(items)" OnAdd='(evt => { Model.Value.GetType().GetMethod("Add").Invoke(Model.Value, new object[]{evt}); StateHasChanged(); })' OnRemove='(evt => { foreach(var item in evt)Model.Value.GetType().GetMethod("Remove").Invoke(Model.Value, new object[]{item}); StateHasChanged(); })'>
+
+                                </ListPrimitiveEditor>
+                            }
+                            else
+                            {
                                 <ListEditor ItemType="@Model.ValueType.ToType()" Items="@(ToListObjects(Model.Value))"></ListEditor>
+                            }
+                            
                         }
                     
                     
@@ -258,9 +349,28 @@ else
 
                     <img style="width: 222px; height: 222px;" @onclick="@OnImageClicked" />
                 </div>
+                
+            }
+            else if (Model.Type == "tcpip4address")
+            {
+            }
+            else if (Model.Type == "creditcard")
+            {
+            }
+            else if (Model.Type == "filepath")
+            {
+            }
+            else if (Model.Type == "url")
+            {
+            }
+            else if (Model.Type == "punctuation")
+            {
+            }
+            else if (Model.Type == "xml")
+            {
             }
             else if (Model.Type == "inputdictionary")
-            {               
+            {
                 <select @oninput="(evt => { Model.Value = evt.Value; StateHasChanged(); })" class="form-control input-sm" style="width: 100%;">
                     <option value="null">Не выбрано</option>
                     @foreach (var item in GetDataDictionary(Model.TextValue))
@@ -269,9 +379,12 @@ else
                     }                                    
                 </select>
             }
+            else if (Model.Type == "percent")
+            {
+            }
             else if (Model.Type == "selectlist")
             {
-                    <SearchListCard TItem="KeyValuePair<int,string>" Items="GetDataDictionary(Model.TextValue).ToList()"></SearchListCard>
+                <SearchListCard TItem="KeyValuePair<int,string>" Items="GetDataDictionary(Model.TextValue).ToList()"></SearchListCard>
             }
             else
             {

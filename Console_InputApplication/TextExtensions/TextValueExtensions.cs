@@ -107,11 +107,11 @@ public static class TextValueExtensions
         char? separator = text.FirstChar(@"-.\/:");
         if (separator == null)
         {
-            return @"Дата должна содержать один из разделителей [-.\/]";
+            return $@"Дата должна содержать один из разделителей [-.\/] inputvalue={text}";
         }
         if (text.CountOfChar((char)separator) != 2)
         {
-            return @"Дата должна содержать 2 разделителя";
+            return $@"Дата должна содержать 2 разделителя inputvalue={text}";
         }
         string numeric = text.Replace("" + (char)separator, "");
         if (numeric.Length != "12341212".Length)

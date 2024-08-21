@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-public class InputRusWordAttribute : Attribute, MyValidation
+public class InputRusWordAttribute : BaseValidationAttribute, MyValidation
 {
 
     protected string _message;

@@ -114,10 +114,23 @@ public class AttributesInputTest : TestingElement
 
         }
     }
+
     public class CollectionModel : MyValidatableObject
     {
+        [Label("Список текстовых сообщений")]
+        [InputPrimitiveCollection()]
         public List<string> ListString { get; set; }
-        [InputStructureCollection(nameof(DateModel))] public List<DateModel> ListDateModel { get; set; }
+
+
+        [Label("Список рассылки")]
+        [InputPrimitiveCollection()]
+        [InputEmail]
+        public List<string> ListEmails { get; set; }
+
+        [Label("Модели данных")]
+        [InputStructureCollection(nameof(DateModel))] 
+        public List<DateModel> ListDateModel { get; set; }
+
         public CollectionModel()
         {
 

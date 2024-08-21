@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
  
-public class TextLengthAttribute: Attribute, MyValidation
+public class TextLengthAttribute: BaseValidationAttribute
 {
     protected int _min;
     protected int _max;

@@ -1,0 +1,371 @@
+﻿@using Console_InputApplication.ViewEvents;
+@using System.Reflection;
+<h3>ListPrimitiveEditor</h3>
+@code
+{
+    public Dictionary<string, List<string>> ValidationResult { get; set; } = new();
+    public Dictionary<string,List<string>> ValidateModel()
+    {
+        Dictionary<string, List<string>> res = new();
+        if (ItemModel is null)
+            return res;
+        foreach (var kv in ItemModel.Attributes)
+        {
+            this.Info(kv.ToJsonOnScreen());
+            if (kv.Key.ToType().GetInterfaces().Contains(typeof(MyValidation)))
+            {
+                List<string> errors = new();
+                List<object> args = new List<object>();
+
+                MyValidation validation =
+                    kv.Key.ToType().Create<MyValidation>(new object[] { kv.Value });
+
+                string validationResult =
+                    validation.Validate(ItemModel.Value);
+                if (validationResult != null)
+                {
+
+                    errors.Add(validationResult);
+                }
+                res[kv.Key] = errors;
+            }
+            
+        }
+        return res;
+    }
+}
+<CardContainer>
+    <CardHeader>          
+        <div>
+            <span class="btn btn-sm btn-primary" @onclick="(evt => { OnAddButtonClicked(); })">добавить</span>
+            <span class="btn btn-sm btn-danger @(SelectedItems is not null &&  SelectedItems.Count()>0?"":"disabled")" @onclick="(evt => { OnRemoveButtonClicked(); })">удалить</span>
+        </div>
+    </CardHeader>
+    <CardBody>
+
+        @if (ItemModel is not null)
+        {
+            <CardContainer>
+                <CardHeader>
+                    @if (ValidationResult is not null)
+                    {
+                        <p class="text text-danger">@ValidationResult.ToJsonOnScreen()</p>
+                    }
+                </CardHeader>
+                <CardBody>
+                    <FormControl Model="@ItemModel" AfterInput="@OnItemValueChanged">
+                    </FormControl>
+                    @ItemModel.Validate().ToJsonOnScreen()
+                </CardBody>
+                <CardFooter>
+                    <button class="btn btn-sm btn-primary @(ValidationResult.Count()>0?"disabled":"")" @onclick="(evt => { OnAdd.InvokeAsync(ItemModel.Value).Wait(); ItemModel = null; StateHasChanged(); })" @onclick:preventDefault> добавить </button>
+                    <button class="btn btn-sm btn-danger" @onclick="(evt => { ItemModel = null; StateHasChanged(); })" @onclick:preventDefault> закрыть </button>
+                </CardFooter>
+            </CardContainer>
+        }
+        else
+        {
+
+            
+            <CheckListGeneric Context="item" TItem="object" CheckedItems="@SelectedItems" ListItems="@VisibleItems" OnChanged="(evt => { SelectedItems=evt; StateHasChanged(); })">
+                <ListItemTemplate>
+                    @ItemModel?.Attributes.ToJsonOnScreen()
+                  <div>@item</div>
+                </ListItemTemplate>
+            </CheckListGeneric>
+        }
+    </CardBody>
+    <CardFooter>
+        <PaginationView PagesCount="@PagesCount" PageNumber="@PageNumber" OnChanged="OnPageChanged"></PaginationView>
+    </CardFooter>
+</CardContainer>
+@code 
+{
+    public void OnItemValueChanged(InputEvent inputEvent)
+    {
+
+        var value = inputEvent.Value;
+        this.ValidationResult = new(ValidateModel().Where(kv => kv.Value.Count()>0));
+        /*foreach (var kv in ItemModel.Attributes)
+        {
+            if (kv.Key.ToType().GetInterfaces().Contains(typeof(MyValidation)))
+            {
+                List<string> errors = new();
+                List<object> args = new List<object>();
+            
+                MyValidation validation =
+                    kv.Key.ToType().Create<MyValidation>(new object[] { kv.Value });
+               
+                string validationResult =
+                    validation.Validate( value);
+                if (validationResult != null)
+                {
+
+                    errors.Add(validationResult);
+                }
+            }
+        }*/
+        
+
+    }
+
+    public InputFormField ItemModel { get; set; }
+    [Parameter]
+    public Type ItemType { get; set; }
+
+    [Parameter]
+    public ICollection<dynamic> Items { get; set; }
+}
+@code
+{
+    public int PageSize = 10;
+    public int PagesCount = 1;
+    public int PageNumber = 1;
+    public List<object> SelectedItems { get; set; } = new();
+    public List<object> VisibleItems { get; set; } = new();
+
+}
+@code
+{
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        Update();
+    }
+    [Parameter]
+    public EventCallback<List<object>> OnRemove { get; set; }
+    public void OnRemoveButtonClicked()
+    {
+
+        foreach (var item in SelectedItems)
+        {
+            Items.Remove(item);
+        }
+        OnRemove.InvokeAsync(SelectedItems).Wait();
+        ItemModel = null;
+        SelectedItems.Clear();
+        Update();
+    }
+
+    public void OnPageChanged(int page)
+    {
+        PageNumber = page;
+        Update();
+    }
+
+    [Parameter] public string Name { get; set; }
+    [Parameter] public string Label { get; set; }
+    [Parameter] public string Description { get; set; }
+    [Parameter] public string Icon { get; set; }
+    [Parameter] public string Help { get; set; }
+    [Parameter] public string ControlType { get; set; }
+    //[Parameter] public string InputType { get; set; }
+    [Parameter] public bool IsInput { get; set; }
+
+    [Parameter]
+    public PropertyInfo PropertyModel { get; set; }
+    [Parameter]
+    public Dictionary<string,string> Attributes { get; set; }
+    public void OnAddButtonClicked()
+    {
+        if (ItemType is not null)
+        {
+
+            InputFormField field = null;
+
+            var property = PropertyModel;
+            if (property == null)
+            {
+                throw new Exception("Ошибка при создании поля " + ItemModel.Name);
+            }
+            var propertyType = Typing.ParsePropertyType(property.PropertyType);
+
+
+            field = new InputFormField();
+            field.Attributes = Attributes;
+
+            field.Order = Attributes.ContainsKey(nameof(InputOrderAttribute)) ?
+                Attributes[nameof(InputOrderAttribute)].ToInt() : 0;
+
+            field.Name = Name;
+
+            field.Label = Label;
+            field.Description = Description;
+            field.Icon = Icon;
+            field.Help = Help;
+            field.IsPrimitive = ReflectionService.IsPrimitive(propertyType);
+            if (Attributes.ContainsKey(nameof(NotInputAttribute)))
+            {
+                throw new Exception();
+            }
+
+            bool isInput = IsInput;
+
+
+            field.Type = (from p in Attributes.Select(kv => kv.Key) where Attrs.GetControlTypes().Contains(p) select p).FirstOrDefault(); ;
+            if (field.Type != null)
+            {
+                string input =
+                    Attributes.ContainsKey(field.Type) ? Attributes[field.Type] :
+                    Attributes.ContainsKey(field.Type.Replace("Attribute", "")) ? Attributes[field.Type.Replace("Attribute", "")] :
+                    Attributes.ContainsKey(field.Type + "Attribute") ? Attributes[field.Type + "Attribute"] :
+                    throw new Exception("Не найден атрибут соответрующий типу элемента управления " + field.Type);
+                Type fieldType = ReflectionService.TypeForShortName(field.Type);
+                ControlAttribute attribute = ReflectionService.Create<ControlAttribute>(fieldType, new object[] { input });
+
+                //field.Control = attribute.CreateControl(field);
+                field.Type = field.Type.Replace("Attribute", "");
+                field.TextValue = input;
+                switch (field.Type)
+                {
+                    case nameof(InputDictionaryAttribute):
+                        {
+                            string entity = input.Split(",")[0];
+                            string display = input.Split(",")[1];
+
+                            break;
+                        }
+                }
+            }
+            else
+            {
+                field.Type = GetInputType();
+                field.Type = field.Type is not null? field.Type.ToLower(): "";
+            }
+
+            ItemModel = field;// new InputFormField();
+
+        }
+        else
+        {
+            throw new ArgumentException("ItemType не задан");
+        }
+    }
+    public string GetInputType()
+    {
+        var type = GetInputTypeByAttrs(Attributes);
+        if(type is null)
+        {
+            if (Typing.IsDateTime(ItemType))
+            {
+                return "date";
+            }
+            else if (Typing.IsBoolean(ItemType))
+            {
+                return "checkbox";
+            }
+            else if (Typing.IsNumber(ItemType))
+            {
+                return "number";
+            }
+            else
+            {
+                return "text";
+            }            
+        }
+        return type
+    }
+    public string GetInputTypeByAttrs(Dictionary<string, string> attrs)
+    {
+        if (attrs.ContainsKey("Key") || attrs.ContainsKey("KeyAttribute"))
+        {
+            return "hidden";
+        }
+        string key = null;
+        List<string> keys = new List<string>(attrs.Keys);
+        BaseInputAttribute.GetInputTypes().ForEach((string name) =>
+        {
+            if (keys.Contains(name))
+            {
+                key = name;
+            }
+        });
+        if (key != null)
+        {
+            return key.Replace("Attribute", "").Replace("Input", "");
+        }
+        else
+        {
+
+            return null;
+        }
+    }
+    public static string GetInputType(Dictionary<string, string> attrs)
+    {
+        if (attrs.ContainsKey("Key") || attrs.ContainsKey("KeyAttribute"))
+        {
+            return "hidden";
+        }
+        string key = null;
+        List<string> keys = new List<string>(attrs.Keys);
+        BaseInputAttribute.GetInputTypes().ForEach((string name) =>
+        {
+            if (keys.Contains(name))
+            {
+                key = name;
+            }
+        });
+        if (key != null)
+        {
+            return key.Replace("Attribute", "").Replace("Input", "");
+        }
+        else
+        {
+
+            return null;
+        }
+    }
+
+    public string GetInputType(Type type, string property)
+    {
+        string result = GetInputType(Attributes);
+        if (result != null) return result;
+
+        string propertyType = ItemType.GetTypeName();
+
+        if (ItemType.IsDateTime())
+        {
+            return "date";
+        }
+        else if (ItemType.IsBoolean())
+        {
+            return "checkbox";
+        }
+        else if (ItemType.IsNumber())
+        {
+            return "number";
+        }
+        else
+        {
+            return "text";
+        }
+
+
+
+
+    }
+    [Parameter]
+    public EventCallback<object> OnAdd { get; set; }
+    public void AddItem(object item)
+    {
+        //Items.Add(ItemModel.Item);
+        OnAdd.InvokeAsync(item).Wait();
+    }
+    protected override void OnInitialized()
+    {
+        if (this.Attributes is null)
+            throw new ArgumentException("Attributes");
+        PagesCount = Items.Count() % PageSize == 0 ? ((int)(Items.Count() / PageSize)) : ((int)(Items.Count() / PageSize) + 1);
+        Update();
+    }
+    [Parameter]
+    public string SearchQuery { get; set; }
+    public void Update()
+    {
+        if (SelectedItems is null)
+            SelectedItems = new();
+        SelectedItems.Clear();
+        //VisibleItems = Items.Where(item => ((object)item).ToString() is not null).ToList();
+        VisibleItems = Items.Skip(PageSize * (PageNumber - 1)).Take(PageSize).ToList();
+    }
+}

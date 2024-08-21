@@ -17,7 +17,18 @@ using System.Threading.Tasks;
 /// </summary>
 public static class StringExtensions
 {
-    
+    public static bool IsDateTime(this Type ptype)
+    {
+        string propertyType = Typing.ParsePropertyType(ptype);
+        if (propertyType == "System.DateTime" || propertyType == "DateTime" || propertyType == "Nullable<DateTime>" || propertyType == "Nullable<System.DateTime>")
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
     public static string GetDisplayText(this object p)
     {
         var type = p.GetType();

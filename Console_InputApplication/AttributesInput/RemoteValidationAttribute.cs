@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace NetCoreConstructorAngular.Data.DataAttributes
 {
-    public class RemoteValidationAttribute:  MyValidation
+    public class RemoteValidationAttribute: BaseValidationAttribute, MyValidation
     {        
         protected string _uri;
 

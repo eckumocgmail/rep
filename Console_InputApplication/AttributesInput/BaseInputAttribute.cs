@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
-public class InputAttribute<T> : BaseInputAttribute
+public class InputAttribute<T> : BaseInputAttribute, MyValidation
 {
     public InputAttribute(string InputType) : base(InputType)
     {
@@ -72,7 +72,9 @@ public abstract class BaseInputAttribute : DataTypeAttribute, MyValidation
 
     public virtual string OnGetMessage(object model, string property, object value)
     {
-        return $"Валидация свойства {property} модели {model.GetType().GetTypeName()} завершена с ошибкой для значения {value}";
+        if (model is null)
+            return $"Значение {value} не является допустимым для адреса электронной почты";
+        return $"Валидация свойства {property} модели {model?.GetType()?.GetTypeName()} завершена с ошибкой для значения {value}";
     }
     public virtual string GetMessage(object model, string property, object value)
         => OnGetMessage(model, property, value);
@@ -361,5 +363,8 @@ public abstract class BaseInputAttribute : DataTypeAttribute, MyValidation
         throw new Exception("Не удалось определить тип данных SQL Server "+_InputType        );
     }
 
-    
+    public virtual string Validate(object value)
+    {
+        return Validate(null,null,value);
+    }
 }

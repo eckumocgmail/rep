@@ -66,6 +66,15 @@ public class InputEmailAttribute : BaseInputAttribute, MyValidation
     public InputEmailAttribute(string message) : base(InputTypes.Email)
     {
         _message = message;
+         
+    }
+
+    public override string Validate(object value)
+    {
+        if (value is null)
+            return null;
+        var mes = $"Значение {value} не является допустимым для адреса электронной почты";
+        return IsValidValue(value) ? null : mes ;
     }
 
     public override string OnValidate(object model, string property, object value)

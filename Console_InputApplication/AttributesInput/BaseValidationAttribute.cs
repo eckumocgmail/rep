@@ -8,17 +8,17 @@ using System.Text;
 using System.Threading.Tasks;
 
  
-public abstract class BaseValidationAttribute: ValidationAttribute, MyValidation  
+public class BaseValidationAttribute: ValidationAttribute, MyValidation  
 {
     public BaseValidationAttribute():base() {
        
     }
 
 
-    public abstract string ValidateValue(object value);
+    public virtual string ValidateValue(object value) => throw new NotImplementedException();
 
-    public abstract string Validate(object model, string property, object value);
-    public abstract string GetMessage(object model, string property, object value);
+    public virtual string Validate(object model, string property, object value) => throw new NotImplementedException();
+    public virtual string GetMessage(object model, string property, object value) => throw new NotImplementedException();
     protected  override ValidationResult IsValid(object value, ValidationContext validationContext)
     {            
         string result = this.Validate(validationContext.ObjectInstance, validationContext.MemberName, value);
@@ -31,6 +31,11 @@ public abstract class BaseValidationAttribute: ValidationAttribute, MyValidation
             return new ValidationResult(result);
         }
 
+    }
+
+    public string Validate(object value)
+    {
+        return Validate(null, null, value);
     }
 }
  

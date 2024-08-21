@@ -12,7 +12,7 @@ using System.Reflection;
 /// <summary>
 /// Проверка уникальности значения атрибута сущности
 /// </summary>
-public class UniqValueAttribute : Attribute, MyValidation
+public class UniqValueAttribute : BaseValidationAttribute, MyValidation
 {
     protected string _error;    
 

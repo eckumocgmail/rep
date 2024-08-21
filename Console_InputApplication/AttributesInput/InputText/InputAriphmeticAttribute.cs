@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 /// <summary>
 /// Атрибут свойства модели, указывает на необходимость удостовериться, что текст свойства содержит только латинские символы
 /// </summary>
-public class InputAriphmeticAttribute : Attribute, MyValidation
+public class InputAriphmeticAttribute : BaseValidationAttribute, MyValidation
 {
     /// <summary>
     /// Сообщение в случае возникновения исключения

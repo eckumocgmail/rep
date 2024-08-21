@@ -91,10 +91,7 @@ public static class ObjectValidationExtensions
 
 
 
-    /// <summary>
-    /// Валидация модели по правилам определённым через атрибуты
-    /// </summary>
-    /// <returns></returns>
+   
     public static Dictionary<string, List<string>> Validate(this object target, string[] keys)
     {
 

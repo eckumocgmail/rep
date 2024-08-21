@@ -27,6 +27,6 @@ public class InputPrimitiveCollectionAttribute : BaseInputAttribute
 
     public override string OnGetMessage(object model, string property, object value)
     {
-        return $"Валидация свойства {property} модели {model.GetType().GetTypeName()} завершена с ошибкой для значения {value}";
+        return $"Валидация свойства {property} модели {model?.GetType()?.GetTypeName()} завершена с ошибкой для значения {value}";
     }
 }

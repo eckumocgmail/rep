@@ -1,0 +1,28 @@
+﻿@typeparam TItem
+<ul class="list-group">
+    @foreach (var item in ListItems)
+    {
+        <li class="list-group-item">
+            <div class="d-flex flex-row flex-wrap">            
+                <CheckBox OnChange="(evt => { if(CheckedItems.Contains(item)){ CheckedItems.Remove(item); } else {CheckedItems.Add(item);} OnChanged.InvokeAsync(CheckedItems); StateHasChanged(); })" Label="" Checked="(CheckedItems.Contains(item))" />
+                @ListItemTemplate(item)
+            </div>
+        </li>
+    }
+    
+</ul>
+@code 
+{
+
+    [Parameter]
+    public RenderFragment<TItem> ListItemTemplate { get; set; }
+
+    [Parameter]
+    public List<TItem> ListItems { get; set; }
+
+    [Parameter]
+    public List<TItem> CheckedItems { get; set; } = new();
+
+    [Parameter]
+    public EventCallback<List<TItem>> OnChanged { get; set; }
+}
