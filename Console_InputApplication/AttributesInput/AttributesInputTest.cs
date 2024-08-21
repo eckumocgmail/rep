@@ -108,7 +108,7 @@ public class AttributesInputTest : TestingElement
         [InputFilePath] public string FilePath { get; set; }
         [InputHidden] public string Hidden { get; set; }
         [InputIcon] public string Icon { get; set; }
-        [InputImage] byte[] Image { get; set; }
+        [InputImage] byte[] Image { get; set; } = new byte[0];
         public CustomModel()
         {
 

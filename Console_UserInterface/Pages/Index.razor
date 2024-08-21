@@ -6,6 +6,11 @@
     public List<string> DbContextTypes { get; set; } = new();
     public Dictionary<string, object> TargetObjects = new();
 }
+
+
+
+<Test></Test>
+
 <PageTitle>Главная страница</PageTitle>
 <CardContainer>
     <CardHeader>Выберите контекст данных</CardHeader>
@@ -29,13 +34,18 @@
     <CardContainer>
         <CardHeader>Сущность @type</CardHeader>
         <CardBody>
-            @*<InputForm TypeName="@type"></InputForm>*@
-            
-            <FormEditor Model="@(TargetObjects.ContainsKey(type)? TargetObjects[type]: (TargetObjects[type]=type.New()))">
-                <button class="btn btn-sm btn-primary" @onclick="(evt => { Console.WriteLine(TargetObjects[type].ToJsonOnScreen()); StateHasChanged(); } )">сохранить</button>
-                <p>@(TargetObjects.ContainsKey(type) == false ? "" : TargetObjects[type].ToJsonOnScreen())</p>
-            </FormEditor>
+            <ListEditor ItemType="@(type.ToType())" OnAdd="(evt => { var db = DataService.GetDbContext(type.ToType()); db.Add(evt); db.SaveChanges(); db.Dispose(); StateHasChanged(); })"></ListEditor>
+            @*<FormEditor Model="@(TargetObjects.ContainsKey(type)? TargetObjects[type]: (TargetObjects[type]=type.New()))">
+                <button class="btn btn-sm btn-primary" @onclick="(evt => { Console.WriteLine(TargetObjects[type].ToJsonOnScreen()); StateHasChanged(); } )">сохранить</button>                
+            </FormEditor>*@
         </CardBody>
     </CardContainer>
 
+}
+@code
+{
+    public void OnAdd(object evt)
+    {
+        //var dbc = DataService.GetDbContext(type.ToType()); dbc.Add(evt); dbc.SaveChanges(); StateHasChanged();
+    }
 }

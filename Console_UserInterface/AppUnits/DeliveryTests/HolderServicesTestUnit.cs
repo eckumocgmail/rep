@@ -43,8 +43,8 @@ namespace Console_BlazorApp.AppUnits.DeliveryTests
 
                     var items = holderService.CreateOrder(holder.Id, products);
                     Assert(el => items.All(p => p.Value == 1), 
-                        "Формирование автозаказа на оптовый склад работает корректно",
-                        "Формирование автозаказа на оптовый склад работает не корректно");
+                        $"Формирование автозаказа на оптовый склад по адресу {holder.HolderLocation} работает корректно",
+                        $"Формирование автозаказа на оптовый склад по адресу {holder.HolderLocation} работает не корректно");
 
                 }
                 return true;

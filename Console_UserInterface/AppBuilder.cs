@@ -6,6 +6,9 @@
         /// <summary>
         /// Модель меню навигации по типам из пространства имён
         /// </summary>        
+        /// <param name="mapping">
+        /// Маппинг значений для маршрута
+        /// </param>
         public Dictionary<string, string> GetNavModel(string snamespace, Dictionary<string, string> mapping = null)
         {
             Dictionary<string, string> result = new();

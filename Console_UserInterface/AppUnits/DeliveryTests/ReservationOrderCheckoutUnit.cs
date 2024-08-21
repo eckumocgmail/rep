@@ -24,12 +24,12 @@ namespace Console_BlazorApp.AppUnits.DeliveryTests
             using(var db = new DeliveryDbContext())
             {
                 var customerService = new CustomerService(db);
-                var products = customerService.SearchProducts("dell");
+                var products = customerService.SearchProducts("");
                 if (products is null || products.Count() == 0)
                 {
                     return;
                 }
-                var product = products.First();
+                var product = products.First( p => p.ProductName.IndexOf("streak")!=-1);
                 Dictionary<int, int> instocks = customerService.SearchProductHolders(product.Id, 1);
                 Console.WriteLine(instocks.ToJsonOnScreen());
                 if (instocks.Count() == 0)

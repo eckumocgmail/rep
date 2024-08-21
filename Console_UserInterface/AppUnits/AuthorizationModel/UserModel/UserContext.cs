@@ -54,7 +54,8 @@ public class UserContext : ActiveObject
     [InputHidden(true)]
     [Label("Учетная запись")]
     public virtual UserAccount Account { get; set; }
-    public int? WalletId { get; set; }
+
+    public int WalletId { get; set; }
     public UserWallet Wallet { get; set; }
     
 

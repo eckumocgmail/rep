@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 
 using pickpoint_delivery_service;
 
+using System.Reflection;
+
 namespace Console_BlazorApp.AppUnits.DeliveryServices
 {
     /// <summary>
@@ -20,38 +22,47 @@ namespace Console_BlazorApp.AppUnits.DeliveryServices
 
         public IEnumerable<int> GetReservationStocksIds(int orderId)
         {
-            var order = _deliveryDbContext.Orders.Include(order => order.OrderItems).FirstOrDefault(order => order.Id == orderId);
-            if (order is null)
-                throw new ArgumentException("orderId");
-            var products = new Dictionary<int, int>(order.OrderItems.Select(item => new KeyValuePair<int,int>(item.ProductID,item.ProductCount)));
-            List<int> results = new List<int>();
-            var instock = _deliveryDbContext.ProductsInStock.Where(instock =>
-                products.Keys.Contains(instock.ProductID) &&
-                order.OrderItems.FirstOrDefault(item => item.ProductID == instock.ProductID).ProductCount <= instock.ProductCount
-            ).ToList();
-            foreach(var id in instock.Select(p => p.HolderID).ToHashSet())
+            try
             {
-                var store = instock.Where(p => p.HolderID == id);
-                foreach(var item in order.OrderItems)
+                var order = _deliveryDbContext.Orders.Include(order => order.OrderItems).FirstOrDefault(order => order.Id == orderId);
+                if (order is null)
+                    throw new ArgumentException("orderId");
+                var products = new Dictionary<int, int>(order.OrderItems.Select(item => new KeyValuePair<int, int>(item.ProductID, item.ProductCount)));
+                List<int> results = new List<int>();
+                var instock = _deliveryDbContext.ProductsInStock.Where(instock =>
+                    _deliveryDbContext.Orders.Include(order => order.OrderItems).FirstOrDefault(order => order.Id == orderId).OrderItems.Select(item => item.ProductID).Contains(instock.ProductID)
+                //products.Keys.Contains(instock.ProductID) &&
+                //order.OrderItems.FirstOrDefault(item => item.ProductID == instock.ProductID).ProductCount <= instock.ProductCount
+                ).ToList();
+                foreach (var id in instock.Select(p => p.HolderID).ToHashSet())
                 {
-                    var p = store.FirstOrDefault(s => s.ProductID == item.ProductID);
-                    if ((p is not null && item.ProductCount<= p.ProductCount))
+                    var store = instock.Where(p => p.HolderID == id);
+                    foreach (var item in order.OrderItems)
                     {
-                        results.Add(id);
+                        var p = store.FirstOrDefault(s => s.ProductID == item.ProductID);
+                        if ((p is not null && item.ProductCount <= p.ProductCount))
+                        {
+                            results.Add(id);
+                        }
                     }
                 }
-            }
 
 
-            /*foreach (var holder in _deliveryDbContext.Holders.ToList())           
-            {
-                var holderId = holder.Id;
-                if(order.OrderItems.Any(item => _deliveryDbContext.ProductsInStock.Where(p => p.HolderID == holderId && item.ProductID == p.ProductID && item.ProductCount <= p.ProductCount).Count() != 1)==false)
+                /*foreach (var holder in _deliveryDbContext.Holders.ToList())           
                 {
-                    results.Add(holderId);
-                }
-            }*/
-            return results;            
+                    var holderId = holder.Id;
+                    if(order.OrderItems.Any(item => _deliveryDbContext.ProductsInStock.Where(p => p.HolderID == holderId && item.ProductID == p.ProductID && item.ProductCount <= p.ProductCount).Count() != 1)==false)
+                    {
+                        results.Add(holderId);
+                    }
+                }*/
+                return results;
+            }           
+            catch(Exception ex)
+            {
+                this.Error(MethodInfo.GetCurrentMethod().Name + " "+ex.Message);
+                throw;
+            }
         }
 
         public IEnumerable<Holder> GetReservationStocks(int orderId)

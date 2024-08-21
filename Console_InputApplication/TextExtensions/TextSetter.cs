@@ -79,6 +79,10 @@ public class TextDataSetter
         {
             p.SetValue(target, value.ToString());
         }
+        else if (ptype.GetTypeName() == "Byte[]")
+        {
+            p.SetValue(target, value);
+        }
         else
         {
             var pvalue = FromText(value, ptype.Name);

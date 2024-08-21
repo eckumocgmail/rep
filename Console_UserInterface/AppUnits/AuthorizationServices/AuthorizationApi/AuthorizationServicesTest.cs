@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 using NSwag.CodeGeneration.CSharp;
 
+[Label("Проверка модуля авторизации во внешних сервисах")]
 public class AuthorizationServicesTest : TestingElement
 {
     public AuthorizationServicesTest(IServiceProvider provider) : base(provider)

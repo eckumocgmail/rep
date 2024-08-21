@@ -1,8 +1,12 @@
 ﻿namespace Console_BlazorApp.AppUnits.DeliveryModel
 {
+    [Label("Позиция в заказе")]
     public class OrderItem : BaseEntity
     {
+        [NotInput]
         public int OrderID { get; set; }
+
+        [InputDictionary($"{nameof(Product)},ProductName")]
         public int ProductID { get; set; }
 
 

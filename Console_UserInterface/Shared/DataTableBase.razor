@@ -1,30 +1,35 @@
-﻿@typeparam DataType
-@using Console_InputApplication
+﻿@using Console_InputApplication
 @code 
 {
     [Parameter]
-    public bool DataCheckable { get; set; }
+    public EventCallback<List<object>> OnSelect { get; set; }
+    public List<object> Selected { get; set; } = new();
 
     [Parameter]
-    public IEnumerable<DataType> DataItems { get; set; }
-    public HashSet<DataType> CheckedItems { get; set; } = new();
+    public bool DataCheckable { get; set; }
+    [Parameter]
+    public Type DataType { get; set; }
+    [Parameter]
+    public IEnumerable<object> DataItems { get; set; }
+    public HashSet<object> CheckedItems { get; set; } = new();
 
     [Parameter]
     public List<string> DisplayColumns { get; set; }  
-    
+
     protected override async Task OnInitializedAsync()
     {
-        this.DisplayColumns = this.DisplayColumns is null ? typeof(DataType).GetInputProperties().Take(5).ToList() : this.DisplayColumns;
+        await base.OnInitializedAsync();
+        this.DisplayColumns = this.DisplayColumns is null ? DataType.GetInputProperties().Take(5).ToList() : this.DisplayColumns;
     }
 
     public List<string> GetColumnsLabels()
     {
-        return typeof(DataType).GetInputProperties().Select(property => typeof(DataType).GetPropertyLabel(property)).ToList();
+        return DataType.GetInputProperties().Select(property => DataType.GetPropertyLabel(property)).ToList();
     }
 
     public List<string> GetColumnsLabels(params string[] properties)
     {
-        return properties.Select(property => typeof(DataType).GetPropertyLabel(property)).ToList();
+        return properties.Select(property => DataType.GetPropertyLabel(property)).ToList();
     }
 }
 @if(DataItems is null || DataItems.Count()==0)
@@ -33,9 +38,9 @@
 }
 else
 {
-    <table class="table table-bordered table-borderless">
+    <table class="table table-bordered table-borderless table-hover">
         <thead>
-            <tr>
+            <tr class="bg-dank text-white">
                 @if(DataCheckable)
                 {
                     <th style="width: 50px;"></th>
@@ -47,9 +52,9 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach(DataType Item in DataItems)
+            @foreach(object Item in DataItems)
             {
-                <tr>
+                <tr class="@(Selected.Contains(Item)? "table-dark": "")" @onclick="(evt => { if(Selected.Contains(Item))Selected.Remove(Item);else Selected.Add(Item); OnSelect.InvokeAsync(Selected).Wait(); StateHasChanged(); })">
                     @if (DataCheckable)
                     {
                         <td style="width: 50px;"><CheckBox Checked="@CheckedItems.Contains(Item)" OnChange="(evt => { if(CheckedItems.Contains(Item))CheckedItems.Remove(Item); else CheckedItems.Add(Item); StateHasChanged(); })"></CheckBox></td>

@@ -1,5 +1,84 @@
-﻿<h3>CreateMessage</h3>
-
-@code {
+﻿@inject IUserMessagesService userMessages
+<h3>CreateMessage</h3>
+<div class="card">
+    <div class="card-header">
+        <h2>Новое сообщение</h2>
+        <div class="form-group">
+            <label>Кому</label>
+            <select class="form-control" @onchange="(evt => { toUserId = int.Parse(evt.Value.ToString()); } )">
+                @foreach (var kv in userMessages.GetUsers())
+                {
+                    <option value="@kv.Value">@kv.Key</option>
+                }
+            </select>
+        </div>
+        <div>
+            <h2>Файлы</h2>
+            <input type="file" hidden id="input_file" />
+            <span class="btn btn-sm btn-primary" onclick="document.getElementById('input_file').click()">загрузить</span>
+            <ul class="list-group">
+                @foreach (var file in files.ToList())
+                {
+                    <li class="list-group-item">
+                        <span class="btn btn-danger" @onclick="(evt => { files.Remove(file); StateHasChanged();/* удалить этот элемент */ } )"> @file X</span>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="form-group">
+            <label>Текст</label>
+            <textarea class="form-control" @oninput="(evt => { message = evt.Value.ToString(); StateHasChanged(); })">@message</textarea>
+        </div>
+    </div>
+    <div class="card-footer">
+        <button class="btn btn-sm btn-primary" @onclick="(evt => { OnSendMessageButtonClicked.InvokeAsync(evt).Wait(); })">Отправить</button>
+    </div>
+</div>
+@code 
+{
     [Parameter] public EventCallback OnComplete { get; set; }
+    public int? toUserId { get; set; }
+    public string message { get; set; }
+    [Parameter]
+    public EventCallback<object> OnSendMessageButtonClicked { get; set; }
+}
+@code
+{
+    private List<UserMessageFile> files { get; set; } = new();
+    private bool isLoading = false;
+
+    public async Task OnFileChanged(InputFileChangeEventArgs evt)
+    {
+        isLoading = true;
+        files.Clear();
+        foreach (var file in evt.GetMultipleFiles(3))
+        {
+            try
+            {
+                using (var ms = new MemoryStream())
+                {
+                    using (var stream = file.OpenReadStream())
+                    {
+                        var data = new byte[stream.Length];
+                        await stream.ReadAsync(data);
+                        files.Add(new UserMessageFile()
+                            {
+                                ContentType = file.ContentType,
+                                FileData = data,
+                                FileName = file.Name
+                            });
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"File: {file.Name} \n Exception: {ex.Message} \n Stack: {ex.StackTrace}");
+            }
+        }
+
+        isLoading = false;
+    }
 }

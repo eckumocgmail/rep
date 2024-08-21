@@ -88,7 +88,7 @@ public static class TextConvertExtensions
     public static bool ToBool(this string text)
     {
         text.EnsureIsBool();
-        return text=="true";
+        return text is not null && text.ToLower().Trim() == "true" ;
     }
     public static float ToFloat(this string text)
     {

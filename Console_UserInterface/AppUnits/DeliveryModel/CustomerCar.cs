@@ -30,14 +30,14 @@ namespace Console_BlazorApp.AppUnits.DeliveryModel
         [NotNullNotEmpty()]
         public string Vin { get; set; }
 
-        [Label("Модель")]
+        [Label("Регистрационный номер")]
         [StringLength(10)]
         [MinLength(10)]
         [NotNullNotEmpty()]
         public string RegNumber { get; set; }
 
         [Label("Клиент")]
-        [InputDictionary(nameof(Customer) + ",Name")]
+        [InputDictionary(nameof(CustomerContext) + ",FirstName")]
         public int CustomerId { get; set; }
 
         [Label("Клиент")]

@@ -6,14 +6,87 @@
     public InputFormModel ItemForm { get; set; }
     public object ItemRef { get; set; }
 
-    public List<string> SelectedItems { get; set; } = new();
+    public List<object> SelectedItems { get; set; } = new();
 
     [Parameter]
-    public List<object> Items { get; set; }
-    public List<string> ItemList { get; set; } = new();
+    public List<object> Items { get; set; } = new();
+    [Parameter]
+    public List<object> VisibleItems { get; set; } = new();
+
+    [Parameter]
+    public string SearchQuery { get; set; }
+    [Parameter]
+    public List<string> SearchOptions { get; set; } = new();
+    [Parameter]
+    public string SortRule { get; set; }
+    [Parameter]
+    public bool ShowLeft { get; set; }
+
+    public async Task OnSearchSubmit(SearchPane search)
+    {
+        SearchQuery = search.SearchQuery;
+        SearchOptions = search.SearchOptions;
+        SortRule = search.SortRule;
+        ShowLeft = search.ShowLeft;
+
+        VisibleItems = Items.Where(item => item.ToJson().IndexOf(SearchQuery.ToLower()) != -1).ToList();
+
+        await Task.CompletedTask;
+    }
+    Dictionary<string, bool> FiltersVisible { get; set; } = new();
 }
 <CardContainer>
     <CardHeader>
+        <div>
+            <SearchPane OnSearchSubmit="@OnSearchSubmit" SearchOptions="@SearchOptions" SearchQuery="@SearchQuery" ShowLeft="@ShowLeft" SortRule="@SortRule"></SearchPane>
+        </div>
+        <div>
+            @foreach (var property in ItemType.GetOwnPropertyNames())
+            {
+                <div>
+                    @(FiltersVisible.ContainsKey(property) ? FiltersVisible[property] : "")
+                    <CheckBox Label="@property" OnChange="(evt => { FiltersVisible[property] = FiltersVisible.ContainsKey(property)==false? true: !FiltersVisible[property]; StateHasChanged(); })"></CheckBox>
+                    
+                </div>
+                <div style="margin-left: 20px;">
+                    @if (FiltersVisible.ContainsKey(property) && FiltersVisible[property])
+                    {
+                        @switch(ItemType.GetProperty(property).PropertyType.GetTypeName())
+                        {
+                            case "Int64": 
+                            case "Int32":
+                            case "long":
+                            case "int":
+                            case "float":
+                            case "decimal":
+                            case "double":
+                                <FormControl Model='@(new FormFieldModel(){ Type = "number", Value="0", Name=property, Label="Мин."})'></FormControl>
+                                <FormControl Model='@(new FormFieldModel(){ Type = "number", Value="0", Name=property, Label="Макс."})'></FormControl>
+                                break;
+                            case "System.DateTime":
+                            case "DateTime":
+                            case "Date":
+                                <FormControl Model='@(new FormFieldModel(){ Type = "datetime", Value="0", Name=property, Label="Мин."})'></FormControl>
+                                <FormControl Model='@(new FormFieldModel(){ Type = "datetime", Value="0", Name=property, Label="Макс."})'></FormControl>
+                                break;
+                            case "string":
+                            case "String":
+                                <CheckBox Label="Email" OnChange="(evt => {})"></CheckBox>
+                                <CheckBox Label="Url" OnChange="(evt => {})"></CheckBox>
+                                <CheckBox Label="Pattern" OnChange="(evt => {})"></CheckBox>
+                                <CheckBox Label="Русккий" OnChange="(evt => {})"></CheckBox>
+                                <CheckBox Label="Англ" OnChange="(evt => {})"></CheckBox>                               
+                                <FormControl Model='@(new FormFieldModel(){ Type = "number", Value="0", Name=property, Label="Длина"})'></FormControl>
+                                break;
+                            default:
+                                <p>@ItemType.GetProperty(property).PropertyType.GetTypeName()</p>
+                            break;
+                        }
+                    }
+                 
+                </div>
+            }
+        </div>
         <div>
             <span class="btn btn-sm btn-primary" @onclick="(evt => { OnAddButtonClicked(); })">добавить</span>
             <span class="btn btn-sm btn-danger @(SelectedItems is not null &&  SelectedItems.Count()>0?"":"disabled")" @onclick="(evt => { OnRemoveButtonClicked(); })">удалить</span>
@@ -22,11 +95,16 @@
     <CardBody>
         @if (ItemForm is not null)
         {           
-            <FormEditor Model="@ItemForm"></FormEditor>
+            <FormEditor Model="@ItemForm">
+                <button class="btn btn-sm btn-primary @(ItemForm.Item.Validate().Count()==0?"":"disabled")"
+                @onclick="(evt => { AddItem(ItemForm.Item); ItemForm = null; StateHasChanged(); } )">
+                    сохранить
+                </button>
+            </FormEditor>
         }
         else
         {
-            <CheckList ListItems="ItemList" OnChanged="(evt => { SelectedItems = evt; StateHasChanged(); })"></CheckList>
+            <DataTableBase DataCheckable="@false" DataType="ItemType" DataItems="VisibleItems" OnSelect="(evt => { SelectedItems = evt; StateHasChanged(); })"></DataTableBase>
         }
     </CardBody>
     <CardFooter>
@@ -35,9 +113,29 @@
 </CardContainer>
 @code
 {
+    [Parameter]
+    public EventCallback<object> OnAdd { get; set; }
+    public void AddItem( object item)
+    {
+        Items.Add(ItemForm.Item);        
+        OnAdd.InvokeAsync(item).Wait();
+    }
     protected override void OnInitialized()
     {
-        this.ItemList = Items is null? new(): Items.Select(item => $"{item}"/* item.GetDisplayText()*/).ToList();
+        if (Items.Count() == 0)
+        {
+            Items = GetDataSet();
+        }
+        PagesCount = Items.Count() % PageSize == 0 ? ((int)(Items.Count() / PageSize)) : ((int)(Items.Count() / PageSize) + 1);
+        Update();
+    }
+    public void Update()
+    {
+        if (SelectedItems is null)
+            SelectedItems = new();
+        SelectedItems.Clear();
+        VisibleItems = Items.Where(item => item.ToJson().IndexOf(SearchQuery.ToLower()) != -1).ToList();
+        VisibleItems = Items.Skip(PageSize * (PageNumber - 1)).Take(PageSize).ToList();
     }
 }
 @code
@@ -58,19 +156,45 @@
         {
             throw new ArgumentException("ItemType не задан");
         }
-
     }
+
+    public List<object> GetDataSet()
+    {
+        List<object> result = new();
+        foreach (var dbt in GetType().Assembly.GetTypes<DbContext>().Select(t => t.GetTypeName()).ToList())
+        {
+            using (var db = (DbContext)dbt.New())
+            {
+                if (db.GetEntitiesTypes().Select(p => p.GenericTypeArguments.Count() > 0 ? p.GenericTypeArguments[0].GetTypeName() : p.GetTypeName()).ToList().Contains(ItemType.GetTypeName()))
+                {
+                    var pdbset = db.GetType().GetProperties().First(p => p.PropertyType == typeof(DbSet<>).MakeGenericType(ItemType));
+                    var pdbsetref = pdbset.GetValue(db);
+                    foreach (object item in (dynamic)pdbsetref)
+                    {
+                        result.Add(item);
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    [Parameter]
+    public EventCallback<List<object>> OnRemove { get; set; }
+
     public void OnRemoveButtonClicked()
     {
-
-    }
-    public void OnEditButtonClicked()
-    {
-
+        foreach(var item in SelectedItems)
+        {
+            Items.Remove(item);
+        }
+        OnRemove.InvokeAsync(SelectedItems).Wait();
+        SelectedItems.Clear();
     }
 
     public void OnPageChanged(int page)
     {
-        
+        PageNumber = page;
+        Update();
     }
 }

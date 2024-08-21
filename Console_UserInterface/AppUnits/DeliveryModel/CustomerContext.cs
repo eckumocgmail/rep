@@ -619,7 +619,7 @@ namespace Console_BlazorApp.AppUnits.DeliveryModel
             public int UpdateCounter { get; set; } = 0;
 
 
-            public IEnumerable<OrderItem> OrderItems { get; set; }
+            public List<OrderItem> OrderItems { get; set; }
 
             public float GetOrderPrice()
             {

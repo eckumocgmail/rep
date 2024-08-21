@@ -150,6 +150,7 @@ public sealed class SignupUser : BaseSignup<UserContext, UserAccount, UserPerson
             try
             {
                 var context = new UserContext();
+                _model.Add(context.Wallet = new( ) { });
                 _model.Add(context.Account = new(Email, Password) { });
                 _model.Add(context.Person = new() { FirstName = FirstName, LastName = LastName, SurName = SurName, Birthday = Birthday, Tel = Tel });
                 _model.Add(context.Settings = new UserSettings());

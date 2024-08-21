@@ -25,20 +25,25 @@ public class UserGroup: DictionaryTable
     public virtual BusinessProcess BusinessProcess { get; set; }*/
 
 
-
-    [NotNullNotEmpty()]
-    [UniqValue()]
+    [Label("Уникальный код")]
+    [UniqValue]
+    [InputEngWord]
+    [StringLength(25)]
+    [NotNullNotEmpty()]    
     public string Code { get; set; }
 
     [NotMapped]
+    [NotInput]
     [JsonIgnore()]
     public virtual List<UserGroupMessage> UserGroupMessages { get; set; }
 
     [NotMapped]
+    [NotInput]
     [JsonIgnore()]
     public virtual List<UserGroups> UserGroups { get; set; }
 
     [NotMapped]
+    [NotInput]
     [JsonIgnore()]
     public virtual List<UserPerson> People { get; set; }
 

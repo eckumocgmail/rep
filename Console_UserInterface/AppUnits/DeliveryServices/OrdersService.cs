@@ -75,7 +75,7 @@ namespace pickpoint_delivery_service
             }
             var user = _signin.Verify();
             var customer = GetCustomerByUser(user);
-            return _unit.Orders.Include(o => o.Holder).Include(o => o.OrderItems).Where(order => order.CustomerID == customer.Id).OrderByDescending(o => o.OrderUpdated).ToList();
+            return _unit.Orders.Include(o => o.Holder).Include(o => o.OrderItems).Where(order => order.CustomerID == customer.Id).OrderByDescending(o => o.OrderCreated).ToList();
         }
 
         public IEnumerable<OrderItem> GetOrderItems(int orderId)

@@ -4,6 +4,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
+[Label("Проверка функции авторизации")]
 public class AuthorizationServiceTest : TestingElement
 {
     public AuthorizationServiceTest(IServiceProvider provider) : base(provider)

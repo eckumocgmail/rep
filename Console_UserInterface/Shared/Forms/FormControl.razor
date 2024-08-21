@@ -92,7 +92,7 @@ else
         }
 
 
-        @if (Model.Type == "number" || Model.Type == "email" || Model.Type == "text" || Model.Type == "date" || Model.Type == "datetime" || Model.Type == "password" || Model.Type == "color")
+        @if (Model.Type == "number" || Model.Type == "email" || Model.Type == "text" || Model.Type == "date" || Model.Type == "datetime" || Model.Type == "password" || Model.Type == "color" || Model.Type == "text")
         {
             <input type="@Model.Type.ToLower()"
                    value="@Model.GetHtmlInputValue()"
@@ -122,13 +122,13 @@ else
         }
         else if (Model.Type == "multilinetext")
         {
-            <textarea type="text"
-                      name="@Model.GetInputName()"
-                      style="width: 100%; resize: none; height: 128px;"
-                      id="@Model.GetInputId()"
-                      @oninput:preventDefault
-                      @oninput="@((e) => OnInputValue(Model.Name)(e))"
-                class="form-control is-@Model.State input-sm">@Model.GetHtmlInputValue()</textarea>
+                    <textarea type="text"
+                              name="@Model.GetInputName()"
+                              style="width: 100%; resize: none; height: 128px;"
+                              id="@Model.GetInputId()"
+                              @oninput:preventDefault
+                              @oninput="@((e) => OnInputValue(Model.Name)(e))"
+                               class="form-control is-@Model.State input-sm">@Model.GetHtmlInputValue()</textarea>
             }
             else if (Model.Type == "icon")
             {
@@ -136,17 +136,21 @@ else
             }
             else if (Model.Type == "file")
             {
-                <FileUpload OnChanged="(evt => { Model.Value = evt.Count()>0?evt.First().FileData: new byte[0]; StateHasChanged(); })"></FileUpload>                
+                <FileUpload OnChanged="(evt => { OnInputValue(Model.Name)(new ChangeEventArgs(){ Value = evt.Count()>0?evt.First().FileData: new byte[0] }); StateHasChanged(); })"></FileUpload>
+            }
+            else if (Model.Type == "Byte[]")
+            {
+                <FileUpload OnChanged="(evt => { OnInputValue(Model.Name)(new ChangeEventArgs(){ Value = evt.Count()>0?evt.First().FileData: new byte[0] }); StateHasChanged(); })"></FileUpload>
             }
             else if (Model.Type == "filedata")
             {
-                <FileUpload OnChanged="(evt => { Model.Value = evt.Count()>0?evt.First().FileData: new byte[0]; StateHasChanged(); })"></FileUpload>
+                <FileUpload OnChanged="(evt => { OnInputValue(Model.Name)(new ChangeEventArgs(){ Value = evt.Count()>0?evt.First().FileData: new byte[0] }); StateHasChanged(); })"></FileUpload>
             }
             else if (Model.Type == "fileitem")
             {
                 <p>@(Model.Value is null ? "null" : Model.Value.GetTypeName())</p>
                 <p>@(Model.Value is null ? "null" : Model.Value)</p>
-                <FileUpload OnChanged="(evt => { Model.Value = evt; StateHasChanged(); })"></FileUpload>
+                <FileUpload OnChanged="(evt => { OnInputValue(Model.Name)(new ChangeEventArgs(){ Value = evt.Count()>0?evt.First().FileData: new byte[0] }); StateHasChanged(); })"></FileUpload>
             }
             else if (Model.Type == "bool" || Model.Type == "checkbox")
             {
@@ -163,7 +167,7 @@ else
 
             }
 
-            else if (Model.Type.ToLower() == "selectcontrol")
+            else if (Model.Type.ToLower() == "select" || Model.Type.ToLower() == "selectcontrol")
             {
                     <select class="form-control input-sm" style="width: 100%;"
                         name="@Model.GetInputName()"
@@ -219,7 +223,9 @@ else
                         else
                         {
                             <FormEditor Model="@(new InputFormModel(Model.Value))" Title="@Model.Label">
-                                <span class="btn btn-sm btn-primary" @onclick="(evt => { AfterInput.InvokeAsync(new InputEvent(){ Value = Model.Value }); Model.Visible = false; StateHasChanged(); })">сохранить</span>
+                                <span class="btn btn-sm btn-primary" @onclick="(evt => { AfterInput.InvokeAsync(new InputEvent(){ Value = Model.Value }); 
+                                    using(var db = new DeliveryDbContext()){ db.Update(Model.Value); db.SaveChanges(); }
+                                    Model.Visible = false; StateHasChanged(); })">сохранить</span>
                             </FormEditor>
                         }                     
                     }
@@ -271,6 +277,7 @@ else
             {
                 <div class="alert alert-warning">Тип поля ввода @Model.Type не зарегистрирован в @GetType().Name</div>
             }
+
 
             @if (string.IsNullOrEmpty(Model.Help) == false)
             {
@@ -349,11 +356,12 @@ else
         {
 
             Info(name + "=" + (changes.Value == null ? "" : changes.Value.ToString()));
+            Model.Value = changes.Value;
             AfterInput.InvokeAsync(new InputEvent()
             {
                 Type = "input",
                 Property = name,
-                Value = changes.Value == null ? "" : changes.Value.ToString()
+                Value = changes.Value == null ? "" : changes.Value
             }).Wait();
         };
     }

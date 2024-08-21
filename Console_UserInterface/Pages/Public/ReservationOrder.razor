@@ -13,6 +13,7 @@
 <div class="card">
     <div class="card-header">
         <h3>Точки выдачи</h3>
+        <div class="text text-danger">@Message</div>
     </div>
     <div class="card-body">
         <ul class="list-group">
@@ -22,13 +23,29 @@
             }
             else
             {
-                @foreach (var holder in Holders)
-                {
-                    <li class="list-group-item" @onclick="(evt => { OnHolderSelected(holder.Id); StateHasChanged(); })" onmouseleave="this.classList.remove('active')" onmouseover="this.classList.add('active')">
-                        <b>@(Reservations.Contains(holder) ? "забрать с адреса: " : "доставить по адресу: ")</b>
-                        <div>@holder.HolderLocation</div>
-                    </li>
-                }
+                <CardContainer>
+                    <CardBody>
+                        @foreach (var holder in Reservations)
+                        {
+                            <li class="list-group-item" @onclick="(evt => { OnHolderSelected(holder.Id); StateHasChanged(); })" onmouseleave="this.classList.remove('active')" onmouseover="this.classList.add('active')">
+                                <b>@(Reservations.Contains(holder) ? "забрать с адреса: " : "доставить по адресу: ")</b>
+                                <div>@holder.HolderLocation</div>
+                            </li>
+                        }
+                    </CardBody>
+                </CardContainer>
+                <CardContainer>
+                    <CardBody>
+                        @foreach (var holder in Holders.Where(item => Reservations.Contains(item) == false))
+                        {
+                            <li class="list-group-item" @onclick="(evt => { OnHolderSelected(holder.Id); StateHasChanged(); })" onmouseleave="this.classList.remove('active')" onmouseover="this.classList.add('active')">
+                                <b>@(Reservations.Contains(holder) ? "забрать с адреса: " : "доставить по адресу: ")</b>
+                                <div>@holder.HolderLocation</div>
+                            </li>
+                        }
+                    </CardBody>
+                </CardContainer>
+                
             }
             
         </ul>
@@ -59,7 +76,7 @@
     public List<Holder> Holders { get; set; }
     public List<Holder> Available { get; set; }
     public List<Holder> Reservations { get; set; }
-
+    public string Message { get; set; }
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
@@ -73,7 +90,7 @@
         }
         catch(Exception ex)
         {
-            this.Error($"Исключение при инициаллизации: {ex}");
+            this.Error(Message=$"Исключение при инициаллизации: {ex}");
         }
     }
     public void UpdatePage()

@@ -45,13 +45,17 @@
     }
 }
 
-<ul class="list-group">
+<ul class="list-group" style="width: 100%;">
     
-    @while(Messages.Count()>0)
+    @foreach (var Message in Messages)
     {
-        <li class="list-grooup-item">
-            <div class="alert alert-info">@Shift()</div>
+        <li class="list-grooup-item" style="width: 100%;">
+            <div class="alert alert-info" style="width: 100%;">
+                <p>@Message</p>
+                <div>
+                    <span @onclick="(evt => { Messages.Remove(Message); StateHasChanged(); } )">закрыть</span>
+                </div>
+            </div>            
         </li>
-    }
-    
+    }    
 </ul>

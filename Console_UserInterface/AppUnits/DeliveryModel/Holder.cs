@@ -42,9 +42,9 @@ namespace Console_BlazorApp.AppUnits.DeliveryModel
         public int UserId { get; set; } // ид-пользователя, хозяина склада
 
         [JsonIgnore]
-        public IEnumerable<Order> HolderOrders { get; set; }
+        public List<Order> HolderOrders { get; set; }
 
         [JsonIgnore]
-        public IEnumerable<ProductsInStock> ProductsInStock { get; set; }
+        public List<ProductsInStock> ProductsInStock { get; set; }
     }
 }

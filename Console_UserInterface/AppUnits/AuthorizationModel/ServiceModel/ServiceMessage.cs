@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -15,16 +17,34 @@ public class ServiceMessage: BaseEntity
 
 
     [Label("Изображение")]
-    public virtual byte[] Image { get; set; }
+    public virtual byte[] Image { get; set; } = new byte[0];
 
 
     [Label("URL")]
     [InputUrl("Значение не является URL адресом ресурса")]
     public string Href { get; set; } = "https://localhost";
 
+    [NotInput]
+    private int _ServiceContextId;
 
-    public int ServiceContextId { get; set; }
-
- 
+    [InputDictionary($"{nameof(ServiceInfo)},{nameof(ServiceInfo.Name)}")]
+    public int ServiceContextId 
+    { 
+        get
+        {
+            return _ServiceContextId;
+        }
+        set
+        {
+            using (DbContextService db = new())
+            {
+                var ctx = db.ServiceContexts.Include(ctx => ctx.ServiceInfo).FirstOrDefault(ctx => ctx.ServiceInfo.Id == value);
+                _ServiceContextId = ctx is null? -1: ctx.Id;
+            }                
+        }
+    }
   
+
+
+
 }

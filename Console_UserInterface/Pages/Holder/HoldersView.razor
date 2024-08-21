@@ -1,11 +1,10 @@
-﻿@page "/holder/holders"
-@attribute [Label("Точка выдачи. Поиск товаров.")]
-
-@using pickpoint_delivery_service;
+﻿@using pickpoint_delivery_service;
 @using Console_BlazorApp.AppUnits.DeliveryModel;
-@inject pickpoint_delivery_service.DeliveryDbContext db
+@page "/holder/holders"
+@attribute [Label("Точка выдачи. Поиск товаров.")]
 @attribute [Authorize(Roles = "webuser")]
-
+@inject pickpoint_delivery_service.DeliveryDbContext db
+<PageTitle>Точка выдчи. Карточка ПВЗ</PageTitle>
 <h3>Точки выдачи</h3>
 @code
 {

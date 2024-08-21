@@ -25,7 +25,13 @@ namespace Console_UserInterface
                 db.Database.EnsureDeleted();
                 db.Database.EnsureCreated();
                 db.UserContexts_.ToList().ToJsonOnScreen().WriteToConsole();
-            }            
+            }
+            /*using (var db = new DbContextService())
+            {
+                db.Database.EnsureDeleted();
+                db.Database.EnsureCreated();
+                db.ServiceContexts.ToList().ToJsonOnScreen().WriteToConsole();
+            }*/
         }
         public static void Main(string[] args)
         {
