@@ -302,6 +302,8 @@ public static List<MyMessageProperty> ParseActions(Type type)
 
     public static string ParsePropertyType(Type propertyType)
     {
+        if (propertyType is null)
+            throw new ArgumentNullException("propertyType");
         string name = propertyType.Name;
 
         if (name.Contains("`"))

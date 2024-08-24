@@ -1,10 +1,26 @@
 ﻿@using Console_InputApplication.ViewEvents;
 @using Microsoft.EntityFrameworkCore;
 @using static Console_UserInterface.Shared.Forms.ValidationForm;
-
 @inject ILogger<FormControl> logger
+@code 
+{
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        try
+        {
+            if (Model != null && Model.Type != null) 
+                Model.Type = Model.Type.ToLower();  
+        }      
+        catch(Exception ex)
+        {
+            this.Error($"Ошибка при иниуиализации: {ex.Message}");
+        }
+    }
 
-@code {
+    [Parameter]
+    public bool Debug { get; set; } = false;
+
     public List<object> ToListObjects(dynamic val)
     {
         List<object> result = new();
@@ -18,25 +34,10 @@
 
     [Parameter]
     public EventCallback<InputEvent> AfterInput { get; set; }
-    public HashSet<Action> AfterInitiallized { get; set; } = new HashSet<Action>();
-    protected override async Task OnInitializedAsync()
-    {
-        await base.OnInitializedAsync();
-        if (Model != null && Model.Type != null) Model.Type = Model.Type.ToLower();
-        
-    }
+
+    
 
     private static string NoName = "NoName";
-    public void Error(Exception ex)
-    {
-        Console.WriteLine($"[{GetType().GetName()}]:[{(Model!=null?Model.Name:NoName)}]: {ex.Message}");
-        Console.WriteLine($"[{GetType().GetName()}]:[{(Model != null ? Model.Name : NoName)}]: {ex.StackTrace}");
-    }
-
-    public void Info(object item)
-    {
-        Console.WriteLine($"[{GetType().GetName()}]:[{(Model != null ? Model.Name : NoName)}]: {item}");
-    }
 
     /// <summary>
     /// Скрипт обработчика события ввода номера телефона в поле формы
@@ -70,344 +71,358 @@
                     };";
     }
 }
-
+@code
+{
+    public void OnAdd(object item)
+    {
+        if (Model.Value is null)
+        {        
+            Model.Value = Model.Property.PropertyType.New();
+        }
+        Model.Value.GetType().GetMethod("Add").Invoke(Model.Value, new object[] { item });
+    }
+}
+@if( Debug )
+{
+    <div>@Model.ToJsonOnScreen()</div>
+}
 @if (Model == null)
 {
     <div class="alert alert-danger">Отсутсвует ссылка в свойстве Model</div>
 }
 else
-{
-    
-<div class="input-group flex-column" style="width: 100%; margin-top: 12px; justify-content: flex-start; align-items: flex-start;">
+{    
+    <div class="input-group flex-column" style="width: 100%; margin-top: 12px; justify-content: flex-start; align-items: flex-start;">
 
-    @if (Model.Type == "hidden")
-    {
-        <input type="hidden" value="@Model.GetHtmlInputValue()" id="@Model.GetInputId()" name="@Model.GetInputName()" />
-    }
-    else
-    {
-        @if (Model.Type != "bool" && Model.Type != "checkbox")
+        @if (Model.Type == "hidden")
         {
-            <label>@Model.Label</label>
+            <input type="hidden" value="@Model.GetHtmlInputValue()" id="@Model.GetInputId()" name="@Model.GetInputName()" />
         }
-
-
-            @if (Model.Type == "rusword" || Model.Type == "rusword" || Model.Type == "rustext" || Model.Type == "engword" || Model.Type == "engtext" || Model.Type == "decimal" || Model.Type == "int" || Model.Type == "positiveint" || Model.Type == "number" || Model.Type == "email" || Model.Type == "text" || Model.Type == "date" || Model.Type == "datetime" || Model.Type == "password" || Model.Type == "color" || Model.Type == "text")
+        else
         {
-            <input type="@Model.Type.ToLower()"
-                   value="@Model.GetHtmlInputValue()"
-                   name="@Model.GetInputName()"
-                   id="@Model.GetInputId()"
-                   style="width: 100%;"
-                   @oninput:preventDefault
-                   @oninput="@((e) => OnInputValue(Model.Name)(e))"
-                   @onfocus="@((e) => OnFocused(Model.Name)(e))"
-                       class="form-control is-@Model.State input-sm" />
-
-        }
-        else if (Model.Type == "confirmation")
-        {
-            <input type="password"
-                   value="@Model.GetHtmlInputValue()"
-                   name="@Model.GetInputName()"
-                   id="@Model.GetInputId()"
-                   style="width: 100%;"
-                   @oninput:preventDefault
-                   @oninput="@((e) => OnInputValue(Model.Name)(e))"
-                   @onfocus="@((e) => OnFocused(Model.Name)(e))"
-                       class="form-control is-@Model.State input-sm" />
-        }
-        else if (Model.Type == "year")
-        {
-            <input type="date"
-                   value="@Model.GetHtmlInputValue()"
-                   name="@Model.GetInputName()"
-                   id="@Model.GetInputId()"
-                   style="width: 100%;"
-                   @oninput:preventDefault
-                   @oninput="@((e) => OnInputValue(Model.Name)(e))"
-                   @onfocus="@((e) => OnFocused(Model.Name)(e))"
-                       class="form-control is-@Model.State input-sm" />
-        }
-        else if (Model.Type == "month")
-        {
-            <input type="month"
-                   value="@Model.GetHtmlInputValue()"
-                   name="@Model.GetInputName()"
-                   id="@Model.GetInputId()"
-                   style="width: 100%;"
-                   @oninput:preventDefault
-                   @oninput="@((e) => OnInputValue(Model.Name)(e))"
-                   @onfocus="@((e) => OnFocused(Model.Name)(e))"
-                       class="form-control is-@Model.State input-sm" />
-        }
-        else if (Model.Type == "time")
-        {
-            <input type="time"
-                   value="@Model.GetHtmlInputValue()"
-                   name="@Model.GetInputName()"
-                   id="@Model.GetInputId()"
-                   style="width: 100%;"
-                   @oninput:preventDefault
-                   @oninput="@((e) => OnInputValue(Model.Name)(e))"
-                   @onfocus="@((e) => OnFocused(Model.Name)(e))"
-                       class="form-control is-@Model.State input-sm" />
-        }
-        else if (Model.Type == "week")
-        {
-            <input type="week"
-                   value="@Model.GetHtmlInputValue()"
-                   name="@Model.GetInputName()"
-                   id="@Model.GetInputId()"
-                   style="width: 100%;"
-                   @oninput:preventDefault
-                   @oninput="@((e) => OnInputValue(Model.Name)(e))"
-                   @onfocus="@((e) => OnFocused(Model.Name)(e))"
-                       class="form-control is-@Model.State input-sm" />
-        }
-        else if (Model.Type == "phone")
-        {
-            <div @oninput:preventDefault
-                 @oninput="@((e) => OnInputValue(Model.Name)(e))"
-                 style="width: 100%;">
-                <input type="text"
+            @if (Model.Type != "bool" && Model.Type != "checkbox")
+            {
+                <label>@Model.Label</label>
+            }
+            @if (Model.Type == "rusword" || Model.Type == "rusword" || Model.Type == "Text" || Model.Type == "rustext" || Model.Type == "engword" || Model.Type == "engtext" || Model.Type == "decimal" || Model.Type == "int" || Model.Type == "positiveint" || Model.Type == "number" || Model.Type == "email" || Model.Type == "text" || Model.Type == "date" || Model.Type == "datetime" || Model.Type == "password" || Model.Type == "color" || Model.Type == "text")
+            {
+            
+                <input type="@Model.Type.ToLower()"
                        value="@Model.GetHtmlInputValue()"
                        name="@Model.GetInputName()"
-                       style="width: 100%;"
                        id="@Model.GetInputId()"
-                       oninput="@GetInputPhoneJS()"
+                       style="width: 100%;"
+                       @oninput:preventDefault
+                       @oninput="@((e) => OnInputValue(Model.Name)(e))"
+                       @onfocus="@((e) => OnFocused(Model.Name)(e))"
                            class="form-control is-@Model.State input-sm" />
-            </div>
 
-        }
-        else if (Model.Type == "multilinetext")
-        {
-                <textarea type="text"
+            }
+            else if (Model.Type == "confirmation")
+            {
+                <input type="password"
+                       value="@Model.GetHtmlInputValue()"
+                       name="@Model.GetInputName()"
+                       id="@Model.GetInputId()"
+                       style="width: 100%;"
+                       @oninput:preventDefault
+                       @oninput="@((e) => OnInputValue(Model.Name)(e))"
+                       @onfocus="@((e) => OnFocused(Model.Name)(e))"
+                           class="form-control is-@Model.State input-sm" />
+            }
+            else if (Model.Type == "year")
+            {
+                <input type="number"
+                       value="@Model.GetHtmlInputValue()"
+                       name="@Model.GetInputName()"
+                       id="@Model.GetInputId()"
+                       style="width: 100%;"
+                       @oninput:preventDefault
+                       @oninput="@((e) => OnInputValue(Model.Name)(e))"
+                       @onfocus="@((e) => OnFocused(Model.Name)(e))"
+                       class="form-control is-@Model.State input-sm" />
+            }
+            else if (Model.Type == "month")
+            {
+                <input type="month"
+                       value="@Model.GetHtmlInputValue()"
+                       name="@Model.GetInputName()"
+                       id="@Model.GetInputId()"
+                       style="width: 100%;"
+                       @oninput:preventDefault
+                       @oninput="@((e) => OnInputValue(Model.Name)(e))"
+                       @onfocus="@((e) => OnFocused(Model.Name)(e))"
+                           class="form-control is-@Model.State input-sm" />
+            }
+            else if (Model.Type == "time")
+            {
+                <input type="time"
+                       value="@Model.GetHtmlInputValue()"
+                       name="@Model.GetInputName()"
+                       id="@Model.GetInputId()"
+                       style="width: 100%;"
+                       @oninput:preventDefault
+                       @oninput="@((e) => OnInputValue(Model.Name)(e))"
+                       @onfocus="@((e) => OnFocused(Model.Name)(e))"
+                           class="form-control is-@Model.State input-sm" />
+            }
+            else if (Model.Type == "week")
+            {
+                <input type="week"
+                       value="@Model.GetHtmlInputValue()"
+                       name="@Model.GetInputName()"
+                       id="@Model.GetInputId()"
+                       style="width: 100%;"
+                       @oninput:preventDefault
+                       @oninput="@((e) => OnInputValue(Model.Name)(e))"
+                       @onfocus="@((e) => OnFocused(Model.Name)(e))"
+                           class="form-control is-@Model.State input-sm" />
+            }
+            else if (Model.Type == "phone")
+            {
+                <div @oninput:preventDefault
+                     @oninput="@((e) => OnInputValue(Model.Name)(e))"
+                     style="width: 100%;">
+                    <input type="text"
+                           value="@Model.GetHtmlInputValue()"
+                           name="@Model.GetInputName()"
+                           style="width: 100%;"
+                           id="@Model.GetInputId()"
+                           oninput="@GetInputPhoneJS()"
+                               class="form-control is-@Model.State input-sm" />
+                </div>
+
+            }
+            else if (Model.Type == "multilinetext")
+            {
+                    <textarea type="text"
+                                name="@Model.GetInputName()"
+                                style="width: 100%; resize: none; height: 128px;"
+                                id="@Model.GetInputId()"
+                                @oninput:preventDefault
+                                @oninput="@((e) => OnInputValue(Model.Name)(e))"
+                                class="form-control is-@Model.State input-sm">@Model.GetHtmlInputValue()</textarea>
+                }
+                else if (Model.Type == "icon")
+                {
+                    <select class="form-control" value="@Model.GetHtmlInputValue()"
                             name="@Model.GetInputName()"
-                            style="width: 100%; resize: none; height: 128px;"
                             id="@Model.GetInputId()"
+                            style="width: 100%;"
                             @oninput:preventDefault
                             @oninput="@((e) => OnInputValue(Model.Name)(e))"
-                            class="form-control is-@Model.State input-sm">@Model.GetHtmlInputValue()</textarea>
-            }
-            else if (Model.Type == "icon")
-            {
-                <select class="form-control" value="@Model.GetHtmlInputValue()"
-                        name="@Model.GetInputName()"
-                        id="@Model.GetInputId()"
-                        style="width: 100%;"
-                        @oninput:preventDefault
-                        @oninput="@((e) => OnInputValue(Model.Name)(e))"
-                        @onfocus="@((e) => OnFocused(Model.Name)(e))">
-                    @foreach (var val in Enum.GetValues(typeof(IconName)))
-                    {
-                        <option value="@val">@val</option>
-                    }                    
-                </select>
-            }
-            else if (Model.Type == "file")
-            {
-                <FileUpload OnChanged="(evt => { OnInputValue(Model.Name)(new ChangeEventArgs(){ Value = evt.Count()>0?evt.First().FileData: new byte[0] }); StateHasChanged(); })"></FileUpload>
-            }
-            else if (Model.Type == "Byte[]")
-            {
-                <FileUpload OnChanged="(evt => { OnInputValue(Model.Name)(new ChangeEventArgs(){ Value = evt.Count()>0?evt.First().FileData: new byte[0] }); StateHasChanged(); })"></FileUpload>
-            }
-            else if (Model.Type == "filedata")
-            {
-                <FileUpload OnChanged="(evt => { OnInputValue(Model.Name)(new ChangeEventArgs(){ Value = evt.Count()>0?evt.First().FileData: new byte[0] }); StateHasChanged(); })"></FileUpload>
-            }
-            else if (Model.Type == "fileitem")
-            {
-                <p>@(Model.Value is null ? "null" : Model.Value.GetTypeName())</p>
-                <p>@(Model.Value is null ? "null" : Model.Value)</p>
-                <FileUpload OnChanged="(evt => { OnInputValue(Model.Name)(new ChangeEventArgs(){ Value = evt.Count()>0?evt.First().FileData: new byte[0] }); StateHasChanged(); })"></FileUpload>
-            }
-            else if (Model.Type == "bool" || Model.Type == "checkbox")
-            {
-                <div class="form-check">
-                    <label class="form-check-label" for="flexCheckDefault">
-                        @Model.Label
-                    </label>
-                        <input style="width: 25px;"
-                               value="@Model.GetHtmlInputValue()"
-                        @oninput:preventDefault
-                        @oninput="@((e) => OnInputValue(Model.Name)(e))" class="form-check-input input-sm" type="checkbox" checked="@Model.Value" id="@Model.GetInputId()" name="@Model.GetInputName()">
-                    </div>
-          
-
-            }
-
-            else if (Model.Type.ToLower() == "select" || Model.Type.ToLower() == "selectcontrol")
-            {
-                    <select class="form-control input-sm" style="width: 100%;"
-                        name="@Model.GetInputName()"
-                        id="@Model.GetInputId()"
-                        @onchange:preventDefault
-                        @oninput="@((e) => OnInputValue(Model.Name)(e))">
-                    @foreach (var option in (((Select)Model.Control).Options))
-                    {
-                        @if (option.Value.ToString() == Model.Value.ToString())
+                            @onfocus="@((e) => OnFocused(Model.Name)(e))">
+                        @foreach (var val in Enum.GetValues(typeof(IconName)))
                         {
-                            <option selected value="@option.Value">@option.Key</option>
-                        }
-                        else
-                        {
-                            <option value="@option.Value">@option.Key</option>
-                        }
-
-                    }
-
-                </select>
-            }
-            else if (Model.Type == "custom")
-            {
-
-            
-                <div class="form-check">
-                    <input @oninput:preventDefault @oninput="@((e) => { Model.Visible = !Model.Visible; StateHasChanged(); })" class="form-check-input input-sm" type="checkbox" value="" id="flexCheckDefault">
-                    <label class="form-check-label" for="flexCheckDefault">
-                        @Model.Label
-                    </label>
-                </div>
-                @if(Model.Visible)
+                            <option value="@val">@val</option>
+                        }                    
+                    </select>
+                }
+                else if (Model.Type == "file")
                 {
-                    @if (Model.IsCollection)
-                    {
-                        @if(Model.ValueType is null)
+                    <FileUpload OnChanged="(evt => { OnInputValue(Model.Name)(new ChangeEventArgs(){ Value = evt.Count()>0?evt.First().FileData: new byte[0] }); StateHasChanged(); })"></FileUpload>
+                }
+                else if (Model.Type == "Byte[]")
+                {
+                    <FileUpload OnChanged="(evt => { OnInputValue(Model.Name)(new ChangeEventArgs(){ Value = evt.Count()>0?evt.First().FileData: new byte[0] }); StateHasChanged(); })"></FileUpload>
+                }
+                else if (Model.Type == "filedata")
+                {
+                    <FileUpload OnChanged="(evt => { OnInputValue(Model.Name)(new ChangeEventArgs(){ Value = evt.Count()>0?evt.First().FileData: new byte[0] }); StateHasChanged(); })"></FileUpload>
+                }
+                else if (Model.Type == "fileitem")
+                {            
+                    <FileUpload OnChanged="(evt => { OnInputValue(Model.Name)(new ChangeEventArgs(){ Value = evt.Count()>0?evt.First().FileData: new byte[0] }); StateHasChanged(); })"></FileUpload>
+                }
+                else if (Model.Type == "bool" || Model.Type == "checkbox")
+                {
+                    <div class="form-check">
+                        <label class="form-check-label" for="flexCheckDefault">
+                            @Model.Label
+                        </label>
+                            <input style="width: 25px;"
+                                   value="@Model.GetHtmlInputValue()"
+                            @oninput:preventDefault
+                            @oninput="@((e) => OnInputValue(Model.Name)(e))" class="form-check-input input-sm" type="checkbox" checked="@Model.Value" id="@Model.GetInputId()" name="@Model.GetInputName()">
+                        </div>          
+                }
+                else if (Model.Type.ToLower() == "select" || Model.Type.ToLower() == "selectcontrol")
+                {
+                        <select class="form-control input-sm" style="width: 100%;"
+                            name="@Model.GetInputName()"
+                            id="@Model.GetInputId()"
+                            @onchange:preventDefault
+                            @oninput="@((e) => OnInputValue(Model.Name)(e))">
+                        @foreach (var option in (((Select)Model.Control).Options))
                         {
-                            <div class="alert alert-warning">Не установлено значение ValueType для FormField</div>
-                        }
-                        else
-                        {
-                            if(Model.IsPrimitive)
+                            @if (option.Value.ToString() == Model.Value.ToString())
                             {
-                                List<dynamic> items = new();
-                                foreach (var item in (dynamic)Model.Value)
-                                {
-                                    items.Add(item);
-                                }
-                                @if (Model.Property is null)
-                                {
-                                    <div> Model.Property не установлен </div>
-                                }
-
-                                <ListPrimitiveEditor Label="@Model.Label" InputType="@Model.Type" ControlType="@(Attrs.GetControlType(Model.Target.GetType(), Model.Name))" PropertyModel='@Model.Property' Attributes="Model.Attributes" ItemType="@Model.ValueType.ToType()" Items="@(items)" OnAdd='(evt => { Model.Value.GetType().GetMethod("Add").Invoke(Model.Value, new object[]{evt}); StateHasChanged(); })' OnRemove='(evt => { foreach(var item in evt)Model.Value.GetType().GetMethod("Remove").Invoke(Model.Value, new object[]{item}); StateHasChanged(); })'>
-
-                                </ListPrimitiveEditor>
+                                <option selected value="@option.Value">@option.Key</option>
                             }
                             else
                             {
-                                <ListEditor ItemType="@Model.ValueType.ToType()" Items="@(ToListObjects(Model.Value))"></ListEditor>
+                                <option value="@option.Value">@option.Key</option>
                             }
-                            
                         }
-                    
-                    
-                    }
-                    else
+                    </select>
+                }
+                else if (Model.Type == "custom")
+                {           
+                    <div class="form-check">
+                        <input @oninput:preventDefault @oninput="@((e) => { Model.Visible = !Model.Visible; StateHasChanged(); })" class="form-check-input input-sm" type="checkbox" value="" id="flexCheckDefault">
+                        <label class="form-check-label" for="flexCheckDefault">
+                            @Model.Label
+                        </label>
+                    </div>
+                    @if(Model.Visible)
                     {
-                        @if (Model.Value is null)
+                        @if (Model.IsCollection)
                         {
-                            <div class="alert alert-warning">Не установлено значение Value для FormField</div>
+                            List<dynamic> items = new();
+                            foreach (var item in (dynamic)Model.Value)
+                            {
+                                items.Add(item);
+                            }
+                            @if(Model.ValueType is null)
+                            {
+                                <div class="alert alert-warning">Не установлено значение ValueType для FormField</div>
+                            }
+                            else
+                            {
+                                if(Model.IsPrimitive)
+                                {                                                               
+                                    @if (Model.Property is null)
+                                    {
+                                        <div> Model.Property не установлен </div>
+                                    }
+                                    <ListPrimitiveEditor Label="@Model.Label" 
+                                        ControlType="@(Attrs.GetControlType(Model.Target.GetType(), Model.Name))" 
+                                        PropertyModel='@Model.Property' 
+                                        Attributes="Model.Attributes" 
+                                        ItemType="@Model.ValueType.ToType()" 
+                                        Items="@(items)" 
+                                        OnAdd='(evt => { OnAdd(evt); StateHasChanged(); })' OnRemove='(evt => { foreach(var item in evt)Model.Value.GetType().GetMethod("Remove").Invoke(Model.Value, new object[]{item}); StateHasChanged(); })'>
+
+                                    </ListPrimitiveEditor>
+                                }
+                                else
+                                {
+                                    <ListEditor ItemType="@Model.ValueType.ToType()" Items="@(items)" OnAdd="(evt => { OnAdd(evt); StateHasChanged();  })" OnRemove="(evt => { OnRemove(evt); StateHasChanged();  })"></ListEditor>
+                                }                            
+                            }                                        
                         }
                         else
                         {
-                            <FormEditor Model="@(new InputFormModel(Model.Value))" Title="@Model.Label">
-                                <span class="btn btn-sm btn-primary" @onclick="(evt => { AfterInput.InvokeAsync(new InputEvent(){ Value = Model.Value }); 
-                                    using(var db = new DeliveryDbContext()){ db.Update(Model.Value); db.SaveChanges(); }
-                                    Model.Visible = false; StateHasChanged(); })">сохранить</span>
-                            </FormEditor>
-                        }                     
+                            @if (Model.Value is null)
+                            {
+                                <div class="alert alert-warning">Не установлено значение Value для FormField</div>
+                            }
+                            else
+                            {
+                                <FormEditor Model="@(new InputFormModel(Model.Value))" Title="@Model.Label">
+                                    <span class="btn btn-sm btn-primary" @onclick="(evt => { OnSaveButtonClicked(); })">сохранить</span>
+                                </FormEditor>
+                            }                     
+                            
+                        }                
                     }
-                
                 }
-
-                @*code
-                    {
-                    //[Parameter]
-                    //public ModalComponent RefModal { get; set; }
-                }
-                <ButtonContainer OnClicked="@(async ()=> { await RefModal.PopupDialog();  })">@Model.Name</ButtonContainer>
-                <ModalComponent @ref="@(RefModal)">
-                    <ContentBox Model="@(Model.Control)"></ContentBox>
-                </ModalComponent>*@
-            }
-            else if (Model.Type == "image")
-            {
-                @inject IJSRuntime js
-                @code
+                else if (Model.Type == "image")
                 {
-                 
-                    public async Task OnImageClicked()
-                    {
-                        await js.InvokeAsync<string>("alert(1);");
+                    @inject IJSRuntime js
+                    @code
+                    {                 
+                        public async Task OnImageClicked()
+                        {
+                            await js.InvokeAsync<string>("alert(1);");
+                        }
                     }
-                }
-                <div>
-                    <input type="hidden" name="@Model.Name" id="@Model.Name" value="@Model.Value" />
-
-                    <img style="width: 222px; height: 222px;" @onclick="@OnImageClicked" />
-                </div>
+                    <div>
+                        <input type="hidden" name="@Model.Name" id="@Model.Name" value="@Model.Value" />
+                        <img style="width: 222px; height: 222px;" @onclick="@OnImageClicked" />
+                    </div>
                 
-            }
-            else if (Model.Type == "tcpip4address")
-            {
-            }
-            else if (Model.Type == "creditcard")
-            {
-            }
-            else if (Model.Type == "filepath")
-            {
-            }
-            else if (Model.Type == "url")
-            {
-            }
-            else if (Model.Type == "punctuation")
-            {
-            }
-            else if (Model.Type == "xml")
-            {
-            }
-            else if (Model.Type == "inputdictionary")
-            {
-                <select @oninput="(evt => { Model.Value = evt.Value; StateHasChanged(); })" class="form-control input-sm" style="width: 100%;">
-                    <option value="null">Не выбрано</option>
-                    @foreach (var item in GetDataDictionary(Model.TextValue))
-                    {
-                        <option value="@item.Key">@item.Value</option>
-                    }                                    
-                </select>
-            }
-            else if (Model.Type == "percent")
-            {
-            }
-            else if (Model.Type == "selectlist")
-            {
-                <SearchListCard TItem="KeyValuePair<int,string>" Items="GetDataDictionary(Model.TextValue).ToList()"></SearchListCard>
-            }
-            else
-            {
-                <div class="alert alert-warning">Тип поля ввода @Model.Type не зарегистрирован в @GetType().Name</div>
-            }
-
-
-            @if (string.IsNullOrEmpty(Model.Help) == false)
-            {
-
-                <small class="form-text text-info">@Model.Help</small>
-            }
-            @foreach (var error in Model.Errors)
-            {
-                <div><small class="form-text text-danger">@error</small></div>
-            }
-    }
-   
-</div>
+                }
+                else if (Model.Type == "tcpip4address")
+                {
+                    <div>tcpip4address</div>
+                }
+                else if (Model.Type == "creditcard")
+                {
+                    <div>
+                        <label>creditcard</label>
+                        <div>
+                            @for (int i = 1; i <= 16; i++)
+                            {
+                                var p = i;
+                                <span class="btn @((i==-1)? "btn-primary": "bg-white")" style="width: 80; height: 80; border: 1px; margin: 2px;">@i</span>
+                            }
+                        </div>
+                    </div>
+                }
+                else if (Model.Type == "filepath")
+                {
+                    <div>filepath</div>
+                }
+                else if (Model.Type == "url")
+                {
+                    <div>url</div>
+                }
+                else if (Model.Type == "punctuation")
+                {
+                    <div>punctuation</div>
+                }
+                else if (Model.Type == "xml")
+                {
+                    <div>xml</div>
+                }
+                else if (Model.Type == "inputdictionary")
+                {
+                    <select @oninput="(evt => { Model.Value = evt.Value; StateHasChanged(); })" class="form-control input-sm" style="width: 100%;">
+                        <option value="null">Не выбрано</option>
+                        @foreach (var item in GetDataDictionary(Model.TextValue))
+                        {
+                            <option value="@item.Key">@item.Value</option>
+                        }                                    
+                    </select>
+                }
+                else if (Model.Type == "percent")
+                {
+                <div>percent</div>
+                }
+                else if (Model.Type == "selectlist")
+                {
+                    <SearchListCard TItem="KeyValuePair<int,string>" Items="GetDataDictionary(Model.TextValue).ToList()"></SearchListCard>
+                }
+                else
+                {
+                    <div class="alert alert-warning">Тип поля ввода @Model.Type не зарегистрирован в @GetType().Name</div>
+                }
+                @if (string.IsNullOrEmpty(Model.Help) == false)
+                {
+                    <small class="form-text text-info">@Model.Help</small>
+                }
+                @foreach (var error in Model.Errors)
+                {
+                    <div><small class="form-text text-danger">@error</small></div>
+                }
+        }   
+    </div>
 }
 @inject IServiceProvider sp
 @code
 {
+
+    public void OnRemove( params object[] items )
+    {
+        
+    }
+    public void OnSaveButtonClicked()
+    {
+        AfterInput.InvokeAsync(new InputEvent() { Value = Model.Value });
+        using (var db = new DeliveryDbContext()) { db.Update(Model.Value); db.SaveChanges(); }
+        Model.Visible = false; StateHasChanged();
+    }
     public Dictionary<int,string> GetDataDictionary( string exp )
     {
         Dictionary<int, string> result = new();
@@ -468,7 +483,7 @@ else
         return (changes) =>
         {
 
-            Info(name + "=" + (changes.Value == null ? "" : changes.Value.ToString()));
+            this.Info(name + "=" + (changes.Value == null ? "" : changes.Value.ToString()));
             Model.Value = changes.Value;
             AfterInput.InvokeAsync(new InputEvent()
             {
@@ -483,7 +498,7 @@ else
     {
         return (evt) =>
         {
-            Info(name + "=" + evt.GetType().Name);
+            this.Info(name + "=" + evt.GetType().Name);
             if (Model.State == "untouched")
             {
                 Model.State = "invalid";

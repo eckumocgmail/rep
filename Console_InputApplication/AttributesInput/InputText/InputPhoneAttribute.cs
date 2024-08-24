@@ -15,7 +15,9 @@ public class InputPhoneAttribute : BaseInputAttribute
     }
     public override bool IsValidValue(object value)
     {
-        return true;
+        if (value == null)
+            return true;
+        return IsPhoneNumber(value.ToString());
     }
 
     private bool isNumber( char ch )

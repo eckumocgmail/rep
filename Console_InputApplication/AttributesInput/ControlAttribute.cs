@@ -24,8 +24,11 @@ public class ControlAttribute : BaseInputAttribute
 
 public class InputFormField
 {
+    [JsonIgnore]
     public object Target { get; set; }
     public bool Visible { get; set; }
+
+    [JsonIgnore]
     public PropertyInfo Property { get; set; }
     public int Order { get; set; }
 
@@ -38,23 +41,23 @@ public class InputFormField
     public virtual InputFormModel InputFormModel { get; set; }
 
     [Label("Наименование")]
-    public string Name { get; set; }
+    public string Name { get; set; } = "Undefined";
 
     [Label("Иконка")]
-    public string Icon { get; set; }
+    public string Icon { get; set; } = "home";
     public string TextValue { get; set; }
 
-    
+
 
     [Label("Описание")]
-    public string Description { get; set; }
+    public string Description { get; set; } = "Нет подробного описания";
 
     [InputSelect("{{GetInputTypes()}}")]
-    public string Type { get; set; }
+    public string Type { get; set; } = "Text";
     public string ValueType { get; set; }
 
     [Label("Надпись")]
-    public string Label { get; set; }
+    public string Label { get; set; } = "Неизвестно";
 
     [Label("Разрешено изменение")]
     public bool Edited { get; set; }
@@ -75,15 +78,16 @@ public class InputFormField
 
     [Label("Состояние")]
     [InputSelect("valid,invalid,undefined")]
-    public string State { get; set; }
+    public string State { get; set; } = "undefined";
 
 
     [NotMapped()]
+    [JsonIgnore]
     public ViewItem Control { get; set; }
 
     [NotMapped]
     [Label("Подсказка")]
-    public string Help { get; set; }
+    public string Help { get; set; } = "Нет справочной информации";
 
     [Label("Ошибки")]
     [NotMapped]
@@ -105,13 +109,7 @@ public class InputFormField
 
     public InputFormField() : base()
     {
-        this.Icon = "home";
-        this.Name = "Undefined";
-        this.Type = "Text";
-        this.State = "undefined";
-        this.Label = "Неизвестно";
-        this.Description = "Нет подробного описания";
-        this.Help = "Нет справочной информации";
+  
     }
 
     public InputFormField(Type model, string name): base()

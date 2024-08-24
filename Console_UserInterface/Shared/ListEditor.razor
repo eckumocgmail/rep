@@ -40,13 +40,12 @@
         <div>
             <SearchPane OnSearchSubmit="@OnSearchSubmit" SearchOptions="@SearchOptions" SearchQuery="@SearchQuery" ShowLeft="@ShowLeft" SortRule="@SortRule"></SearchPane>
         </div>
-        <div>
+        <div align="left">
+            <label> Настроить фильтры </label>
             @foreach (var property in ItemType.GetOwnPropertyNames())
             {
-                <div>
-                    @(FiltersVisible.ContainsKey(property) ? FiltersVisible[property] : "")
-                    <CheckBox Label="@property" OnChange="(evt => { FiltersVisible[property] = FiltersVisible.ContainsKey(property)==false? true: !FiltersVisible[property]; StateHasChanged(); })"></CheckBox>
-                    
+                <div>                   
+                    <CheckBox Label="@property" OnChange="(evt => { FiltersVisible[property] = FiltersVisible.ContainsKey(property)==false? true: !FiltersVisible[property]; StateHasChanged(); })"></CheckBox>                    
                 </div>
                 <div style="margin-left: 20px;">
                     @if (FiltersVisible.ContainsKey(property) && FiltersVisible[property])
@@ -60,23 +59,24 @@
                             case "float":
                             case "decimal":
                             case "double":
-                                <FormControl Model='@(new FormFieldModel(){ Type = "number", Value="0", Name=property, Label="Мин."})'></FormControl>
-                                <FormControl Model='@(new FormFieldModel(){ Type = "number", Value="0", Name=property, Label="Макс."})'></FormControl>
+                                <FormControl Model='@(new InputFormField(){ Label="Мин.", Name = property, Help = "", Value = 0})'></FormControl>
+                                <FormControl Model='@(new InputFormField(){ Label="Макс.", Name = property, Help = "", Value = 100})'></FormControl>
                                 break;
                             case "System.DateTime":
                             case "DateTime":
                             case "Date":
-                                <FormControl Model='@(new FormFieldModel(){ Type = "datetime", Value="0", Name=property, Label="Мин."})'></FormControl>
-                                <FormControl Model='@(new FormFieldModel(){ Type = "datetime", Value="0", Name=property, Label="Макс."})'></FormControl>
+                              
+                                <FormControl Model='@(new InputFormField(){ Label="Мин.", Name = property, Help = "", Value = 0})'></FormControl>
+                                <FormControl Model='@(new InputFormField(){ Label="Макс.", Name = property, Help = "", Value = 100})'></FormControl>
                                 break;
                             case "string":
-                            case "String":
+                            case "String":                              
                                 <CheckBox Label="Email" OnChange="(evt => {})"></CheckBox>
                                 <CheckBox Label="Url" OnChange="(evt => {})"></CheckBox>
                                 <CheckBox Label="Pattern" OnChange="(evt => {})"></CheckBox>
                                 <CheckBox Label="Русккий" OnChange="(evt => {})"></CheckBox>
                                 <CheckBox Label="Англ" OnChange="(evt => {})"></CheckBox>                               
-                                <FormControl Model='@(new FormFieldModel(){ Type = "number", Value="0", Name=property, Label="Длина"})'></FormControl>
+                                <FormControl Model='@(new InputFormField(){ Type = "number", Value="0", Name=property, Label="Длина"})'></FormControl>
                                 break;
                             default:
                                 <p>@ItemType.GetProperty(property).PropertyType.GetTypeName()</p>
@@ -96,10 +96,10 @@
         @if (ItemForm is not null)
         {           
             <FormEditor Model="@ItemForm">
-                <button class="btn btn-sm btn-primary @(ItemForm.Item.Validate().Count()==0?"":"disabled")"
-                @onclick="(evt => { AddItem(ItemForm.Item); ItemForm = null; StateHasChanged(); } )">
+                <span class="btn btn-sm btn-primary @(ItemForm.Item.Validate().Count()==0?"":"disabled")"
+                    @onclick="(evt => { AddItem(ItemForm.Item);  } )">
                     сохранить
-                </button>
+                </span>
             </FormEditor>
         }
         else
@@ -115,14 +115,31 @@
 {
     [Parameter]
     public EventCallback<object> OnAdd { get; set; }
+
+    public void AddItemTest()
+    {
+        Items.Add(ItemType.New());
+        Update();
+        StateHasChanged();
+    }
     public void AddItem( object item)
     {
-        Items.Add(ItemForm.Item);        
-        OnAdd.InvokeAsync(item).Wait();
+        Items.Add(item);
+        ItemForm = null;
+        try
+        {
+            OnAdd.InvokeAsync(item).Wait();
+        }
+        catch(Exception ex)
+        {
+            this.Error(ex);
+        }
+        Update();
+        StateHasChanged();
     }
     protected override void OnInitialized()
     {
-        if (Items.Count() == 0)
+        if (Items is null || Items.Count() == 0)
         {
             Items = GetDataSet();
         }
@@ -131,11 +148,19 @@
     }
     public void Update()
     {
-        if (SelectedItems is null)
-            SelectedItems = new();
-        SelectedItems.Clear();
-        VisibleItems = Items.Where(item => item.ToJson().IndexOf(SearchQuery.ToLower()) != -1).ToList();
-        VisibleItems = Items.Skip(PageSize * (PageNumber - 1)).Take(PageSize).ToList();
+        try
+        {
+            if (SelectedItems is null)
+                SelectedItems = new();
+            SelectedItems.Clear();
+            //VisibleItems = Items.Where(item => item.ToJson().IndexOf(SearchQuery.ToLower()) != -1).ToList();
+            VisibleItems = Items.Skip(PageSize * (PageNumber - 1)).Take(PageSize).ToList();
+        }
+        catch(Exception ex)
+        {
+            this.Error($"Исключение при обновлении модели данных: {ex.Message}\n{ex.StackTrace}");
+        }
+
     }
 }
 @code
@@ -190,6 +215,8 @@
         }
         OnRemove.InvokeAsync(SelectedItems).Wait();
         SelectedItems.Clear();
+        Update();
+        StateHasChanged();
     }
 
     public void OnPageChanged(int page)

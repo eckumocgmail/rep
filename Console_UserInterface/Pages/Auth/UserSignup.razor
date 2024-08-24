@@ -43,8 +43,9 @@
 
     <div class="form-group">
         <label>Телефон</label>
-        <input type="text" value="@person.Tel" @oninput="(evt => {person.Tel = evt.Value.ToString(); StateHasChanged();})" class="form-control">
+        <input type="text" value="@person.Tel" @oninput="(evt => { if(new InputPhoneAttribute().IsValid(evt.Value.ToString())) person.Tel = evt.Value.ToString(); StateHasChanged();})" class="form-control">
     </div>
+    <FormControl Model='@(new InputFormField(){ Type="phone" })'></FormControl>
     <div align="center">
         <a @onclick='(evt => { nav.NavigateTo("/User/Signin"); })'>
             Перейти к странице авторизации

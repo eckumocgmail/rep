@@ -7,6 +7,8 @@ using pickpoint_delivery_service;
 using Console_UserInterface.AppUnits.AuthorizationBlazor;
 using Console_BlazorApp;
 using Blazored.Modal;
+using Microsoft.AspNetCore.Http.Extensions;
+using Console_UserInterface.Pages.Auth;
 
 namespace Console_UserInterface
 {
@@ -35,6 +37,13 @@ namespace Console_UserInterface
         }
         public static void Main(string[] args)
         {
+
+            /*var model = new InputFormModel();
+            model.Item = new AttributesInputTest.CollectionModel();
+            var field = model.CreateFormField(model.Item.GetType(), nameof(AttributesInputTest.CollectionModel.ListDateModel));
+            field.ToJsonOnScreen().WriteToConsole();*/
+            
+
             //new DeliveryServicesUnit().DoTest(false).ToDocument().WriteToConsole();
             UpdateDatabase();
 
@@ -62,8 +71,10 @@ namespace Console_UserInterface
             DeliveryDbContext.ConfigureDeliveryServices(builder.Services, builder.Configuration);
             //DeliveryDbContext.CreateDeliveryData(builder.Services, builder.Configuration);
             DbContextUserInitializer.CreateUserData(builder.Services, builder.Configuration);
-            var app = builder.Build();
 
+            var app = builder.Build();
+            UseOdbc(app);
+            UseApi(app);
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
@@ -84,6 +95,30 @@ namespace Console_UserInterface
 
             app.Run();
         }
+
+        private static void UseApi(WebApplication app)
+        {
+            app.Use((http, next) =>
+            {
+                if(http.Request.GetDisplayUrl().IndexOf("/api/") != -1)
+                {
+                    var signin = http.RequestServices.GetService<SigninUser>();
+                    if (signin.IsSignin())
+                    {
+                        UserContext context = signin.Verify();
+                        context.UserAgent = http.Request.Headers.UserAgent;
+                        using (var db = new DbContextUser())
+                        {
+                            db.Update(context);
+                            db.SaveChanges();
+                        }
+                        signin.GetFromSession<ApiController>("api").Apply(http);                        
+                    }
+                }
+                return next.Invoke();
+            });
+        }
+
         public static void Main2(string[] args)
         {
             

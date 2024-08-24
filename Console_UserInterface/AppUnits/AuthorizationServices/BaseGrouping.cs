@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 
-public abstract class BaseGrouping<TItem, TParent, TGroup> 
+public abstract class BaseGrouping<TItem, TParent, TGroup>: BaseEntity
     where TGroup: BaseEntity 
     where TParent: BaseEntity
 {

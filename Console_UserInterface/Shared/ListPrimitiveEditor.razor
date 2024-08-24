@@ -1,6 +1,5 @@
 ﻿@using Console_InputApplication.ViewEvents;
 @using System.Reflection;
-<h3>ListPrimitiveEditor</h3>
 @code
 {
     public Dictionary<string, List<string>> ValidationResult { get; set; } = new();
@@ -36,7 +35,7 @@
 }
 <CardContainer>
     <CardHeader>          
-        <div>
+        <div class="d-flex flex-row">
             <span class="btn btn-sm btn-primary" @onclick="(evt => { OnAddButtonClicked(); })">добавить</span>
             <span class="btn btn-sm btn-danger @(SelectedItems is not null &&  SelectedItems.Count()>0?"":"disabled")" @onclick="(evt => { OnRemoveButtonClicked(); })">удалить</span>
         </div>
@@ -47,15 +46,21 @@
         {
             <CardContainer>
                 <CardHeader>
-                    @if (ValidationResult is not null)
-                    {
-                        <p class="text text-danger">@ValidationResult.ToJsonOnScreen()</p>
-                    }
+                    
                 </CardHeader>
                 <CardBody>
                     <FormControl Model="@ItemModel" AfterInput="@OnItemValueChanged">
                     </FormControl>
-                    @ItemModel.Validate().ToJsonOnScreen()
+                    @if (ValidationResult is not null)
+                    {
+                        @foreach (var kv in ValidationResult )
+                        {                            
+                            @foreach (var error in @kv.Value)
+                            {
+                                <p class="text text-danger">@kv.Key @error</p>        
+                            }
+                        }                        
+                    }
                 </CardBody>
                 <CardFooter>
                     <button class="btn btn-sm btn-primary @(ValidationResult.Count()>0?"disabled":"")" @onclick="(evt => { OnAdd.InvokeAsync(ItemModel.Value).Wait(); ItemModel = null; StateHasChanged(); })" @onclick:preventDefault> добавить </button>
@@ -263,7 +268,7 @@
                 return "text";
             }            
         }
-        return type
+        return type;
     }
     public string GetInputTypeByAttrs(Dictionary<string, string> attrs)
     {
@@ -355,7 +360,7 @@
     {
         if (this.Attributes is null)
             throw new ArgumentException("Attributes");
-        PagesCount = Items.Count() % PageSize == 0 ? ((int)(Items.Count() / PageSize)) : ((int)(Items.Count() / PageSize) + 1);
+        PagesCount = Items.Count() % PageSize == 0 ? ((int)(Items.Count() / PageSize)) : ((int)(Items.Count() / PageSize) + 1);        
         Update();
     }
     [Parameter]

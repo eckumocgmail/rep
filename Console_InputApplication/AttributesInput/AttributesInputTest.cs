@@ -127,9 +127,17 @@ public class AttributesInputTest : TestingElement
         [InputEmail]
         public List<string> ListEmails { get; set; }
 
+        [InputDate]
+        public string Date { get; set; }
+
+        [Label("Даты")]
+        [InputPrimitiveCollection()]
+        [InputDate]
+        public List<string> ListDates { get; set; }
+
         [Label("Модели данных")]
-        [InputStructureCollection(nameof(DateModel))] 
-        public List<DateModel> ListDateModel { get; set; }
+        [InputStructureCollection(nameof(DateModel))]
+        public List<DateModel> ListDateModel { get; set; } = new() { new DateModel() };
 
         public CollectionModel()
         {

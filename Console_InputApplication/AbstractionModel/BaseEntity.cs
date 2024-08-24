@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 
 [Label("Общий класс для всех сущностей")]
-public abstract class BaseEntity
+public class BaseEntity
 {
     [Key]
     [InputHidden()]

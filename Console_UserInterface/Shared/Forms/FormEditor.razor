@@ -25,9 +25,19 @@
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        if (Model is InputFormModel)
-            Model = ((InputFormModel)Model).Item;
-        Form = new InputFormModel(Model);
+        try
+        {
+            if (Model is InputFormModel)
+                Model = ((InputFormModel)Model).Item;
+            if (Model is null)
+                throw new ArgumentNullException("Model");
+            this.Info($"Model: {Model.ToJsonOnScreen()}");
+            Form = new InputFormModel(Model);
+        }
+        catch(Exception ex)
+        {
+            this.Error("Исключение при инициаллизации: ",ex);
+        }
         await Validate();
     }
     public Dictionary<string, List<string>> Errors { get; set; }
@@ -38,6 +48,9 @@
     }
     protected async Task Validate()
     {
+        await Task.CompletedTask;
+        if (Form is null)
+            return;
         var message = Form.Item.Validate();
         SetErrors(Form, message);
         Form.FormFields.ForEach(item =>
