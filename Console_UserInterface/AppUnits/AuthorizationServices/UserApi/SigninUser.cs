@@ -197,8 +197,30 @@ public sealed class SigninUser : BaseSignin<UserContext, UserAccount, UserPerson
     }
 
     
+    public override void PutIntoSession (string key, object item)
+    {
+        var session = this._users.GetSession(this._tokenProvider.Get());
+        if (session == null)
+        {
+            _httpContextAccessor.HttpContext.Response.Redirect("/Auth/Signin");
+            throw new Exception("Сессия недоступна неавторизованному контексту")
+            {
+
+
+            };
+        }
+        else
+        {
+            if (session.ContainsKey(key) == false)
+            {
+                session[key] = item;
+            }
+          
+        }
+    }
     public override T GetFromSession<T>(string key)
     {
+      
         var session = this._users.GetSession(this._tokenProvider.Get());
         if (session == null)
         {

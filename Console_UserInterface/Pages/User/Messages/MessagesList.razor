@@ -1,5 +1,7 @@
 ﻿@using Microsoft.EntityFrameworkCore;
 @inject DbContextUser dbu
+
+<DataTable DataType="UserMessage" DataItems="Messages"></DataTable>
 <table>
     @if (Messages is null || Messages.Count() == 0)
     {
@@ -20,8 +22,8 @@
             {
                 <tr>
                     <th></th>
-                    <th>@(dbu.UserContexts_.Include(u=>u.Person).First(u => u.Id==Message.FromUserID).Person.GetFullName())</th>
-                    <th>@Message.Subject / @Message.Text.Substring(0,48)</th>
+                    <th>@(Message.ToUserID)</th>
+                    <th>@Message.Subject / @Message.Text </th>
                     <th>@Message.Created.ToString("d")</th>
                 </tr>
             }
@@ -34,4 +36,9 @@
 {
     [Parameter]
     public IEnumerable<UserMessage> Messages { get; set; }
+
+    public string GetUser(int userId)
+    {
+        return dbu.UserContexts_.Include(u => u.Person).First(u => u.Id == userId).Person.GetFullName();
+    }
 }

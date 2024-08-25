@@ -1,0 +1,33 @@
+﻿@page "/user/info"
+@attribute [Authorize(Roles = "webuser")]
+@inject SigninUser signin
+@code
+{
+    private global::UserPerson Person { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        try
+        {
+            if (signin.IsSignin())
+            {
+                Person = signin.Verify().Person;
+            }
+        }
+        catch(Exception ex)
+        {
+            this.Error($"Ошибка при инициализации {GetType().GetTypeName()}:  {ex.Message}\n{ex.StackTrace}");
+        }
+    }
+}
+<CardContainer>
+    <CardHeader>
+        <h2>Инфорация о пользователе</h2>
+    </CardHeader>
+    <CardBody>
+        <FormEditor Model="Person"></FormEditor>
+    </CardBody>
+    <CardFooter>
+        <Button>Сохранить</Button>
+    </CardFooter>
+</CardContainer>

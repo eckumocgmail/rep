@@ -308,7 +308,7 @@ public class ReflectionService
             }
             if (t == null)
             {
-                return FactoryUtils.Get().TypeForName(type);
+                return ServiceFactory.Get().TypeForName(type);
                 //throw new Exception("Не удалось найти тип " + type);
             }
             SHORT_NAME_TYPE_DICTIONARY[type] = t;

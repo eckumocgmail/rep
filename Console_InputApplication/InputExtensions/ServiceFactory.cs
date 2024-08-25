@@ -15,18 +15,18 @@ using System.Threading.Tasks;
 /// <summary>
 /// Методы упрощают инициаллизацию объектов
 /// </summary>
-public class FactoryUtils 
+public class ServiceFactory 
 {
-    private static FactoryUtils Instance = null;
-    public static FactoryUtils Get()
+    private static ServiceFactory Instance = null;
+    public static ServiceFactory Get()
     {
         
         if (Instance == null)
         {
-            Instance = new FactoryUtils();
+            Instance = new ServiceFactory();
         }
         
-        Instance.AddTypes(typeof(FactoryUtils).Assembly);
+        Instance.AddTypes(typeof(ServiceFactory).Assembly);
         Instance.AddTypes(typeof(DataColumnCollection).Assembly);
         Instance.AddTypes(typeof(System.String).Assembly);
         Instance.AddTypes(typeof(System.Data.DataTable).Assembly);
@@ -56,7 +56,7 @@ public class FactoryUtils
        new ConcurrentDictionary<string, Type>();
    
 
-    private FactoryUtils():base()
+    private ServiceFactory():base()
     {
 
         ByFullNames["Nulalble<System.DateTime>"] = typeof(DateTime?);
@@ -141,6 +141,11 @@ public class FactoryUtils
     /// </summary>    
     /// <param name="assembly">сборка</param>
     public HashSet<Assembly> Assemblies = new HashSet<Assembly>();
+    public void AddTypes(IEnumerable<Assembly> assembly)
+    {
+        foreach (Assembly asm in assembly)
+            AddTypes(asm);
+    }
     public void AddTypes(Assembly assembly)
     {
         if (Assemblies.Contains(assembly) == true)

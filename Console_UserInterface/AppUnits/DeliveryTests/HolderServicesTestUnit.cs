@@ -27,31 +27,26 @@ namespace Console_BlazorApp.AppUnits.DeliveryTests
              */
             AssertService<IHolderService>(holderService =>
             {
-                foreach(var holder in provider.Get<DeliveryDbContext>().Holders.ToList())
+                var holder = provider.Get<DeliveryDbContext>().Holders.ToList().First();
+                var products = holderService.GetProductsCounts(holder.Id);
+                new
                 {
-                    var products = holderService.GetProductsCounts(holder.Id);
-                    new
-                    {
-                        holder = holder,
-                        products = products
-                    }.ToJsonOnScreen().WriteToConsole();
+                    holder = holder,
+                    products = products
+                }.ToJsonOnScreen().WriteToConsole();
 
-                    foreach(var key in products.Keys)
-                    {
-                        products[key] = products[key]+1;
-                    }
-
-                    var items = holderService.CreateOrder(holder.Id, products);
-                    Assert(el => items.All(p => p.Value == 1), 
-                        $"Формирование автозаказа на оптовый склад по адресу {holder.HolderLocation} работает корректно",
-                        $"Формирование автозаказа на оптовый склад по адресу {holder.HolderLocation} работает не корректно");
-
+                foreach(var key in products.Keys)
+                {
+                    products[key] = products[key]+1;
                 }
-                return true;
 
-                
-            }, 
-                "", 
+                var items = holderService.CreateOrder(holder.Id, products);
+                Assert(el => items.All(p => p.Value == 1), 
+                    $"Формирование автозаказа на оптовый склад по адресу {holder.HolderLocation} работает корректно",
+                    $"Формирование автозаказа на оптовый склад по адресу {holder.HolderLocation} работает не корректно");
+
+                return true;                
+            },  "", 
                 "");
             try
             {

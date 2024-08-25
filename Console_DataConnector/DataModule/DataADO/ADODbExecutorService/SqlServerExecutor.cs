@@ -19,7 +19,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbExecutorService
     {
         protected readonly IDataTableService DataTableService = new DataTableService();
 
-        public SqlServerExecutor()
+        public SqlServerExecutor(): base()
         {
         }
 
@@ -30,6 +30,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbExecutorService
         public SqlServerExecutor(string server, string database, bool trustedConnection, string userID, string password) : base(server, database, trustedConnection, userID, password)
         {
         }
+        public IEnumerable<TRecord> GetResultSet<TRecord>(DataTable dataTable) where TRecord : class => DataTableService.GetResultSet<TRecord>(dataTable);
 
         public int ExecuteProcedure(
             [InputEngText][NotNullNotEmpty()] string name, IDictionary<string, string> input, IDictionary<string, string> output)
@@ -43,8 +44,13 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbExecutorService
                 SqlCommand command = new SqlCommand(name, GetConnection());
                 command.CommandType = CommandType.StoredProcedure;
 
-                command.ExecuteReader();
-                command.Parameters.Add(new SqlParameter());
+                
+                foreach(var kv in input)
+                {
+                    command.Parameters.Add(new SqlParameter(kv.Key, kv.Value));
+                }
+                var reader = command.ExecuteReader();
+
                 return 1;
             }
             catch(Exception ex)

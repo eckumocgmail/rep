@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Console_DataConnector", "..
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Console_UserInterface", "..\Console_UserInterface\Console_UserInterface.csproj", "{181AF9F6-72B5-4889-8FB2-153AF25D3F6A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Console_Server", "Console_Server\Console_Server.csproj", "{0B0BFE79-93A6-4335-AEB5-E1F13E01E5E1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{181AF9F6-72B5-4889-8FB2-153AF25D3F6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{181AF9F6-72B5-4889-8FB2-153AF25D3F6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{181AF9F6-72B5-4889-8FB2-153AF25D3F6A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0B0BFE79-93A6-4335-AEB5-E1F13E01E5E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B0BFE79-93A6-4335-AEB5-E1F13E01E5E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0B0BFE79-93A6-4335-AEB5-E1F13E01E5E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B0BFE79-93A6-4335-AEB5-E1F13E01E5E1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

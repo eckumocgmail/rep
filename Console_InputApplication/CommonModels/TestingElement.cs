@@ -21,6 +21,10 @@ public class TestingUnit : TestingElement
     {
     }
 
+    public TestingUnit(IServiceProvider parent) : base(parent)
+    {
+    }
+
     public override void OnTest()
     {
         

@@ -13,17 +13,12 @@ public class UserMessagesService : IUserMessagesService
         _signin = signin;
     }
 
-    public async Task<int> Send(string subject, string text, int fromUserIID, int toUserId, List<ProductImage> files)
+
+    public async Task<int> Send(UserMessage p, List<ProductImage> files)
     {
 
-        UserMessage p = new UserMessage()
-        {
-            Subject = subject,
-            Text = text,
-            FromUserID = fromUserIID,
-            ToUserID = toUserId
-        };
-        p.EnsureIsValide();
+        
+        this.Info(p.Validate().ToJsonOnScreen());
         _context.Add(p);
         _context.SaveChanges();
 

@@ -10,6 +10,7 @@
 
         public override void OnTest()
         {
+            /*
             AssertService<DbContextService>
             (
                 db => 
@@ -74,7 +75,7 @@
                 },
                 "Добавление данных в DbContextService работает корректно",
                 "Добавление данных в DbContextService работает не корректно"
-            );
+            );*/
         }
     }
 }

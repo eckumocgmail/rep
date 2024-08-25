@@ -48,13 +48,13 @@ public class UserMessage : BaseEntity
 
     [Label("Тема")]
     [NotNullNotEmpty("Необходимо указать тему сообщения")]
-    public virtual string Subject { get; set; }
+    public virtual string Subject { get; set; } = "Личное";
 
 
     [Label("Текст сообщения")]
-    [InputMultilineText( )]
+    [InputMultilineText()]
     [NotNullNotEmpty("Необходимо ввести текст сообщения")]
-    public virtual string Text { get; set; }
+    public virtual string Text { get; set; } = "Текст";
 
     public bool Readed { get; set; } = false;
 

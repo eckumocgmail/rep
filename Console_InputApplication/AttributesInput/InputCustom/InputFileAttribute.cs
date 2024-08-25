@@ -18,7 +18,7 @@ public class InputFileAttribute: BaseInputAttribute
 
     public override string OnValidate(object model, string property, object value)
     {
-        return "";
+        return null;
     }
 
     public override string OnGetMessage(object model, string property, object value)

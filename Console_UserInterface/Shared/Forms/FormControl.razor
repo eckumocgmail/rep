@@ -102,7 +102,7 @@ else
         {
             @if (Model.Type != "bool" && Model.Type != "checkbox")
             {
-                <label>@Model.Label</label>
+                <label class="text @(Model.State == "valid"? "": "text-danger")">@Model.Label</label>
             }
             @if (Model.Type == "rusword" || Model.Type == "rusword" || Model.Type == "Text" || Model.Type == "rustext" || Model.Type == "engword" || Model.Type == "engtext" || Model.Type == "decimal" || Model.Type == "int" || Model.Type == "positiveint" || Model.Type == "number" || Model.Type == "email" || Model.Type == "text" || Model.Type == "date" || Model.Type == "datetime" || Model.Type == "password" || Model.Type == "color" || Model.Type == "text")
             {
@@ -331,15 +331,42 @@ else
                 {
                     @inject IJSRuntime js
                     @code
-                    {                 
+                    {
+                        public string ImageSource { get; set;  }
+                        string code { get; set; }
+                        string message { get; set; }
                         public async Task OnImageClicked()
                         {
-                            await js.InvokeAsync<string>("alert(1);");
+                            this.Info($@"document.querySelector('input[id='{Model.Name}']')");
+                            await js.InvokeAsync<string>("eval", $"document.querySelector('[id={Model.Name}]').click();");
                         }
                     }
                     <div>
-                        <input type="hidden" name="@Model.Name" id="@Model.Name" value="@Model.Value" />
-                        <img style="width: 222px; height: 222px;" @onclick="@OnImageClicked" />
+                        @inject SigninUser signin
+                        @inject NavigationManager nav
+                        <div class="d-flex card flex-row flex-nowrap">
+                            <input type="text" style="width: 100%;" @oninput="(evt => { code=evt.Value.ToString(); })">
+                            <span class="btn btn-sm btn-info" @onclick='(async evt => { message = await js.InvokeAsync<string>("eval",code); })' >Выполнить</span>
+                        </div>
+                        <img style="width: 222px; height: 222px;" src="@ImageSource" @onclick="@OnImageClicked" />
+                        <div>@message</div>
+                        <div style="display: none;">
+                            <FileUpload FileExts=".png,.jpg,.icon" Single="true"
+                                Id="@Model.Name"
+                                OnChanged='(evt => {
+                                    if( evt is not null && evt.Count() > 0 )
+                                    {
+                                        Model.Value = evt.First().FileData;
+                                        //ImageSource = "data:image/gif;base64,"+Convert.ToBase64String((byte[])Model.Value);
+                                        signin.PutIntoSession($"{nav.Uri}#{Model.Name}", Model.Value);
+                                        ImageSource = "data:image/json;base64,"+Convert.ToBase64String((byte[])Model.Value);
+                                        OnInputValue(Model.Name)(new ChangeEventArgs(){ Value = Model.Value });
+                                        StateHasChanged();
+                                    }
+                        })'></FileUpload>
+                        </div>
+                        <input type="hidden" value="@Model.Value" />                        
+                        
                     </div>
                 
                 }

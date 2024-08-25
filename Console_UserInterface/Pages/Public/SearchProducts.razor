@@ -51,7 +51,7 @@
                 Children = getChildren(p.ID)
             }).ToList();
         };
-        Root.Children = getChildren(rootId);
+        getChildren(rootId).ToList().ForEach(Root.Children.Add);
 
         //this.OnSearch();
         if (signin.IsSignin())

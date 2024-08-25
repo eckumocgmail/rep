@@ -5,50 +5,50 @@ using Console_DataConnector.DataModule.DataODBC.Connectors;
 using Newtonsoft.Json;
 using pickpoint_delivery_service;
 using Console_UserInterface.AppUnits.AuthorizationBlazor;
-using Console_BlazorApp;
-using Blazored.Modal;
 using Microsoft.AspNetCore.Http.Extensions;
-using Console_UserInterface.Pages.Auth;
+using Console_BlazorApp;
+using Blazored.Modal.Services;
+using System.Reflection;
+using Console_DataConnector.DataModule.DataADO.ADOWebApiService;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Console_UserInterface
 {
     public class Program
     {
-        public static void UpdateDatabase()
-        {
-            using (var db = new AuthorizationDbContext())
-            {
-                db.Database.EnsureDeleted();
-                db.Database.EnsureCreated();
-                db.UserContexts_.ToList().ToJsonOnScreen().WriteToConsole();
-            }
-            using (var db = new DbContextUser())
-            {
-                db.Database.EnsureDeleted();
-                db.Database.EnsureCreated();
-                db.UserContexts_.ToList().ToJsonOnScreen().WriteToConsole();
-            }
-            /*using (var db = new DbContextService())
-            {
-                db.Database.EnsureDeleted();
-                db.Database.EnsureCreated();
-                db.ServiceContexts.ToList().ToJsonOnScreen().WriteToConsole();
-            }*/
-        }
         public static void Main(string[] args)
         {
+            ServiceFactory.Get().AddTypes(typeof(Program).Assembly);
+            ServiceFactory.Get().AddTypes(typeof(Program).Assembly.Modules.Select(mod => mod.Assembly));
 
-            /*var model = new InputFormModel();
-            model.Item = new AttributesInputTest.CollectionModel();
-            var field = model.CreateFormField(model.Item.GetType(), nameof(AttributesInputTest.CollectionModel.ListDateModel));
-            field.ToJsonOnScreen().WriteToConsole();*/
-            
-
-            //new DeliveryServicesUnit().DoTest(false).ToDocument().WriteToConsole();
-            UpdateDatabase();
-
+            //TestApp();
+            UpdateDatabases();
             var builder = WebApplication.CreateBuilder(args);
-           
+            ConfigureServices(builder);
+            Configure(builder);
+        }
+
+        public static void Configure(WebApplicationBuilder builder)
+        {
+
+            var app = builder.Build();
+
+
+            app.UseExceptionHandler("/Error");
+            app.UseHttpsRedirection();
+            app.UseStaticFiles();
+            UseApi(app);
+            app.UseRouting();
+            app.MapControllers();
+            //UseOdbc(app);
+            
+            app.MapBlazorHub();
+            app.MapFallbackToPage("/_Host");
+            app.Run();
+        }
+
+        public static void ConfigureServices(WebApplicationBuilder builder)
+        {
             builder.Services.AddBlazorBootstrap();
 
             // Add services to the container.
@@ -56,6 +56,8 @@ namespace Console_UserInterface
             builder.Services.AddRazorPages();
             builder.Services.AddControllers();
             builder.Services.AddServerSideBlazor();
+            
+            builder.Services.AddScoped<SqlServerWebApi>();
             builder.Services.AddScoped<UserService>();
             builder.Services.AddScoped<UserAuthStateProvider>();
             builder.Services.AddScoped<AuthenticationStateProvider>(sp => sp.GetRequiredService<UserAuthStateProvider>());
@@ -71,38 +73,69 @@ namespace Console_UserInterface
             DeliveryDbContext.ConfigureDeliveryServices(builder.Services, builder.Configuration);
             //DeliveryDbContext.CreateDeliveryData(builder.Services, builder.Configuration);
             DbContextUserInitializer.CreateUserData(builder.Services, builder.Configuration);
-
-            var app = builder.Build();
-            UseOdbc(app);
-            UseApi(app);
-
-            // Configure the HTTP request pipeline.
-            if (!app.Environment.IsDevelopment())
-            {
-                app.UseExceptionHandler("/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
-            }
-
-            app.UseHttpsRedirection();
-
-            app.UseStaticFiles();
-
-            app.UseRouting();
-            app.MapControllers();
-            app.MapBlazorHub();
-            app.MapFallbackToPage("/_Host");
-
-            app.Run();
         }
 
-        private static void UseApi(WebApplication app)
+        public static void TestApp()
         {
-            app.Use((http, next) =>
+            new DeliveryServicesUnit().DoTest(true).ToDocument().WriteToConsole();
+        }
+
+        public static void TestInputField()
+        {
+            var model = new InputFormModel();
+            model.Item = new AttributesInputTest.CollectionModel();
+            var field = model.CreateFormField(model.Item.GetType(), nameof(AttributesInputTest.CollectionModel.ListDateModel));
+            field.ToJsonOnScreen().WriteToConsole();
+        }
+
+        [Label("Создание структуры баз данных")]
+        public static void UpdateDatabases()
+        {
+            using (var db = new AuthorizationDbContext())
             {
-                if(http.Request.GetDisplayUrl().IndexOf("/api/") != -1)
+                db.Database.EnsureDeleted();
+                db.Database.EnsureCreated();
+            }
+            using (var db = new DbContextUser())
+            {
+                db.Database.EnsureDeleted();
+                db.Database.EnsureCreated();
+            }
+            using (var db = new DbContextService())
+            {
+                db.Database.EnsureDeleted();
+                db.Database.EnsureCreated();
+                db.ServiceContexts.ToList().ToJsonOnScreen().WriteToConsole();
+            }
+        }
+
+
+        public static void UseApi(WebApplication app)
+        {
+            app.MapWhen(http => http.Request.GetDisplayUrl().IndexOf("/api") != -1, app => {
+                app.Run(async http => {
+                    var uri = http.Request.GetDisplayUrl().Substring(http.Request.GetDisplayUrl().IndexOf("/api")+3);
+                    if(uri.IndexOf("?")!=-1)
+                    {
+                        uri = uri.Substring(0, uri.IndexOf("?"));
+                    }
+                    
+                    var api = http.RequestServices.Get<SqlServerWebApi>();
+                    var args = new Dictionary<string, string>(http.Request.Query.Select(q => new KeyValuePair<string, string>(q.Key, q.Value.First())));
+                    var headers = new Dictionary<string, string>(http.Request.Headers.Select(q => new KeyValuePair<string, string>(q.Key, q.Value.First())));
+                    var response = await api.Request(uri, args, headers);
+                    //http.Response.StatusCode = response.Item1;
+                    http.Response.ContentType = "application/json; utf-8";
+                    await http.Response.WriteAsync(response.Item2.ToJson());                    
+                });
+            });
+            //app.Use(async (http, next) => { await http.Response.WriteAsync(new { }.ToJsonOnScreen()); await next.Invoke(); });
+            app.Use(async (http, next) =>
+            {
+                if(http.Request.GetDisplayUrl().IndexOf("/api") != -1)
                 {
-                    var signin = http.RequestServices.GetService<SigninUser>();
+                    
+                    /*var signin = http.RequestServices.GetService<SigninUser>();
                     if (signin.IsSignin())
                     {
                         UserContext context = signin.Verify();
@@ -112,65 +145,15 @@ namespace Console_UserInterface
                             db.Update(context);
                             db.SaveChanges();
                         }
-                        signin.GetFromSession<ApiController>("api").Apply(http);                        
-                    }
+                        
+                    }*/
                 }
-                return next.Invoke();
+                else
+                {
+                    await next.Invoke();
+                }
+                
             });
-        }
-
-        public static void Main2(string[] args)
-        {
-            
-
-            /*builder.Services.AddSingleton<AppRouterMiddleware>();
-
-            builder.Services.AddTransient<MailRuService2>();
-            builder.Services.AddTransient<InputModalService>();
-            builder.Services.AddTransient<IModalService, ModalService>();
-
-
-            builder.Services.AddInputModal();
-
-            builder.Services.AddControllers();
-            builder.Services.AddRazorPages();
-            builder.Services.AddServerSideBlazor();
-
-
-            UseOdbc(app);
-
-            DeliveryDbContext.UseDeliveryServices(app);*/
-           
-        }
-        public static void DefaultStartup(string[] args)
-        {
-            var builder = WebApplication.CreateBuilder(args);
-
-            // Add services to the container.
-            builder.Services.AddRazorPages();
-            builder.Services.AddControllers();
-            builder.Services.AddServerSideBlazor();
-
-            var app = builder.Build();
-
-            // Configure the HTTP request pipeline.
-            if (!app.Environment.IsDevelopment())
-            {
-                app.UseExceptionHandler("/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
-            }
-
-            app.UseHttpsRedirection();
-
-            app.UseStaticFiles();
-
-            app.UseRouting();
-            app.MapControllers();
-            app.MapBlazorHub();
-            app.MapFallbackToPage("/_Host");
-
-            app.Run();
         }
 
         private static void UseOdbc(WebApplication app)
@@ -211,5 +194,24 @@ namespace Console_UserInterface
                 }
             }
         }
+
+        public static void Main2(string[] args)
+        {
+
+            var builder = WebApplication.CreateBuilder(args);
+            builder.Services.AddSingleton<AppRouterMiddleware>();
+
+            builder.Services.AddTransient<MailRuService2>();
+            //builder.Services.AddTransient<InputModalService>();
+            builder.Services.AddTransient<IModalService, ModalService>();
+
+
+            //builder.Services.AddInputModal();
+
+            builder.Services.AddControllers();
+            builder.Services.AddRazorPages();
+            builder.Services.AddServerSideBlazor();                       
+        }
+        
     }
 }

@@ -1,11 +1,18 @@
 ﻿@inject IUserMessagesService userMessages
-<h3>CreateMessage</h3>
+@code
+{
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        MessageModel.ToUserID = userMessages.GetUsers().First().Value;
+    }
+}
 <div class="card">
     <div class="card-header">
         <h2>Новое сообщение</h2>
         <div class="form-group">
             <label>Кому</label>
-            <select class="form-control" @onchange="(evt => { toUserId = int.Parse(evt.Value.ToString()); } )">
+            <select class="form-control" @onchange="(evt => { MessageModel.ToUserID = int.Parse(evt.Value.ToString()); } )">
                 @foreach (var kv in userMessages.GetUsers())
                 {
                     <option value="@kv.Value">@kv.Key</option>
@@ -29,20 +36,24 @@
     <div class="card-body">
         <div class="form-group">
             <label>Текст</label>
-            <textarea class="form-control" @oninput="(evt => { message = evt.Value.ToString(); StateHasChanged(); })">@message</textarea>
+            <textarea class="form-control" @oninput="(evt => { MessageModel.Text = evt.Value.ToString(); StateHasChanged(); })">@MessageModel.Text</textarea>
         </div>
     </div>
     <div class="card-footer">
-        <button class="btn btn-sm btn-primary" @onclick="(evt => { OnSendMessageButtonClicked.InvokeAsync(evt).Wait(); })">Отправить</button>
+        <button class="btn btn-sm btn-primary" @onclick="(evt => { OnSendClicked(); })">Отправить</button>
     </div>
 </div>
 @code 
 {
-    [Parameter] public EventCallback OnComplete { get; set; }
-    public int? toUserId { get; set; }
-    public string message { get; set; }
     [Parameter]
-    public EventCallback<object> OnSendMessageButtonClicked { get; set; }
+    public EventCallback<UserMessage> OnSend { get; set; }
+
+    private UserMessage MessageModel { get; set; } = new() { };
+     
+    public async Task OnSendClicked()
+    {
+        await OnSend.InvokeAsync(MessageModel);
+    }
 }
 @code
 {

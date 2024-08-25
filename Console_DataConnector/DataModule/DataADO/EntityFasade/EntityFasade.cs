@@ -21,6 +21,12 @@ public class EntityFasade: IEntityFasade
         _entity = entity;
         _metadata = metadata;
     }
+
+    public override string ToString()
+    {
+        return _metadata.TableName.ToLower();
+    }
+
     public int Count( ) 
     {
         return _api.GetSingleJObject($"SELECT COUNT(*) AS CNT FROM [{_metadata.TableSchema}].[{_metadata.TableName}]")["CNT"].ToString().ToInt();
@@ -132,7 +138,7 @@ public class EntityFasade: IEntityFasade
         return text;
     }
 
-    public Task<object[]> List()
+    public Task<object[]> GetAll()
     {
         return Task.Run(() => {
             return _api.ExecuteQuery($"SELECT * FROM [{_metadata.TableSchema}].[{_metadata.TableName}]",_entity).ToArray();

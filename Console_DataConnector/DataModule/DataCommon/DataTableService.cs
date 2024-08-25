@@ -206,45 +206,64 @@ public class DataTableService: MyValidatableObject,IDataTableService
     }
     public IEnumerable<TRecord> GetResultSet<TRecord>(DataTable dataTable) where TRecord: class
     {
-        Type type = typeof(TRecord);
-        var properties = type.GetOwnPropertyNames();
         var result = new List<TRecord>();
-        var columns = GetColumnsNames(dataTable);
-        foreach (DataRow row in dataTable.Rows)
+        Type type = typeof(TRecord);
+        if (type.Equals(typeof(Dictionary<string, object>)))
         {
-            object next = type.New();
-            foreach(var name in properties)
+            
+            foreach (DataRow row in dataTable.Rows)
             {
-                    
-                string columnName = name.ToTSQLStyle();
-                string key = columns.Contains(columnName) ? columnName : columnName.ToCapitalStyle();
-                if (columns.Contains(key) == false)
-                    continue;
-                try
+                dynamic item = typeof(TRecord).New();
+                for (int i=0; i<dataTable.Columns.Count; i++)
                 {
-                    object value = row[columnName];
-                    if (value != null)
-                    {
-                        Setter.SetValue(next, name, value.ToString());
-                    }
+                    var column = dataTable.Columns[i];
+                    item[column.ColumnName] = row[column.ColumnName];
                 }
-                catch(Exception ex)
-                {
-                    this.Error("Ошибка при разборе свойства "+ name, ex);
-                    this.Error(ex);
-                }
-                                     
+                result.Add(item);
             }
-                
-                
-                
-            if (next is MyValidatableObject)
-                ((MyValidatableObject)next).EnsureIsValide();
-            result.Add((TRecord)next);
-                
-                    
-                
-                
+        }
+        else
+        {
+           
+            var properties = type.GetOwnPropertyNames();
+            
+            var columns = GetColumnsNames(dataTable);
+            foreach (DataRow row in dataTable.Rows)
+            {
+                object next = type.New();
+                foreach (var name in properties)
+                {
+
+                    string columnName = name.ToTSQLStyle();
+                    string key = columns.Contains(columnName) ? columnName : columnName.ToCapitalStyle();
+                    if (columns.Contains(key) == false)
+                        continue;
+                    try
+                    {
+                        object value = row[columnName];
+                        if (value != null)
+                        {
+                            Setter.SetValue(next, name, value.ToString());
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        this.Error("Ошибка при разборе свойства " + name, ex);
+                        this.Error(ex);
+                    }
+
+                }
+
+
+
+                if (next is MyValidatableObject)
+                    ((MyValidatableObject)next).EnsureIsValide();
+                result.Add((TRecord)next);
+
+
+
+
+            }
         }
         return result.ToArray();
     }

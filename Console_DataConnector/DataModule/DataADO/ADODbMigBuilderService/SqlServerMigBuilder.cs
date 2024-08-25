@@ -26,7 +26,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbMigBuilderService
 
 
 
-        public SqlServerMigBuilder()
+        public SqlServerMigBuilder(): base()
         {
         }
 

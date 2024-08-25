@@ -1,14 +1,21 @@
 ﻿ 
-<InputFile OnChange="OnFilesLoaded"></InputFile>
+<InputFile OnChange="OnFilesLoaded" AdditionalAttributes='new Dictionary<string, object>(){
+    { "multiple", Single ? "false": "true" },
+    { "accept", FileExts },
+    { "id", (Id is null? (Id=$"{GetType()}_{GetHashCode()}"): Id)}
+}'></InputFile>
 
 @code 
-{
-    
-
-
-
+{    
     [Parameter]
     public string FileExts { get; set; } = "*.*";
+
+    [Parameter]
+    public bool Single { get; set; } = false;
+
+    [Parameter]
+    public string Id { get; set; } = null;
+
     [Parameter]
     public EventCallback<IEnumerable<FileItem>> OnChanged { get; set; }
     public List<FileItem> Files { get; set; } = new();

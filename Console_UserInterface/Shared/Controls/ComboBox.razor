@@ -1,5 +1,24 @@
-﻿<h3>ComboBox</h3>
+﻿<div class="form-group">
+    <label>@Label</label>
+    <input type="search" class="form-control" style="width: 100%;" @oninput="(async evt => { await OnInput.InvokeAsync(evt.Value.ToString()); StateHasChanged(); })" list="list_@GetHashCode()"/>
+    <datalist id="list_@GetHashCode()">
+        @foreach (var Option in Options)
+        {
+            <option value="@Option">@Option</option>
+        }        
+    </datalist>
+</div>
+@code 
+{
+    [Parameter]
+    public EventCallback<string> OnInput { get; set; }
 
-@code {
+    [Parameter]
+    public string Label { get; set; } = "";
 
+    [Parameter]
+    public string Value { get; set; } = "";
+
+    [Parameter]
+    public List<string> Options { get; set; } = new();
 }

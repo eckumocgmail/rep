@@ -67,7 +67,7 @@ using System;
 
         [InputOrder(6)]
         [Label("Файл")]
-        //[InputImage()]
+        [InputImage()]
         [Icon("add_a_photo")]
         public byte[] Data { get; set; } = new byte[0];
 

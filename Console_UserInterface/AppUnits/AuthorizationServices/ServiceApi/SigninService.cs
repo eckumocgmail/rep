@@ -61,7 +61,10 @@ public sealed class SigninService : BaseSignin<ServiceContext, ServiceSertificat
         return (T)session[key];
     }
 
-   
+    public override void PutIntoSession(string key, object item)
+    {
+        throw new NotImplementedException();
+    }
 }
 public class SigninServiceTest : TestingElement
 {

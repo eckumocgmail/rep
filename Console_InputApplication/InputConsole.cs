@@ -225,7 +225,6 @@ public class InputConsole: ProgramDialog
       
     public static void Clear()
     {
-
         Console.Clear();    
         Console.ResetColor();
     }
@@ -995,7 +994,7 @@ public class InputConsole: ProgramDialog
                     .Concat(System.IO.Directory.GetFiles(dir));
             string location = System.IO.Directory.GetCurrentDirectory();
             IEnumerable<string> navs = nav(location);
-            int cursor = 0;
+            //int cursor = 0;
 
 
 

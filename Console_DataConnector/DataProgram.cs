@@ -159,7 +159,7 @@ namespace Console_DataConnector
                     DataSource = postgres;
                     //Executor = postgres;
                     break;
-                case "Exit":
+                case "Выход":
                     Process.GetCurrentProcess().Close();
                     break;
                 default: throw new Exception("Нет обработки выбора");

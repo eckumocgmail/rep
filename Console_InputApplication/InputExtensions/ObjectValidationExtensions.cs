@@ -154,7 +154,6 @@ public static class ObjectValidationExtensions
                     validation.Validate(target, key, value);
                 if (validationResult != null)
                 {
-
                     errors.Add(validationResult);
                 }
             }

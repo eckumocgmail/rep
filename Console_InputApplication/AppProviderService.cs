@@ -74,7 +74,7 @@ public class AppProviderService: IServiceProvider
     public virtual object GetService(Type serviceType)
         => Factories.ContainsKey(serviceType) ?
             Factories[serviceType].Invoke(this) :
-            throw new ArgumentException("serviceType");
+            throw new ArgumentException("serviceType",$"{serviceType}");
 
     
 
@@ -275,7 +275,14 @@ public static class IServiceProviderExtrensions
 {
     public static T Get<T>(this IServiceProvider sp)
     {
-
-        return sp.GetService<T>();
+        if( typeof(T).IsInterface )
+        {
+            var implementation = typeof(T).Assembly.GetTypes().Where(pt => pt.GetInterfaces().Contains(typeof(T))).FirstOrDefault();
+            return (T)sp.GetService(implementation);
+        }
+        else
+        {
+            return sp.GetService<T>();
+        }        
     }
 }

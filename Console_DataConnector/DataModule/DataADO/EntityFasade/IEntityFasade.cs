@@ -12,7 +12,7 @@ public interface IEntityFasade
     public Task<int> Delete(int id);
     public Task<int> Update(object model);
     public Task<int> Create(object model);
-    public Task<object[]> List();
+    public Task<object[]> GetAll();
 
     public Task<object[]> Page(int page, int size);
     public Task<object[]> Page(int page, int size, params string[] sorting);

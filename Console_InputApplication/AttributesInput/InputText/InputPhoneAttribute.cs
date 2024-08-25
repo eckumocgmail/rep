@@ -13,6 +13,7 @@ public class InputPhoneAttribute : BaseInputAttribute
     {
         _message = message;
     }
+    public override bool IsValid(object value) => IsValidValue(value);
     public override bool IsValidValue(object value)
     {
         if (value == null)

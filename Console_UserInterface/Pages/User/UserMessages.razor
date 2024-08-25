@@ -6,25 +6,137 @@
 @inject IHttpContextAccessor http
 @code
 {
-    public int inboxNotReaded { get; set; }
+    public string TextMessage { get; set; }
+    public int InboxNotReaded { get; set; }
+    public UserMessage Message { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
         try
         {
-            toUserId = userMessages.GetUsers().First().Value;
             this.inbox = userMessages.GetInbox();
-            this.inboxNotReaded = userMessages.GetInboxNotReaded();
+            this.InboxNotReaded = userMessages.GetInboxNotReaded();
             this.outbox = userMessages.GetOutbox();
             OnInboxButtonClicked();
         }
         catch(Exception ex)
         {
-            message = ex.Message;
+            TextMessage = ex.Message;
+        }
+    }
+}
+
+<div class="card" style="width: 100%; height: 1024px;">
+    <div class="card-header">
+        <h2>Сообщения пользователя</h2>
+        <nav class="navbar navbar-light" style="background-color: #e3f2fd;">
+            <ul class="list-group d-flex flex-row">
+
+                <li class="list-group-item @(view == "new_message"? "active": "")" @onclick="OnCreateMessageButtonClicked">Новое сообщение</li>
+                <li class="list-group-item @(view == "inbox"? "active": "")" @onclick="OnInboxButtonClicked">Входящие (@inbox.Count())</li>
+                <li class="list-group-item @(view == "outbox"? "active": "")" @onclick="OnOutboxButtonClicked">Исходящие (@outbox.Count())</li>
+            </ul>
+        </nav>
+    </div>
+    <div class="card-body">
+        <div class="container-fluid">
+            <div class="row">
+               
+                <div class="col-12">
+                    @switch (view)
+                    {
+                        case "message":
+                            <MessageCard></MessageCard>
+                            break;
+                        case "outbox":
+                            <MessagesList Messages="@outbox"></MessagesList>
+                            break;
+                        case "inbox":
+                            <MessagesList Messages="@inbox"></MessagesList>                      
+                            break;
+                        case "new_message":
+                            <CreateMessage OnSend="(evt => { OnSendMessage(evt); StateHasChanged();  })"></CreateMessage>
+                            break;
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer"></div>
+</div>
+@inject SigninUser signin
+@code 
+{
+
+        List<UserMessage> inbox;
+        List<UserMessage> outbox;
+
+        string view;
+
+
+        int fromUserId;
+
+
+    public string UserMessage { get; set; }
+
+    public void OnResendMessageButtonClicked()
+    {      
+        //toUserId = fromUserId;
+        fromUserId = signin.Verify().Id;
+        view = "new_message";
+        //message = "";
+        StateHasChanged();
+    }
+
+    public void OnSendMessage(UserMessage evt)
+    {
+        try
+        {
+            var from = signin.Verify().Id;
+            if (evt.ToUserID is null)
+                throw new ArgumentNullException("ToUserID");
+            userMessages.Send(evt,null);
+
+            this.inbox = userMessages.GetInbox();
+            this.outbox = userMessages.GetOutbox();
+            view = "inbox";
+        }
+        catch(Exception ex)
+        {
+            this.Error(UserMessage = $"Ошибка при отправки сообщения: {ex.Message}");
+        }
+        finally
+        {
+            StateHasChanged();
         }
 
     }
+    public void OnCreateMessageButtonClicked()
+    {
+        this.view = "new_message";
+        StateHasChanged();
+    }
+    public void OnInboxButtonClicked()
+    {
+        this.view = "inbox";
+        StateHasChanged();
+    }
+    public void OnOutboxButtonClicked()
+    {
+        this.view = "outbox";
+        StateHasChanged();
+    } 
+    
+    public void OnMessageClicked(UserMessage message)
+    {
+        //this.message = message;
+        this.view = "message";
+        this.Message = message;                
+        StateHasChanged();
+    }
 }
+
 @code
 {
     private List<UserMessageFile> files { get; set; } = new();
@@ -61,105 +173,5 @@
         }
 
         isLoading = false;
-    }
-}
-<div class="card" style="width: 100%; height: 1024px;">
-    <div class="card-header">
-        <h2>Сообщения пользователя</h2>
-        <nav class="navbar navbar-light" style="background-color: #e3f2fd;">
-            <ul class="list-group d-flex flex-row">
-
-                <li class="list-group-item @(view == "new_message"? "active": "")" @onclick="OnCreateMessageButtonClicked">Новое сообщение</li>
-                <li class="list-group-item @(view == "inbox"? "active": "")" @onclick="OnInboxButtonClicked">Входящие (@inbox.Count())</li>
-                <li class="list-group-item @(view == "outbox"? "active": "")" @onclick="OnOutboxButtonClicked">Исходящие (@outbox.Count())</li>
-            </ul>
-        </nav>
-    </div>
-    <div class="card-body">
-        <div class="container-fluid">
-            <div class="row">
-               
-                <div class="col-12">
-                    @switch (view)
-                    {
-                        case "message":
-                            <MessageCard></MessageCard>
-                            break;
-                        case "outbox":
-                            <MessagesList Messages="@outbox"></MessagesList>
-                            break;
-                        case "inbox":
-                            <MessagesList Messages="@inbox"></MessagesList>                      
-                            break;
-                        case "new_message":
-                            <CreateMessage></CreateMessage>
-                            break;
-                    }
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="card-footer"></div>
-</div>
-@inject SigninUser signin
-@code 
-{
-
-    List<UserMessage> inbox;
-    List<UserMessage> outbox;
-
-    string view;
-    string subject;
-    string message;
-
-    int fromUserId;
-    int toUserId;
-
-    
-
-    public void OnResendMessageButtonClicked()
-    {      
-        toUserId = fromUserId;
-        fromUserId = signin.Verify().Id;
-        view = "new_message";
-        message = "";
-        StateHasChanged();
-    }
-
-    public void OnSendMessageButtonClicked()
-    {
-        var from = signin.Verify().Id;
-        userMessages.Send("Тест", message, from, toUserId, null);
-
-        this.inbox = userMessages.GetInbox();
-        this.outbox = userMessages.GetOutbox();
-        view = "inbox";
-        StateHasChanged();
-    }
-    public void OnCreateMessageButtonClicked()
-    {
-        this.view = "new_message";
-        StateHasChanged();
-    }
-    public void OnInboxButtonClicked()
-    {
-        this.view = "inbox";
-        StateHasChanged();
-    }
-    public void OnOutboxButtonClicked()
-    {
-        this.view = "outbox";
-        StateHasChanged();
-    } 
-    public void OnMessageClicked(UserMessage message)
-    {
-        //this.message = message;
-        this.view = "message";
-        this.message = message.Text;
-        this.subject = message.Subject;
-        this.fromUserId = (int)message.FromUserID;
-        this.toUserId = (int)message.ToUserID;
-        
-        StateHasChanged();
     }
 }

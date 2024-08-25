@@ -3,35 +3,53 @@
 @inject DeliveryDbContext db
 @inject NavigationManager nav
 @inject SigninUser signin
-
-<div class="card" style="width: 100%;">
-    У вас на счету @(signin.Verify().WalletId) $
-
-
-    <CardContainer width="100%">               
-
-        <CardBody>
-            <div>
+@code
+{
+    private string View { get; set; }
+}
+<div class="container card" style="padding: 0px; margin: 0px;">
+    <div class="row" style="padding: 0px; margin: 0px;">
+        <div class="col-3" style="padding: 0px; margin: 0px;">
             <div class="list-group">
-                <li class="list-group-item">Аккаунт</li>
-                <li class="list-group-item">Персональная информация</li>
-                <li class="list-group-item">Настройки</li>
-                <li class="list-group-item">Сообщения</li>
-                <li class="list-group-item">Группы</li>
-                <li class="list-group-item">Автомобили</li>
-                <li class="list-group-item">Учетные даные</li>
-                <li class="list-group-item">Корзина</li>
-                <li class="list-group-item">Заказы</li>
-
-            </div>
-            <div>
-                <Index></Index>
+                <li class="list-group-item" @onclick='(evt => { View = "UserAccount"; StateHasChanged(); })'>Аккаунт</li>
+                <li class="list-group-item" @onclick='(evt => { View = "UserPerson"; StateHasChanged(); })'>Персональная информация</li>
+                <li class="list-group-item" @onclick='(evt => { View = "UserSettings"; StateHasChanged(); })'>Настройки</li>
+                <li class="list-group-item" @onclick='(evt => { View = "UserMessages"; StateHasChanged(); })'>Сообщения</li>
+                <li class="list-group-item" @onclick='(evt => { View = "UserGroups"; StateHasChanged(); })'>Группы</li>
+                <li class="list-group-item" @onclick='(evt => { View = "UserCars"; StateHasChanged(); })'>Автомобили</li>
+                <li class="list-group-item" @onclick='(evt => { View = "UserBasket"; StateHasChanged(); })'>Корзина</li>
+                <li class="list-group-item" @onclick='(evt => { View = "UserOrders"; StateHasChanged(); })'>Заказы</li>
             </div>
         </div>
-        </CardBody>      
-    </CardContainer>
-</div>
-
-@code {
-
-}
+        <div class="col-9" style="padding: 0px; margin: 0px;">
+            @switch (View)
+            {
+                case "UserAccount":
+                    <UserGroups></UserGroups>
+                    break;
+                case "UserPerson":
+                    <UserPerson></UserPerson>
+                    break;
+                case "UserSettings":
+                    <UserSettings></UserSettings>
+                    break;
+                case "UserMessages":
+                    <UserMessages></UserMessages>
+                    break;
+                case "UserGroups":
+                    <UserGroups></UserGroups>
+                    break;
+                case "UserCars":
+                    <UserCars></UserCars>
+                    break;
+                case "UserBasket":
+                    <UserBasket></UserBasket>
+                    break;
+                case "UserOrders":
+                    <UserOrders></UserOrders>
+                    break;
+                default: break;
+            }
+        </div>
+    </div>
+</div> 

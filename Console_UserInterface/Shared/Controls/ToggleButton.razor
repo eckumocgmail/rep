@@ -1,17 +1,46 @@
-﻿<button class="btn btn-primary"> @Label </button>
+﻿@inherits BaseComponent
+@code
+{
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();        
+    }
+}
+<p>@ValidationErrors.ToJsonOnScreen()</p>
+@if( IsValid() )
+{
+    <button class="btn @(IsActive? "btn-danger": "btn-primary")" @onclick="(evt => { IsActive = !IsActive; OnToggle.InvokeAsync(IsActive).Wait(); StateHasChanged(); })"> @Label </button>
+}
+else
+{
 
-@code {
-
+    <p>dsdf</p>
+    <div class="card">
+        @foreach (var kv in ValidationErrors)
+        {
+            <div class="alert alert-info">
+                <label style="font-size: 20px;">@kv.Key</label>
+                @foreach (var error in kv.Value)
+                {
+                    <div class="text text-danger">@error</div>
+                }
+            </div>
+        }
+    </div>
+}
+@code 
+{
     [Parameter]
+    [Label("Надпись")]
+    [NotNullNotEmpty]
     public string Label { get; set; }
 
+    [Label("Состояние")]
     [Parameter]
-    public bool IsActive { get; set; }
+    public bool IsActive { get; set; } = false;
 
+    [Label("Событие нажатия")]
     [Parameter]
-    public bool Enabled { get; set; }
-
-    [Parameter]
+    [NotNullNotEmpty]
     public EventCallback<bool> OnToggle { get; set; }
-
 }

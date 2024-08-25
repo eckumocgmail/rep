@@ -5,7 +5,8 @@ public interface IUserMessagesService
     Dictionary<string, int> GetUsers();
     List<UserMessage> GetInbox();
     List<UserMessage> GetOutbox();
-    Task<int> Send(string subject, string text, int fromUserIID, int toUserId, List<ProductImage> files);
+    Task<int> Send(UserMessage p, List<ProductImage> files);
+
 
     /// <summary>
     /// Кол-во непрочитанных сообщений

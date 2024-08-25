@@ -23,6 +23,7 @@ public abstract class BaseSignin<TActiveObject, TAuthenticationMember, TObjectIn
     public abstract bool Signout( string key );
     public abstract MethodResult<TActiveObject> Signin( TAuthenticationMember item );
     public abstract bool Validate(string key);
+    public abstract void PutIntoSession(string key, object item);
 
     public abstract T GetFromSession<T>(string key);
 

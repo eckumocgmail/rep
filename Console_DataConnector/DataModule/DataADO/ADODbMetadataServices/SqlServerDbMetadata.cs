@@ -51,7 +51,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbMetadataServices
             new Dictionary<string, IDictionary<string, ProcedureMetadata>>();
 
 
-        public SqlServerDbMetadata()
+        public SqlServerDbMetadata(): base()
         {
         }
 

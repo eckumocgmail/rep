@@ -19,7 +19,7 @@ public static class DbContextExtensions
     
     public static Type GetDbContextWithEntity(this object target)
     {
-        foreach(var pdbtype in FactoryUtils.Get().GetTypesExtended<DbContext>())
+        foreach(var pdbtype in ServiceFactory.Get().GetTypesExtended<DbContext>())
         {
             using (var pdb = (DbContext)pdbtype.New())
             {
