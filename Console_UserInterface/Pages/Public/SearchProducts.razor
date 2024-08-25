@@ -26,6 +26,7 @@
     TreeNode Root;
     protected override void OnInitialized()
     {
+        base.OnInitialized();
         var p = db.ProductCatalogs.FirstOrDefault(p => p.ParentId == null);
         if (p is null)
         {
@@ -33,25 +34,29 @@
         }
         else
         {
-            
-        }
-        Root = new()
-        {
-            Id = p.ID,
-            Name = p.ProductCatalogName,
-        };
-        int rootId = db.ProductCatalogs.FirstOrDefault(p => p.ParentId == null).ID;
-        Func<int?, List<TreeNode>> getChildren = (id) => null;
-        getChildren = (int? id) =>
-        {
-            return db.ProductCatalogs.Where(p => p.ParentId == id).ToList().Select(p => new TreeNode()
+            Root = new()
             {
                 Id = p.ID,
                 Name = p.ProductCatalogName,
-                Children = getChildren(p.ID)
-            }).ToList();
-        };
-        getChildren(rootId).ToList().ForEach(Root.Children.Add);
+            };
+            int rootId = db.ProductCatalogs.FirstOrDefault(p => p.ParentId == null).ID;
+            Func<int?, List<TreeNode>> getChildren = (id) => null;
+            getChildren = (int? id) =>
+            {
+                return db.ProductCatalogs.Where(p => p.ParentId == id).ToList().Select(p => new TreeNode()
+                {
+                    Id = p.ID,
+                    Name = p.ProductCatalogName,
+                    Children = getChildren(p.ID)
+                }).ToList();
+            };
+
+            var childrens = getChildren(rootId).ToList();
+            if(childrens is not null && Root is not null && Root.Children is not null)
+                childrens.ForEach(Root.Children.Add);
+        }
+        
+         
 
         //this.OnSearch();
         if (signin.IsSignin())

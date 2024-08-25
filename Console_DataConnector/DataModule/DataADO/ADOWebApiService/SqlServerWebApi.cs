@@ -36,10 +36,14 @@ namespace Console_DataConnector.DataModule.DataADO.ADOWebApiService
             Init();
         }
 
-        private void Init()
+        protected void Init()
         {
             foreach (var tmd in GetTablesMetadata().Values)
             {
+                var tableName = tmd.TableName.ToSingleCount().ToLower();
+                this.Info(tableName);
+                this.Info(this.EntityTypes.Select(entity => entity.GetTypeName().ToLower().ToSingleCount()).ToJsonOnScreen());
+                this.EntityTypes.First(entity => entity.GetTypeName().ToLower().ToSingleCount().Equals(tableName));
                 Services.Add(new global::EntityFasade(this, tmd, typeof(BaseEntity)));
             }
             foreach(var pmd in GetProceduresMetadata())

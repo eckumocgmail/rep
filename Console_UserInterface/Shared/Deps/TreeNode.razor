@@ -31,7 +31,7 @@
     [Parameter]
     public bool Checked { get; set; } = true;
     [Parameter]
-    public List<TreeNode> Children { get; set; }
+    public List<TreeNode> Children { get; set; } = new();
     [Parameter]
     public EventCallback<bool> OnChanged { get; set; }
 

@@ -8,14 +8,15 @@ using System.Threading.Tasks;
 
 namespace Console_DataConnector.DataModule.DataModels.MessageModel
 {
-    public class MessageDbContext : SqlServerWebApi
+    public class MessageWebApi : SqlServerWebApi
     {
-        public MessageDbContext()
+        public MessageWebApi()
         {
             AddEntityType(typeof(MessageAttribute));
             AddEntityType(typeof(MessageProperty));
             AddEntityType(typeof(MessageProtocol));
             AddEntityType(typeof(ValidationModel));
+            this.Init();
         }
     }
 }
