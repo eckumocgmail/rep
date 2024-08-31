@@ -254,9 +254,9 @@ public sealed class SignupUser : BaseSignup<UserContext, UserAccount, UserPerson
     public void RemoveWith(UserAccount account)
     {
         var user = GetBy(account);
-        _model.UserAccounts_.Remove(_model.UserAccounts_.Find(user.AccountID));
-        _model.UserPersons_.Remove(_model.UserPersons_.Find(user.PersonID));
-        _model.UserSettings_.Remove(_model.UserSettings_.Find(user.SettingsID));
+        _model.UserAccounts_.Remove(_model.UserAccounts_.Find(user.AccountId));
+        _model.UserPersons_.Remove(_model.UserPersons_.Find(user.PersonId));
+        _model.UserSettings_.Remove(_model.UserSettings_.Find(user.SettingsId));
         _model.UserContexts_.Remove(user);
         _model.SaveChanges();
     }

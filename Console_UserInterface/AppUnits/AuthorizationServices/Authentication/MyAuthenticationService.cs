@@ -66,7 +66,7 @@ namespace Console_AuthModel.AuthorizationServices.Authentication
                         }
                         catch (Exception ex)
                         {
-                            Console.WriteLine(ex.Message);
+                            this.Info(ex.Message);
                             return AuthenticateResult.Fail(ex);
                         }*/
 
@@ -119,20 +119,20 @@ namespace Console_AuthModel.AuthorizationServices.Authentication
         public async Task ChallengeAsync(HttpContext context, string? scheme, AuthenticationProperties properties)
         {
             await Task.CompletedTask;
-            Console.WriteLine($"ChallengeAsync {scheme} \n {JsonSerializer.Serialize(properties)}");
+            this.Info($"ChallengeAsync {scheme} \n {JsonSerializer.Serialize(properties)}");
         }
 
         public async Task ForbidAsync(HttpContext context, string? scheme, AuthenticationProperties properties)
         {
             await Task.CompletedTask;
-            Console.WriteLine($"ForbidAsync {scheme} \n {JsonSerializer.Serialize(properties)}");
+            this.Info($"ForbidAsync {scheme} \n {JsonSerializer.Serialize(properties)}");
             //await context.Response.WriteAsync("forbid");
         }
 
         public async Task SignInAsync(HttpContext context, string? scheme, ClaimsPrincipal principal, AuthenticationProperties properties)
         {
             await Task.CompletedTask;
-            Console.WriteLine($"SignInAsync {scheme} \n {JsonSerializer.Serialize(properties)}");
+            this.Info($"SignInAsync {scheme} \n {JsonSerializer.Serialize(properties)}");
 
             //await context.Response.WriteAsync("SignInAsync");
         }
@@ -140,7 +140,7 @@ namespace Console_AuthModel.AuthorizationServices.Authentication
         public async Task SignOutAsync(HttpContext context, string? scheme, AuthenticationProperties properties)
         {
             await Task.CompletedTask;
-            Console.WriteLine($"SignOutAsync {scheme} \n {JsonSerializer.Serialize(properties)}");
+            this.Info($"SignOutAsync {scheme} \n {JsonSerializer.Serialize(properties)}");
             //await context.Response.WriteAsync("SignOutAsync");
         }
     }

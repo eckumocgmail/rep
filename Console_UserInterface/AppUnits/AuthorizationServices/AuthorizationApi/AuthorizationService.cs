@@ -34,9 +34,9 @@ namespace Console_AuthModel.AuthorizationServices.AuthorizationApi
             return _user.Verify().Account.Activated is not null;
         }
 
-        public UserContext Signin(string RFIDLabel)
+        public UserContext Signin(string RFIdLabel)
         {
-            return authorizationDbContext.UserContexts_.Include(u => u.Account).FirstOrDefault(u => u.AccountID == authorizationDbContext.UserAccounts_.FirstOrDefault(user => user.RFID == RFIDLabel).Id);
+            return authorizationDbContext.UserContexts_.Include(u => u.Account).FirstOrDefault(u => u.AccountId == authorizationDbContext.UserAccounts_.FirstOrDefault(user => user.RFId == RFIdLabel).Id);
         }
 
         public UserContext Signin(string Email, string Password, bool? IsFront = false)
@@ -59,7 +59,7 @@ namespace Console_AuthModel.AuthorizationServices.AuthorizationApi
             throw new NotImplementedException();
         }
 
-        public Task<UserAccount> GetAccountByID(int iD)
+        public Task<UserAccount> GetAccountById(int iD)
         {
             throw new NotImplementedException();
         }

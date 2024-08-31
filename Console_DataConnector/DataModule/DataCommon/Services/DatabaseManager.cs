@@ -37,7 +37,7 @@ public class OdbcDatabaseManager : MyValidatableObject
     public Dictionary<string, TableManagerStatefull> memory = new Dictionary<string, TableManagerStatefull>();
 
 
-    public OdbcDatabaseManager(APIDataSource odbc)
+    public OdbcDatabaseManager(APIdataSource odbc)
     {
         Init(ds = odbc);
     }
@@ -66,7 +66,7 @@ public class OdbcDatabaseManager : MyValidatableObject
         string login = "root";
         string password = "sgdf1423";
 
-        return GetOdbcDatabaseManager("dsn=" + dns + ";UID=" + login + ";PWD=" + password + ";");
+        return GetOdbcDatabaseManager("dsn=" + dns + ";UId=" + login + ";PWD=" + password + ";");
     }
     public static OdbcDatabaseManager GetOdbcDatabaseManager()
     {
@@ -74,7 +74,7 @@ public class OdbcDatabaseManager : MyValidatableObject
         string login = "root";
         string password = "sgdf1423";
 
-        return GetOdbcDatabaseManager("dsn=" + dns + ";UID=" + login + ";PWD=" + password + ";");
+        return GetOdbcDatabaseManager("dsn=" + dns + ";UId=" + login + ";PWD=" + password + ";");
     }
 
     public OdbcTableManager GetTableManager(string tableName)
@@ -103,7 +103,7 @@ public class OdbcDatabaseManager : MyValidatableObject
 
         if (DATASOURCES.ContainsKey(odbcConnectionString) == false)
         {
-            APIDataSource ds = new OdbcDataSource(odbcConnectionString);
+            APIdataSource ds = new OdbcDataSource(odbcConnectionString);
             OdbcDatabaseManager dbm = new OdbcDatabaseManager(ds);
             DATASOURCES[odbcConnectionString] = dbm;
             dbm.discovery();
@@ -145,7 +145,7 @@ public class OdbcDatabaseManager : MyValidatableObject
         string odbcConnectionString = SQL_SERVERL_ODBC_DRIVER + connectionString.Replace(@"\\", @"\");
         if (DATASOURCES.ContainsKey(odbcConnectionString) == false)
         {
-            APIDataSource ds = new SqlServerAPIDataSource(odbcConnectionString);
+            APIdataSource ds = new SqlServerAPIdataSource(odbcConnectionString);
             DatabaseManager dbm = new DatabaseManager(ds);
             DATASOURCES[name] = dbm;
             //dbm.discovery();
@@ -157,7 +157,7 @@ public class OdbcDatabaseManager : MyValidatableObject
          
     */
 
-    public void Use(APIDataSource ds)
+    public void Use(APIdataSource ds)
     {
         fasade = new Dictionary<string, OdbcTableManager>();
         Init(this.ds = ds);
@@ -207,7 +207,7 @@ public class OdbcDatabaseManager : MyValidatableObject
                 {
                     try
                     {
-                        if (true) Console.WriteLine(record);
+                        if (true) this.Info(record);
                         int id = pk is not null ? record[record.ContainsKey(pk)? pk: record.ContainsKey("Id")? "Id": "id"].Value<int>(): -1;
 
                         Dictionary<string, int> statisticsForThisRecord = new Dictionary<string, int>();
@@ -215,7 +215,7 @@ public class OdbcDatabaseManager : MyValidatableObject
                         {
                             if (record[column] != null)
                             {
-                                if (true) Console.WriteLine(record.ToString());
+                                if (true) this.Info(record.ToString());
                                 string textValue = record[column].Value<string>();
                                 if (string.IsNullOrEmpty(textValue)) continue;
                                 foreach (string word in textValue.Split(" "))
@@ -249,7 +249,7 @@ public class OdbcDatabaseManager : MyValidatableObject
                     }
                     catch (Exception ex)
                     {
-                        if (true) Console.WriteLine(ex);
+                        if (true) this.Info(ex);
                         continue;
                     }
 
@@ -261,7 +261,7 @@ public class OdbcDatabaseManager : MyValidatableObject
         catch (Exception ex)
         {
             keywords[ex.Message] = 500;
-            if (true) Console.WriteLine(ex);
+            if (true) this.Info(ex);
         }
         this.keywords = keywords;
         this.statistics = statistics;
@@ -368,7 +368,7 @@ public class OdbcDatabaseManager : MyValidatableObject
 
     //new JdbcConnector("jdbc:postgresql://localhost:4200/postgres","mister_kest", "Kest1423");
 
-    private APIDataSource ds;
+    private APIdataSource ds;
     /*string datasource; 
     string username; 
     string password;*/
@@ -376,7 +376,7 @@ public class OdbcDatabaseManager : MyValidatableObject
 
     Dictionary<string, int> keywords = new Dictionary<string, int>();
 
-    public APIDataSource GetDataSource()
+    public APIdataSource GetDataSource()
     {
         this.EnsureIsValide();
         return ds;
@@ -387,7 +387,7 @@ public class OdbcDatabaseManager : MyValidatableObject
         this.datasource = datasource;
         this.username = username;
         this.password = password;
-        this.ds = new APIDataSource(datasource, username, password);
+        this.ds = new APIdataSource(datasource, username, password);
         foreach (var prop in GetMetaData().Tables)
         {
             OdbcTableManager manager = new OdbcTableManager(prop.Key, GetDataSource(), prop.Value);
@@ -398,15 +398,15 @@ public class OdbcDatabaseManager : MyValidatableObject
 
 
 
-    public void Init(APIDataSource ds)
+    public void Init(APIdataSource ds)
     {
-        if (true) Console.WriteLine("Инициаллизация источника данных ODBC: ");
-        if (true) Console.WriteLine("\t строка соединения: " + (this.ds = ds).GetConenctionString());
+        if (true) this.Info("Инициаллизация источника данных ODBC: ");
+        if (true) this.Info("\t строка соединения: " + (this.ds = ds).GetConenctionString());
         fasade = new Dictionary<string, OdbcTableManager>();
         var dbm = GetMetaData();
         foreach (var prop in dbm.Tables)
         {
-            Console.WriteLine(prop.Key);
+            this.Info(prop.Key);
             OdbcTableManager manager = new OdbcTableManager(prop.Key, GetDataSource(), prop.Value);
             TableManagerStatefull statefull = new TableManagerStatefull(this, manager);
             fasade[prop.Key] = manager;

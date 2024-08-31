@@ -6,7 +6,7 @@ using Console_DataConnector.DataModule.DataADO.ADODbMetadataServices;
 
 namespace Console_DataConnector.DataModule.DataADO.ADODbModelService
 {
-    public class SqlServerDbModel : SqlServerDbMetadata, IDbModel
+    public class SqlServerDbModel : SqlServerDbMetadata, IdbModel
     {
         public ISet<Type> EntityTypes { get; set; }
 
@@ -20,7 +20,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbModelService
             EntityTypes = new HashSet<Type>();
         }
 
-        public SqlServerDbModel(string server, string database, bool trustedConnection, string userID, string password) : base(server, database, trustedConnection, userID, password)
+        public SqlServerDbModel(string server, string database, bool trustedConnection, string userId, string password) : base(server, database, trustedConnection, userId, password)
         {
             EntityTypes = new HashSet<Type>();
 

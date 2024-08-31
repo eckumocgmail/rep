@@ -47,7 +47,7 @@ public class OdbcDriverManager: MyValidatableObject
             }
             else
             {
-                //System.Console.WriteLine(line.Length+ " "+line);                
+                //this.Info(line.Length+ " "+line);                
                 if(next || ds==null)
                     ds = new OdbcDatasourceDescription();
                 next = false;
@@ -77,7 +77,7 @@ public class OdbcDriverManager: MyValidatableObject
             }
             else
             {
-                //System.Console.WriteLine(line.Length+ " "+line);                
+                //this.Info(line.Length+ " "+line);                
                 if(next || driver==null)
                     driver = new OdbcDriver();
                 next = false;
@@ -95,7 +95,7 @@ public class OdbcDriverManager: MyValidatableObject
 
     private string Execute(string command)
     {
-        System.Console.WriteLine("Выполнение команды: "+command);
+        this.Info("Выполнение команды: "+command);
 
         ProcessStartInfo info = new ProcessStartInfo("PowerShell.exe", "/C " + command);
         info.RedirectStandardError = true;
@@ -107,7 +107,7 @@ public class OdbcDriverManager: MyValidatableObject
 
         string result = reader.ReadToEnd();
 
-        System.Console.WriteLine("Результат выполнения: \n"+result);
+        this.Info("Результат выполнения: \n"+result);
         return result;
     }
 }

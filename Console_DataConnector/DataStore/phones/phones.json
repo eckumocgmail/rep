@@ -80,7 +80,7 @@
         "carrier": "Verizon", 
         "id": "droid-2-global-by-motorola", 
         "imageUrl": "img/phones/droid-2-global-by-motorola.0.jpg", 
-        "name": "DROID\u2122 2 Global by Motorola", 
+        "name": "DROId\u2122 2 Global by Motorola", 
         "snippet": "The first smartphone with a 1.2 GHz processor and global capabilities."
     }, 
     {
@@ -88,7 +88,7 @@
         "carrier": "Verizon", 
         "id": "droid-pro-by-motorola", 
         "imageUrl": "img/phones/droid-pro-by-motorola.0.jpg", 
-        "name": "DROID\u2122 Pro by Motorola", 
+        "name": "DROId\u2122 Pro by Motorola", 
         "snippet": "The next generation of DOES."
     }, 
     {
@@ -136,7 +136,7 @@
         "id": "samsung-transform", 
         "imageUrl": "img/phones/samsung-transform.0.jpg", 
         "name": "Samsung Transform\u2122", 
-        "snippet": "The Samsung Transform\u2122 brings you a fun way to customize your Android powered touch screen phone to just the way you like it through your favorite themed \u201cSprint ID Service Pack\u201d."
+        "snippet": "The Samsung Transform\u2122 brings you a fun way to customize your Android powered touch screen phone to just the way you like it through your favorite themed \u201cSprint Id Service Pack\u201d."
     }, 
     {
         "age": 18, 

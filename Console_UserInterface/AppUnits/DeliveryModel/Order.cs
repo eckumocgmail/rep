@@ -12,17 +12,17 @@ namespace Console_BlazorApp.AppUnits.DeliveryModel
 
         [NotMapped]
         public string LastUpdated { get; set; } = DateTime.Now.ToString("T");
-        public int CustomerID { get; set; }
+        public int CustomerId { get; set; }
 
 
         [JsonIgnore]
         public CustomerContext Customer { get; set; }
-        public int? HolderID { get; set; }
+        public int? HolderId { get; set; }
 
 
         [JsonIgnore]
         public Holder Holder { get; set; }
-        public int? TransportID { get; set; }
+        public int? TransportId { get; set; }
 
 
         [JsonIgnore]

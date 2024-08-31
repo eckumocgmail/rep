@@ -41,7 +41,7 @@ public class SystemProgram
         }
         if (dist)
         {
-            Console.WriteLine("Устанавливаю программу в систему ... ");
+            AppProviderService.GetInstance().Info("Устанавливаю программу в систему ... ");
             if (Exists(DistrDir) == false)
             {
                 CreateDirectory(DistrDir);
@@ -56,7 +56,7 @@ public class SystemProgram
         }
                
          
-        Console.WriteLine("Нажмите любую клавишу для продолжения ... ");
+        AppProviderService.GetInstance().Info("Нажмите любую клавишу для продолжения ... ");
         Console.ReadKey();
     }
 
@@ -102,18 +102,18 @@ public class SystemProgram
         {
             Console.ForegroundColor = ConsoleColor.White;
             //Clear();
-            Console.WriteLine("\n");
+            AppProviderService.GetInstance().Info("\n");
             if (History.Count() > 0)
             {
-                Console.WriteLine("операции:");
-                History.Select(cmd => ("    " + cmd)).ToList().ForEach(Console.WriteLine);
+                AppProviderService.GetInstance().Info("операции:");
+                History.Select(cmd => ("    " + cmd)).ToList().ForEach(AppProviderService.GetInstance().Info);
             }
-            Console.WriteLine("\nдействия:");
-            Console.WriteLine("  back- удалить последнюю операцию");
-            Console.WriteLine("  programs- прикладные программы");
-            Console.WriteLine("  save- сохранить последовательность операций");
-            Console.WriteLine("  restart- перезапустить программу");
-            Console.WriteLine("  exit- выход");
+            AppProviderService.GetInstance().Info("\nдействия:");
+            AppProviderService.GetInstance().Info("  back- удалить последнюю операцию");
+            AppProviderService.GetInstance().Info("  programs- прикладные программы");
+            AppProviderService.GetInstance().Info("  save- сохранить последовательность операций");
+            AppProviderService.GetInstance().Info("  restart- перезапустить программу");
+            AppProviderService.GetInstance().Info("  exit- выход");
             Console.Write("\n>");
 
             //bool first = true;
@@ -121,7 +121,7 @@ public class SystemProgram
             switch (command = Console.ReadLine())
             {
                 case "help":
-                    Console.WriteLine(GetHelpMessage());
+                    AppProviderService.GetInstance().Info(GetHelpMessage());
                     break;
                 case "restart":
                     History.Clear();
@@ -130,7 +130,7 @@ public class SystemProgram
                     History.Clear();
                     break;
                 case "programs":
-                    SearchFilesProgram.GetProgramFiles().ToList().ForEach(Console.WriteLine);
+                    SearchFilesProgram.GetProgramFiles().ToList().ForEach(AppProviderService.GetInstance().Info);
                     break;
                 case "save":
                     {
@@ -160,7 +160,7 @@ public class SystemProgram
                             History.Clear();
                             break;
                         case "programs":
-                            SearchFilesProgram.GetProgramFiles().ToList().ForEach(Console.WriteLine);
+                            SearchFilesProgram.GetProgramFiles().ToList().ForEach(AppProviderService.GetInstance().Info);
                             break;
                         case "save":
                             {
@@ -191,8 +191,8 @@ public class SystemProgram
 
             }
             History.Add("cmd /c \"" + command + "\"");
-            Console.WriteLine(Execute(command));
-            Console.WriteLine("Нажмите любую клавишу для продолжения ... ");
+            AppProviderService.GetInstance().Info(Execute(command));
+            AppProviderService.GetInstance().Info("Нажмите любую клавишу для продолжения ... ");
             Console.ReadKey();
 
 

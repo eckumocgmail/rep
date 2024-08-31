@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Console_DataConnector.DataModule.DataADO.ADODbMigBuilderService
 {
-    public interface IDbMigBuilder
+    public interface IdbMigBuilder
     {
 
 

@@ -8,7 +8,7 @@ public class MessageProperty: IObjectWithId
     [HelpMessage("Надпись располагается рядом над элементом ввода")]
     [NotNullNotEmpty("Введите ")]
     [InputRusText("Используйте русскую кирилицу для надписи поля ввода")]
-    public string Label { get; set; }
+    public string Label { get; set; } = "Свойство";
 
 
     [Label("Имя в наборе данных")]
@@ -19,45 +19,45 @@ public class MessageProperty: IObjectWithId
 
 
     [Label("Порядковый номер")]
-    public int Order { get; set; } = 0;
+    public int ZOrder { get; set; } = 0;
 
 
     [Label("Подпись")]
     [InputRusText("Используйте русскую кирилицу")]
-    public string Help { get; set; }
+    public string Help { get; set; } = "Подсказка";
 
     [Label("Обязательное")]
-    public bool Required { get; set; }
+    public bool Required { get; set; } = false;
 
     [Label("Уникальное")]
-    public bool Unique { get; set; }
+    public bool Unique { get; set; } = false;
 
     [Label("Создание индекса")]
     [HelpMessage("Индексируемые поля являются ключами для поиска")]
-    public bool Index { get; set; }
+    public bool Index { get; set; } = false;
 
 
 
     [Label("Атрибут")]
-    [SingleSelectApi(nameof(MessageAttribute) +",Name")]
+    [SingleSelectApi(nameof(MessageAttribute) + ",Name")]
     [NotNullNotEmpty("Необходимо выбрать атрибут")]
-    public int AttributeID { get; set; }
+    public int AttributeId { get; set; } = 1;
 
     [Label("Атрибут")]
     [JsonIgnore()]
-    [NotInput("Свойство "+nameof(Attribute) + " не вводится пользователем, оно устанавливается в соответвии с внешним ключом " + nameof(AttributeID))]
+    [NotInput("Свойство "+nameof(Attribute) + " не вводится пользователем, оно устанавливается в соответвии с внешним ключом " + nameof(AttributeId))]
     public virtual MessageAttribute Attribute { get; set; }
 
 
 
     [Label("Протокол сообщения")]
     [SingleSelectApi(nameof(MessageProtocol) + ",Name")]
-    [NotNullNotEmpty("Необходимо выбрать протокол")]
-    public int MessageProtocolID { get; set; }
+    //[NotNullNotEmpty("Необходимо выбрать протокол")]
+    public int? MessageProtocolId { get; set; }
     
     [Label("Протокол сообщения")]
     [JsonIgnore()]
-    [NotInput("Свойство " + nameof(MessageProtocol) + " не вводится пользователем, оно устанавливается в соответвии с внешним ключом " + nameof(MessageProtocolID))]
+    [NotInput("Свойство " + nameof(MessageProtocol) + " не вводится пользователем, оно устанавливается в соответвии с внешним ключом " + nameof(MessageProtocolId))]
     public virtual MessageProtocol MessageProtocol { get; set; }
 
 

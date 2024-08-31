@@ -41,7 +41,7 @@ public class ConsoleProgram<TServiceModel> : ConsoleProgram
         {
             try
             {
-                this.Info(http.Request.Path.ToString());
+                AppProviderService.GetInstance().Info(http.Request.Path.ToString());
                 await next();
             }
             catch(Exception ex)
@@ -88,7 +88,7 @@ public class ConsoleProgram: ProgressProgram
             throw new Exception("Нужно присвоить значение свойству ProgramData");
         Type ProgramType = ProgramData.GetType();
 
-        this.Info($"[{ProgramType.GetTypeName()}] Свойства: \n{ProgramData.ToJsonOnScreen()}");
+        AppProviderService.GetInstance().Info($"[{ProgramType.GetTypeName()}] Свойства: \n{ProgramData.ToJsonOnScreen()}");
    
          
 
@@ -188,19 +188,19 @@ public class ConsoleProgram: ProgressProgram
 
             // before read
             () => {
-                Console.WriteLine("\n" + "\n  " + title + "\n");
+                AppProviderService.GetInstance().Info("\n" + "\n  " + title + "\n");
                 int ctn = 0;
                 foreach (dynamic ListItemTitle in items)
                 {
                     if (ctn++ == cursor)
                     {
                         Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.WriteLine($"  [{((bool)(ListItemTitle["Selected"]) ? "x" : " ")}]  {ListItemTitle["Label"]}");
+                        AppProviderService.GetInstance().Info($"  [{((bool)(ListItemTitle["Selected"]) ? "x" : " ")}]  {ListItemTitle["Label"]}");
                         Console.ResetColor();
                     }
                     else
                     {
-                        Console.WriteLine($"  [{((bool)(ListItemTitle["Selected"]) ? "x" : " ")}]  {ListItemTitle["Label"]}");
+                        AppProviderService.GetInstance().Info($"  [{((bool)(ListItemTitle["Selected"]) ? "x" : " ")}]  {ListItemTitle["Label"]}");
                     }
 
                 }
@@ -209,7 +209,7 @@ public class ConsoleProgram: ProgressProgram
             // onKeyPressed
             (key) => {
                 Clear();
-                Console.WriteLine(key + " " + cursor);
+                AppProviderService.GetInstance().Info(key + " " + cursor);
                 switch (key.ToString().Trim())
                 {
                     case "Enter": throw new CompleteException();
@@ -279,19 +279,19 @@ public class ConsoleProgram: ProgressProgram
 
             // before read
             () => {
-                Console.WriteLine("\n" + "\n  " + title + "\n");
+                AppProviderService.GetInstance().Info("\n" + "\n  " + title + "\n");
                 int ctn = 0;
                 foreach (dynamic ListItemTitle in items)
                 {
                     if (ctn++ == cursor)
                     {
                         Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.WriteLine($"  [{((bool)(ListItemTitle["Selected"]) ? "x" : " ")}]  {ListItemTitle["Label"]}");
+                        AppProviderService.GetInstance().Info($"  [{((bool)(ListItemTitle["Selected"]) ? "x" : " ")}]  {ListItemTitle["Label"]}");
                         Console.ResetColor();
                     }
                     else
                     {
-                        Console.WriteLine($"  [{((bool)(ListItemTitle["Selected"]) ? "x" : " ")}]  {ListItemTitle["Label"]}");
+                        AppProviderService.GetInstance().Info($"  [{((bool)(ListItemTitle["Selected"]) ? "x" : " ")}]  {ListItemTitle["Label"]}");
                     }
 
                 }
@@ -301,7 +301,7 @@ public class ConsoleProgram: ProgressProgram
             (key) => {
 
                 Clear();
-                Console.WriteLine(key + " " + cursor);
+                AppProviderService.GetInstance().Info(key + " " + cursor);
                 switch (key.ToString().Trim())
                 {
                     case "Enter": throw new CompleteException();
@@ -338,7 +338,7 @@ public class ConsoleProgram: ProgressProgram
     public string InputString(ref string[] args, string name)
     {
         Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine();
+        AppProviderService.GetInstance().Info("");
         Console.Write(name + ">");
         Console.ResetColor();
         if (ProgramDialog.UserInteractive)
@@ -349,7 +349,7 @@ public class ConsoleProgram: ProgressProgram
         else
         {
             string value = Shift(ref args);
-            Console.WriteLine(value);
+            AppProviderService.GetInstance().Info(value);
             return value;
         }
     }
@@ -359,11 +359,11 @@ public class ConsoleProgram: ProgressProgram
     {
 
         Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine("\n");
+        AppProviderService.GetInstance().Info("\n");
         Info(message);
 
 
-        Console.WriteLine("\nДля продолжения нажмите ENTER....");
+        AppProviderService.GetInstance().Info("\nДля продолжения нажмите ENTER....");
         Console.ResetColor();
         if (ProgramDialog.UserInteractive)
         {
@@ -484,7 +484,7 @@ public class ConsoleProgram: ProgressProgram
                 foreach (var next in items)
                 {
                     string label = next.ToString();
-                    Console.WriteLine(i + $"){label}");
+                    AppProviderService.GetInstance().Info(i + $"){label}");
                     i++;
                 }
                 key = Console.ReadKey();

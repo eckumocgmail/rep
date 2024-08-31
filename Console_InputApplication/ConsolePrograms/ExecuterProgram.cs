@@ -16,7 +16,7 @@ public class ExecuterProgram
 
     public static string StartDotnetApplication(string program, string wrk = null)
     {
-        Console.WriteLine(program);
+        AppProviderService.GetInstance().Info(program);
         if (wrk == null)
             wrk = System.IO.Directory.GetCurrentDirectory();
         ProcessStartInfo info = new ProcessStartInfo("PowerShell.exe",
@@ -29,7 +29,7 @@ public class ExecuterProgram
         System.IO.StreamReader reader = process.StandardOutput;
         process.WaitForExit();
         string text = reader.ReadToEnd();
-        Console.WriteLine(text);
+        AppProviderService.GetInstance().Info(text);
         InputConsole.ConfirmContinue();
         return text;
 

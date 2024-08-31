@@ -49,7 +49,7 @@ public class UserContext : ActiveObject
         }).ToList()
     };
     [Label("Учетная запись")]
-    public int AccountID { get; set; }
+    public int AccountId { get; set; }
 
     [InputHidden(true)]
     [Label("Учетная запись")]
@@ -60,7 +60,7 @@ public class UserContext : ActiveObject
     
 
     //[Label("Роль")]
-    //public int? BusinessResourceID { get; set; }
+    //public int? BusinessResourceId { get; set; }
 
     //[InputHidden(true)]
     //[Label("Роль")]
@@ -68,13 +68,13 @@ public class UserContext : ActiveObject
 
 
     [Label("Настройки")]
-    public int SettingsID { get; set; }
+    public int SettingsId { get; set; }
     [Label("Настройки")]
     public virtual UserSettings Settings { get; set; }
             
 
     [Label("Личная инф.")]
-    public int PersonID { get; set; }
+    public int PersonId { get; set; }
 
     [Label("Личная инф.")]
     public virtual UserPerson Person { get; set; }
@@ -87,7 +87,7 @@ public class UserContext : ActiveObject
 
     [Label("Группы")]
     [NotMapped]
-    public int UserGroupsID { get; set; }
+    public int UserGroupsId { get; set; }
 
     [Label("Группы")]
     [ManyToMany("Groups")]

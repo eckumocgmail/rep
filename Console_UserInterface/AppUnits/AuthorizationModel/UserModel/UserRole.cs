@@ -8,7 +8,7 @@ namespace Console_AuthModel.AuthorizationModel.UserModel
     {          
         [Label("Корневой каталог")]
         [InputDictionary("GetType().Name,Name")]
-        public int? ParentID { get; set; }
+        public int? ParentId { get; set; }
 
 
         [InputHidden(true)]

@@ -19,7 +19,7 @@
                                 <b>@item.Product.ProductName </b>
                             </div>
                             <div style="height: 20px; width: 100%; font-size: 14px; text-align: center;">
-                                (осталось: <b>@db.ProductsInStock.Where(instock => instock.ProductID == item.Product.Id).Sum(p => p.ProductCount)</b> шт)
+                                (осталось: <b>@db.ProductsInStock.Where(instock => instock.ProductId == item.Product.Id).Sum(p => p.ProductCount)</b> шт)
                             </div>
 
                         </div>
@@ -52,7 +52,7 @@
         }
         else
         {
-            this.OrderRef = new Order() { CustomerID = customer.Id };
+            this.OrderRef = new Order() { CustomerId = customer.Id };
             db.Orders.Add(this.OrderRef);
             db.SaveChanges();
             customer.CurrentOrderId = this.OrderRef.Id;

@@ -384,7 +384,7 @@ public static class TextNamingExtensions
 
 
         /// <summary>
-        /// Проверка стиля записи SnakeStyle( user_id, USER_ID )
+        /// Проверка стиля записи SnakeStyle( user_id, USER_Id )
         /// </summary>
         /// <param name="name"> идентификатор </param>
         /// <returns> true, если идентификатор записан в SnakeStyle </returns>
@@ -458,7 +458,7 @@ public static class TextNamingExtensions
 
 
         /// <summary>
-        /// Проверка стиля записи KebabStyle( user-id, USER-ID )
+        /// Проверка стиля записи KebabStyle( user-id, USER-Id )
         /// </summary>
         /// <param name="name"> идентификатор </param>
         /// <returns> true, если идентификатор записан в KebabStyle </returns>
@@ -562,7 +562,7 @@ public static class TextNamingExtensions
     {
         
         if (lastname.ToLower().EndsWith("_id"))
-            return TextNaming.ToKebabStyle(lastname.Substring(0,lastname.Length-3))+"_ID";
+            return TextNaming.ToKebabStyle(lastname.Substring(0,lastname.Length-3))+"_Id";
         else
         return TextNaming.ToKebabStyle(lastname);
     }

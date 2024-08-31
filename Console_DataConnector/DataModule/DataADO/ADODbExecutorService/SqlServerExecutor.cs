@@ -17,7 +17,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbExecutorService
     public class SqlServerExecutor : SqlServerDbConnector, ISqlExecutor
 
     {
-        protected readonly IDataTableService DataTableService = new DataTableService();
+        protected readonly IdataTableService DataTableService = new DataTableService();
 
         public SqlServerExecutor(): base()
         {
@@ -27,7 +27,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbExecutorService
         {
         }
 
-        public SqlServerExecutor(string server, string database, bool trustedConnection, string userID, string password) : base(server, database, trustedConnection, userID, password)
+        public SqlServerExecutor(string server, string database, bool trustedConnection, string userId, string password) : base(server, database, trustedConnection, userId, password)
         {
         }
         public IEnumerable<TRecord> GetResultSet<TRecord>(DataTable dataTable) where TRecord : class => DataTableService.GetResultSet<TRecord>(dataTable);
@@ -40,7 +40,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbExecutorService
                 MethodBase.GetCurrentMethod().EnsureIsValid(new object[] { name, input, output});
 
 
-                Console.WriteLine($"ExecuteProcedure({name})");
+                this.Info($"ExecuteProcedure({name})");
                 SqlCommand command = new SqlCommand(name, GetConnection());
                 command.CommandType = CommandType.StoredProcedure;
 
@@ -62,7 +62,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbExecutorService
 
         public JArray GetJsonResult(string sql)
         {
-            Console.WriteLine($"GetJsonResult({sql})");
+            this.Info($"GetJsonResult({sql})");
             DataTable ResultDataTable = ExecuteQuery(sql);
             JArray JResult = DataTableService.GetJArray(ResultDataTable);
             return JResult;
@@ -70,7 +70,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbExecutorService
 
         public JObject GetSingleJObject(string sql)
         {
-            Console.WriteLine($"GetSingleJObject({sql})");
+            this.Info($"GetSingleJObject({sql})");
             DataTable ResultDataTable = ExecuteQuery(sql);
             JArray JResult = DataTableService.GetJArray(ResultDataTable);
             JToken token = JResult.FirstOrDefault();
@@ -83,9 +83,9 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbExecutorService
         /// </summary>
         public DataTable ExecuteQuery(string tsql)
         {
-            Console.WriteLine($"ExecuteQuery({tsql})");
+            this.Info($"ExecuteQuery({tsql})");
             DataTable dataTable = new DataTable();
-            Console.WriteLine($"{tsql}=>{dataTable.Rows.Count}");
+            this.Info($"{tsql}=>{dataTable.Rows.Count}");
             SqlCommand command = new SqlCommand(tsql, GetConnection());
             using (SqlDataAdapter adapter = new SqlDataAdapter(tsql, GetConnection()))
             {
@@ -99,7 +99,8 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbExecutorService
         /// </summary>
         public int PrepareQuery(string tsql)
         {
-            Console.WriteLine($"PrepareQuery({tsql})");
+            InputConsole.Clear();
+            this.Info($"PrepareQuery(\n{tsql}\n)");
             try
             {
                 SqlCommand command = new SqlCommand(tsql, GetConnection());

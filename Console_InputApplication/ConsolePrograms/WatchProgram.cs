@@ -29,7 +29,7 @@ public class WatchProgram: ConsoleProgram
     /// </summary>
     private static void Watch(string dir, string cmd)
     {
-        Console.WriteLine("Начинаем прослушивать изменения файлов "+dir);
+        AppProviderService.GetInstance().Info("Начинаем прослушивать изменения файлов "+dir);
         using (var watcher = new FileSystemWatcher(dir, "*.*"))
         {
             watcher.IncludeSubdirectories = true;
@@ -79,7 +79,7 @@ public class WatchProgram: ConsoleProgram
             watcher.IncludeSubdirectories = true;
             watcher.EnableRaisingEvents = true;
 
-            Console.WriteLine("Press enter to exit.");
+            AppProviderService.GetInstance().Info("Press enter to exit.");
             Console.ReadLine();
               
         }

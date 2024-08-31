@@ -19,7 +19,7 @@ namespace Console_DataConnector.DataModule.DataODBC.Connectors
         //System.Data.Odbc   @"DRIVER={SQL SERVER};SERVER=(LocalDB)\\v11.0;AttachDbFileName=G:\projects\eckumoc\AppData\persistance.mdf;"   "
         //System.Data.OleDb  @"Provider=Microsoft.Jet.OLEDB.12.0;Data Source=a:\\master.mdb;";
      */
-    public class OdbcDataSource : MyValidatableObject, APIDataSource
+    public class OdbcDataSource : MyValidatableObject, APIdataSource
     {
         public DatabaseMetadata metadata { get; set; }
         public string connectionString { get; set; }
@@ -30,7 +30,7 @@ namespace Console_DataConnector.DataModule.DataODBC.Connectors
         /// <param name="ex"></param>
         public void Log(Exception ex)
         {
-            Console.WriteLine(ex.Message);
+            this.Info(ex.Message);
 
         }
         public OdbcDataSource()
@@ -53,13 +53,13 @@ namespace Console_DataConnector.DataModule.DataODBC.Connectors
         {
             GetConnection().InfoMessage += (sender, args) =>
             {
-                Console.WriteLine("From ODBC Driver: " + sender + " " + args);
+                this.Info("From ODBC Driver: " + sender + " " + args);
             };
             GetConnection().StateChange += (sender, args) =>
             {
-                Console.WriteLine("ODBC state changed: " + sender + " " + args);
+                this.Info("ODBC state changed: " + sender + " " + args);
             };
-            Console.WriteLine("Connection state: " + GetConnection().State);
+            this.Info("Connection state: " + GetConnection().State);
         }
 
         public ResultSet CleverExecute(string expression)
@@ -112,7 +112,7 @@ namespace Console_DataConnector.DataModule.DataODBC.Connectors
 
         public void SetSystemDatasource(string dns, string login, string password)
         {
-            connectionString = "dsn=" + dns + ";UID=" + login + ";PWD=" + password + ";";
+            connectionString = "dsn=" + dns + ";UId=" + login + ";PWD=" + password + ";";
         }
 
 
@@ -125,7 +125,7 @@ namespace Console_DataConnector.DataModule.DataODBC.Connectors
             OdbcConnection connection = null;
             try
             {
-                Console.WriteLine(connectionString);
+                this.Info(connectionString);
                 connection = new OdbcConnection(connectionString);
             }
             catch (Exception ex)
@@ -137,7 +137,7 @@ namespace Console_DataConnector.DataModule.DataODBC.Connectors
 
         public void Error(string message, Exception ex)
         {
-            Console.WriteLine(message);
+            this.Info(message);
         }
 
 
@@ -296,7 +296,7 @@ namespace Console_DataConnector.DataModule.DataODBC.Connectors
                 metadata.database = connection.Database;
                 object site = connection.Site;
 
-                metadata.serverVersion = connection.ServerVersion;
+                //metadata.serverVersion = connection.ServerVersion;
                 metadata.connectionString = connection.ConnectionString;
 
                 DataTable columns = connection.GetSchema("Columns");
@@ -427,14 +427,14 @@ namespace Console_DataConnector.DataModule.DataODBC.Connectors
 
 
 
-        JArray APIDataSource.GetJsonResult(string sql)
+        JArray APIdataSource.GetJsonResult(string sql)
         {
             return this.Execute(sql);
         }
 
         public DataTable CreateDataTable(string sql)
         {
-            Console.WriteLine(sql);
+            this.Info(sql);
             using (OdbcConnection connection = GetConnection())
             {
                 try
@@ -459,7 +459,7 @@ namespace Console_DataConnector.DataModule.DataODBC.Connectors
         public DataTable ExecuteDT(string sql)
 
         {
-            Console.WriteLine(sql);
+            this.Info(sql);
             using (OdbcConnection connection = GetConnection())
             {
                 try
@@ -485,7 +485,7 @@ namespace Console_DataConnector.DataModule.DataODBC.Connectors
         public JArray Execute(string sql)
 
         {
-            Console.WriteLine(sql);
+            this.Info(sql);
             using (OdbcConnection connection = GetConnection())
             {
                 try
@@ -508,12 +508,12 @@ namespace Console_DataConnector.DataModule.DataODBC.Connectors
                         tmd.columns.Add(column.ColumnName, cmd);
                     }
                     var array = convert(dataTable);
-                    Console.WriteLine(array);
+                    this.Info(array);
                     return array;
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("Ошибка при выполнении запроса: " + sql + " " + ex.Message);
+                    this.Info("Ошибка при выполнении запроса: " + sql + " " + ex.Message);
                     throw;
                 }
 
@@ -563,7 +563,7 @@ namespace Console_DataConnector.DataModule.DataODBC.Connectors
             throw new NotImplementedException();
         }
 
-        void APIDataSource.InsertBlob(string sql, string v, byte[] data)
+        void APIdataSource.InsertBlob(string sql, string v, byte[] data)
         {
             throw new NotImplementedException();
         }

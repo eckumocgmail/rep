@@ -12,7 +12,7 @@
         this.UserContext = signin.Verify();
         if(this.UserContext is not null)
         {
-            this.Settings = dbu.UserSettings_.Find(this.UserContext.SettingsID);
+            this.Settings = dbu.UserSettings_.Find(this.UserContext.SettingsId);
         }
     }
 }

@@ -116,7 +116,7 @@ public static class TextFactoryExtensions
                 }
                 catch(Exception ex)
                 {
-                    Console.WriteLine($"Исключение при копироавнии данных в поле с ключом {kv.Key} => {ex.Message}");
+                    AppProviderService.GetInstance().Info($"Исключение при копироавнии данных в поле с ключом {kv.Key} => {ex.Message}");
                 }
 
             }

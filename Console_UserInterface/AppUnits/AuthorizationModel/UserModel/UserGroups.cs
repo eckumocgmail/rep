@@ -10,9 +10,9 @@ public class UserGroups: BaseEntity
 
     [JsonIgnore()]
     public virtual UserContext  User { get; set; }
-    public int UserID { get; set; }
+    public int UserId { get; set; }
 
     [JsonIgnore()]
     public virtual UserGroup Group { get; set; }
-    public int GroupID { get; set; }
+    public int GroupId { get; set; }
 }

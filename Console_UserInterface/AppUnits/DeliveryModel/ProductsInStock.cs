@@ -26,8 +26,8 @@ namespace Console_BlazorApp.AppUnits.DeliveryModel
     public class ProductsInStock : BaseEntity
     {
 
-        public int HolderID { get; set; }
-        public int ProductID { get; set; }
+        public int HolderId { get; set; }
+        public int ProductId { get; set; }
         public Product Product { get; set; }
         public Holder Holder { get; set; }
         public int ProductCount { get; set; }

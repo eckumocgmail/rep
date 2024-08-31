@@ -18,7 +18,7 @@ public static class ServiceCollectionExtension
         where TDBContext : DataContext
         
     {
-        System.Console.WriteLine($"[Info][{typeof(TDBContext).Name}]: AddSqlServer({Server},{typeof(TDBContext).Name},{TrustedConnection},{Username},{Password})");
+        AppProviderService.GetInstance().Info($"[Info][{typeof(TDBContext).Name}]: AddSqlServer({Server},{typeof(TDBContext).Name},{TrustedConnection},{Username},{Password})");
         AddDataContext<TDBContext>(
             services,
             options => {
@@ -27,7 +27,7 @@ public static class ServiceCollectionExtension
                 Server = Server,
                 Database = typeof(TDBContext).Name,
                 TrustedConnection = TrustedConnection,
-                UserID = Username,
+                UserId = Username,
                 Password = Password
             };
             var validator = new SqlServerADOService();

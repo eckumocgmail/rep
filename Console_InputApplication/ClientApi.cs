@@ -20,7 +20,7 @@ public interface IModalDialogAPI
 
 
 
-public interface IDomAPI
+public interface IdomAPI
 {
     string Eval(string js);
     string HandleEvalResult(Func<object, object> handle, string js);
@@ -37,7 +37,7 @@ public interface IAngularAPI
 
 
 
-public interface ClientAPI: IModalDialogAPI, IDomAPI, IAngularAPI, ConnectionEvents
+public interface ClientAPI: IModalDialogAPI, IdomAPI, IAngularAPI, ConnectionEvents
 {
 
 }

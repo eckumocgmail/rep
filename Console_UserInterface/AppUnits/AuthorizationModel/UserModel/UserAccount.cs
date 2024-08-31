@@ -56,8 +56,8 @@ public class UserAccount: BaseEntity
 
     [Label("Радио метка")]
     [InputHidden(true)]
-    [NotInput("Свойство " + nameof(RFID) + " не вводится пользователем, оно устанавливается системой при регистрации служебного билета")]
-    public string RFID { get; set; } = "";
+    [NotInput("Свойство " + nameof(RFId) + " не вводится пользователем, оно устанавливается системой при регистрации служебного билета")]
+    public string RFId { get; set; } = "";
 
 
     public UserAccount() :base(){ }

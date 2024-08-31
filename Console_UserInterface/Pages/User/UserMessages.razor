@@ -94,8 +94,8 @@
         try
         {
             var from = signin.Verify().Id;
-            if (evt.ToUserID is null)
-                throw new ArgumentNullException("ToUserID");
+            if (evt.ToUserId is null)
+                throw new ArgumentNullException("ToUserId");
             userMessages.Send(evt,null);
 
             this.inbox = userMessages.GetInbox();
@@ -168,7 +168,7 @@
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"File: {file.Name} \n Exception: {ex.Message} \n Stack: {ex.StackTrace}");
+                this.Info($"File: {file.Name} \n Exception: {ex.Message} \n Stack: {ex.StackTrace}");
             }
         }
 

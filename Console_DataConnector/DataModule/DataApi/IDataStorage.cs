@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Console_DataConnector.DataModule.DataApi
 {
-    public interface IDataStorage
+    public interface IdataStorage
     {
 
         public void RestoreDatabaseFrom(

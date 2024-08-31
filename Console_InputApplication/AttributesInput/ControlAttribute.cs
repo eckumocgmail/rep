@@ -33,7 +33,7 @@ public class InputFormField
     public int Order { get; set; }
 
     [InputHidden]
-    public int InputFormModelID { get; set; }
+    public int InputFormModelId { get; set; }
 
     [NotInput]
     [NotMapped]

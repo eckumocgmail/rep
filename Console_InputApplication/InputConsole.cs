@@ -82,8 +82,8 @@ public class InputConsole: ProgramDialog
         }).ToList();
     }
     public static bool ConfirmContinue(string title="") {
-        Console.WriteLine($"\n{title}");
-        Console.WriteLine("\n Для продолжение нажмите пожалуйста клавишу ENTER..");
+        AppProviderService.GetInstance().Info($"\n{title}");
+        AppProviderService.GetInstance().Info("\n Для продолжение нажмите пожалуйста клавишу ENTER..");
         ConsoleKeyInfo key;
         do
         {
@@ -142,16 +142,16 @@ public class InputConsole: ProgramDialog
         do
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine();
+            AppProviderService.GetInstance().Info("");
             Console.Write(name + ">");
             Console.ResetColor();
             result = Console.ReadLine();
             errors = validate(result);
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine();
+            AppProviderService.GetInstance().Info("");
             foreach (var error in errors)
             {
-                Console.WriteLine($"error: {error}");
+                AppProviderService.GetInstance().Info($"error: {error}");
             }
             Console.ResetColor();
             ConfirmContinue(  );
@@ -174,16 +174,16 @@ public class InputConsole: ProgramDialog
             do
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine();
+                AppProviderService.GetInstance().Info("");
                 Console.Write(name + ">");
                 Console.ResetColor();
                 result = Console.ReadLine();
                 errors = validate(result);
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine();
+                AppProviderService.GetInstance().Info("");
                 foreach (var error in errors)
                 {
-                    Console.WriteLine($"error: {error}");
+                    AppProviderService.GetInstance().Info($"error: {error}");
                 }
                 Console.ResetColor();
                 ConfirmContinue();
@@ -193,7 +193,7 @@ public class InputConsole: ProgramDialog
         else
         {
             string value = Shift(ref args);
-            Console.WriteLine(value);
+            AppProviderService.GetInstance().Info(value);
             return value;
         }
     }
@@ -321,7 +321,7 @@ public class InputConsole: ProgramDialog
             }
             else
             {
-                Console.WriteLine(arg);
+                AppProviderService.GetInstance().Info(arg);
             }
 
         }
@@ -364,11 +364,11 @@ public class InputConsole: ProgramDialog
     {
 
         Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine("\n");
+        AppProviderService.GetInstance().Info("\n");
         Info(message);
 
 
-        Console.WriteLine("\nДля продолжения нажмите ENTER....");
+        AppProviderService.GetInstance().Info("\nДля продолжения нажмите ENTER....");
         Console.ResetColor();
         if (UserInteractive)
         {
@@ -528,7 +528,7 @@ public class InputConsole: ProgramDialog
             if(errors != null)
             {
                 foreach(var error in errors)
-                    Console.WriteLine(error);
+                    AppProviderService.GetInstance().Info(error);
             }            
         } while (errors != null && errors.Count() != 0);
         return value;
@@ -1004,7 +1004,7 @@ public class InputConsole: ProgramDialog
                 /*() => {
 
                     //вывод списка
-                    Console.WriteLine("\n" + "\n  " + title + "\n");
+                    AppProviderService.GetInstance().Info("\n" + "\n  " + title + "\n");
                     navs = nav(location);
                     int ctn = 0;
                     foreach (string item in navs)
@@ -1012,12 +1012,12 @@ public class InputConsole: ProgramDialog
                         if (ctn++ == cursor)
                         {
                             Console.ForegroundColor = ConsoleColor.Yellow;
-                            Console.WriteLine($" => {item}");
+                            AppProviderService.GetInstance().Info($" => {item}");
                             Console.ResetColor();
                         }
                         else
                         {
-                            Console.WriteLine($"    {item}");
+                            AppProviderService.GetInstance().Info($"    {item}");
                         }
 
                     }
@@ -1027,7 +1027,7 @@ public class InputConsole: ProgramDialog
                 (key) => {
 
                     Clear();
-                    Console.WriteLine(key + " " + cursor);
+                    AppProviderService.GetInstance().Info(key + " " + cursor);
                     switch (key.ToString().Trim())
                     {
                         case "Enter": throw new CompleteException();

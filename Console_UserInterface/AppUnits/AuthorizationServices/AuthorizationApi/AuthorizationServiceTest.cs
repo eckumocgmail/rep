@@ -17,7 +17,7 @@ public class AuthorizationServiceTest : TestingElement
         {
             var auth = provider.Get<APIAuthorization>();
             var result = auth.Signin("eckumoc@gmail.com", "Gye*34FRtw",false);
-            Console.WriteLine(result.ToJsonOnScreen());
+            this.Info(result.ToJsonOnScreen());
               
         }
         catch(Exception ex)

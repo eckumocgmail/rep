@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Linq;
 
 namespace DataModule
 {
@@ -9,41 +11,44 @@ internal class Utils
 {
     internal static Dictionary<string, Dictionary<string, string>> ForAllPropertiesInType(Type type)
     {
-        throw new NotImplementedException();
+        return new Dictionary<string, Dictionary<string, string>>((type.GetProperties().Select(p => new KeyValuePair<string, Dictionary<string, string>>(
+                p.Name, type.GetPropertyAttributes(p.Name)))));
     }
 
     internal static Dictionary<string, Dictionary<string, string>> ForAllMethodsInType(Type type)
     {
-        throw new NotImplementedException();
+        return new Dictionary<string, Dictionary<string, string>>((type.GetMethods().Select(p => new KeyValuePair<string, Dictionary<string, string>>(
+                p.Name, type.GetMethodAttributes(p.Name)))));
     }
 
     internal static Dictionary<string, string> ForType(Type type)
     {
-        throw new NotImplementedException();
+        return type.GetAttributes();
     }
 
-    internal static string LabelFor(Type typeofEntity, string name)
+    internal static string LabelFor(Type type, string name)
     {
-        throw new NotImplementedException();
+        return type.GetPropertyLabel(name);
     }
 
-    internal static string DescriptionFor(Type typeofEntity, string name)
+    internal static string DescriptionFor(Type type, string name)
     {
-        throw new NotImplementedException();
+        return type.GetPropertyDescription(name);
     }
 
-    internal static bool IsUniq(Type typeofEntity, string name)
+    internal static bool IsUniq(Type type, string name)
     {
-        throw new NotImplementedException();
+        var attrs = type.GetPropertyAttributes(name);
+        return attrs.Keys.Contains(nameof(UniqValueAttribute)) || attrs.ContainsKey(nameof(UniqueConstraint)) || attrs.ContainsKey(nameof(UniqueConstraintAttribute));
     }
 
-    internal static string GetInputType(Type typeofEntity, string name)
+    internal static string GetInputType(Type type, string name)
     {
-        throw new NotImplementedException();
+        return type.GetPropertyInputType(name);
     }
 
     static internal Dictionary<string, string> ForProperty(Type type, string name)
     {
-        throw new NotImplementedException();
+        return type.GetPropertyAttributes(name);
     }
 }

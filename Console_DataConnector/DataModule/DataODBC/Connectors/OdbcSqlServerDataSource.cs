@@ -21,17 +21,17 @@ namespace Console_DataConnector.DataModule.DataODBC.Connectors
          */
         public OdbcSqlServerDataSource() : this("Driver={SQL Server};Server=kest;Database=model;Trusted_Connection=True;MultipleActiveResultSets=True")
         {
-            Console.WriteLine(base.GetConnection());
+            this.Info(base.GetConnection());
         }
 
         public OdbcSqlServerDataSource(string connectionString) : base( connectionString.Replace(@"\\", @"\")+ "Driver={SQL Server};")
         {
-            Console.WriteLine(base.GetConnection());
+            this.Info(base.GetConnection());
         }
 
         public OdbcSqlServerDataSource(string server, string database) : base("Driver={SQL Server};" + $"Server={server};Database={database};Trusted_Connection=True;MultipleActiveResultSets=True".Replace(@"\\", @"\"))
         {
-            Console.WriteLine(base.GetConnection());
+            this.Info(base.GetConnection());
         }
 
 

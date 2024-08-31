@@ -191,14 +191,14 @@ public static class StackTraceExtensions
 
         string text = "";
         int n = 1;
-        //Console.WriteLine(cs);
+        //AppProviderService.GetInstance().Info(cs);
         int i = cs.IndexOf("class " + className) + ("class " + className).Length;
         if (i == -1)
             throw new ArgumentException(cs, className);
         while ((cs.Length - 1) > i && cs[i] != '{')
         {
             //Console.Clear();
-            //Console.WriteLine(cs.Substring(i));
+            //AppProviderService.GetInstance().Info(cs.Substring(i));
             ++i;
         }
         ++i;
@@ -206,9 +206,9 @@ public static class StackTraceExtensions
         {
 
             //Console.Clear();
-            //Console.WriteLine("N=" + n);
+            //AppProviderService.GetInstance().Info("N=" + n);
 
-            //Console.WriteLine(cs.Substring(i));
+            //AppProviderService.GetInstance().Info(cs.Substring(i));
 
             if (cs[i] == '{') n++;
             else if (cs[i] == '}') n--;
@@ -220,7 +220,7 @@ public static class StackTraceExtensions
 
         text = text.Substring(0, text.Length - 1);
         Console.Clear();
-        Console.WriteLine(text);
+        AppProviderService.GetInstance().Info(text);
         return text;
 
     }
@@ -232,14 +232,14 @@ public static class StackTraceExtensions
 
         string text = "";
         int n = 1;
-        //Console.WriteLine(cs);
+        //AppProviderService.GetInstance().Info(cs);
         int i = cs.IndexOf(" " + className) + (" " + className).Length;
         if (i == -1)
             throw new ArgumentException(cs, className);
         while ((cs.Length - 1) > i && cs[i] != '{')
         {
             //Console.Clear();
-            //Console.WriteLine(cs.Substring(i));
+            //AppProviderService.GetInstance().Info(cs.Substring(i));
             ++i;
         }
         ++i;
@@ -247,9 +247,9 @@ public static class StackTraceExtensions
         {
 
             //Console.Clear();
-            //Console.WriteLine("N=" + n);
+            //AppProviderService.GetInstance().Info("N=" + n);
 
-            //Console.WriteLine(cs.Substring(i));
+            //AppProviderService.GetInstance().Info(cs.Substring(i));
 
             if (cs[i] == '{') n++;
             else if (cs[i] == '}') n--;
@@ -261,7 +261,7 @@ public static class StackTraceExtensions
 
         text = text.Substring(0, text.Length - 1);
         Console.Clear();
-        Console.WriteLine(text);
+        AppProviderService.GetInstance().Info(text);
         return text;
 
     }
@@ -427,17 +427,17 @@ public static class StackTraceExtensions
     /*
     private static string SelectClass(string cs, string className)
     {
-        Console.WriteLine($"SelectClass({cs}, {className}");
+        AppProviderService.GetInstance().Info($"SelectClass({cs}, {className}");
         string text = "";
         int n = 1;
-        //Console.WriteLine(cs);
+        //AppProviderService.GetInstance().Info(cs);
         int i = cs.IndexOf("class "+className);
         if (i == -1)
             throw new ArgumentException(cs,className);
         while (cs[i] != '{')
         {
             //Console.Clear();
-            //Console.WriteLine(cs.Substring(i));
+            //AppProviderService.GetInstance().Info(cs.Substring(i));
             ++i;
         }
         ++i;
@@ -650,7 +650,6 @@ public static class ObjectLogExtensions
     {
         Console.WriteLine(title);
         Console.WriteLine(target);
-        Console.WriteLine(target);
     }
     public static void WriteToFile(this object target, string filename)
     {
@@ -773,7 +772,7 @@ public static class ObjectLogExtensions
     }
     public static void WriteLine(this object target, object message)
     {
-        Console.WriteLine(message);
+        AppProviderService.GetInstance().Info(message);
     }
     public static void WriteLine(this object target, object[] messages)
     {
@@ -800,14 +799,14 @@ public static class ObjectLogExtensions
             {
                 if (message is String)
                 {
-                    Console.WriteLine(message);
+                    WriteLine(message);
                   
                 }
                 else if (IsImplements(message, typeof(IEnumerable)) == true)
                 {
                     foreach (object next in ((IEnumerable)message))
                     {
-                        target.Info(next);
+                        Console.WriteLine(next);
                     }
                 }
                 else
@@ -831,7 +830,7 @@ public static class ObjectLogExtensions
             string id = target.GetId();
             Console.ForegroundColor = ConsoleColor.Yellow;
 
-            Write($"\n[{id}] ");
+            Console.Write($"\n[{id}] ");
             Console.ForegroundColor = ConsoleColor.White;
             if (messages != null)
                 foreach (var message in messages)

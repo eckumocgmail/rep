@@ -474,7 +474,7 @@ namespace Console_BlazorApp.AppUnits.DeliveryModel
 
 
                 /// <summary>
-                /// Проверка стиля записи SnakeStyle( user_id, USER_ID )
+                /// Проверка стиля записи SnakeStyle( user_id, USER_Id )
                 /// </summary>
                 /// <param name="name"> идентификатор </param>
                 /// <returns> true, если идентификатор записан в SnakeStyle </returns>
@@ -548,7 +548,7 @@ namespace Console_BlazorApp.AppUnits.DeliveryModel
 
 
                 /// <summary>
-                /// Проверка стиля записи KebabStyle( user-id, USER-ID )
+                /// Проверка стиля записи KebabStyle( user-id, USER-Id )
                 /// </summary>
                 /// <param name="name"> идентификатор </param>
                 /// <returns> true, если идентификатор записан в KebabStyle </returns>
@@ -609,9 +609,9 @@ namespace Console_BlazorApp.AppUnits.DeliveryModel
         {
 
 
-            public int CustomerID { get; set; }
+            public int CustomerId { get; set; }
             public CustomerContext Customer { get; set; }
-            public int? HolderID { get; set; }
+            public int? HolderId { get; set; }
             public Holder Holder { get; set; }
 
             public DateTime OrderCreated { get; set; } = DateTime.Now;
@@ -659,8 +659,8 @@ namespace Console_BlazorApp.AppUnits.DeliveryModel
         {
 
 
-            public int OrderID { get; set; }
-            public int ProductID { get; set; }
+            public int OrderId { get; set; }
+            public int ProductId { get; set; }
             public int ProductCount { get; set; }
 
         }

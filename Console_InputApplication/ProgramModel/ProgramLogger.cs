@@ -19,8 +19,8 @@ public class ProgramLogger: MyValidatableObject
         {                
             var arg = args[i];
             if (arg.StartsWith("\n\t") == false && arg.StartsWith("\t") == false)
-                Console.WriteLine("\t" + arg);
-            else Console.WriteLine(arg);
+                AppProviderService.GetInstance().Info("\t" + arg);
+            else AppProviderService.GetInstance().Info(arg);
         }
         Console.ResetColor();
     }
@@ -36,11 +36,11 @@ public class ProgramLogger: MyValidatableObject
         {
             if (arg.StartsWith("\t") == false)
             {
-                Console.WriteLine("\t" + arg);
+                AppProviderService.GetInstance().Info("\t" + arg);
             }
             else
             {
-                Console.WriteLine( arg);
+                AppProviderService.GetInstance().Info( arg);
             }
         }
         Console.ResetColor();
@@ -57,11 +57,11 @@ public class ProgramLogger: MyValidatableObject
         {
             if(arg.StartsWith("\t") == false)
             {
-                Console.WriteLine("\t"+arg);
+                AppProviderService.GetInstance().Info("\t"+arg);
             }
             else
             {
-                Console.WriteLine(arg);
+                AppProviderService.GetInstance().Info(arg);
             }
         }
         Console.ResetColor();

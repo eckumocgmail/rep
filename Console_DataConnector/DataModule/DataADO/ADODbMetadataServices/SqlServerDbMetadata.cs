@@ -22,7 +22,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbMetadataServices
                 DROP TABLE {TableName}
             END
             CREATE TABLE History( 
-                ID INT PRIMARY KEY IDENTITY, 
+                Id INT PRIMARY KEY IdENTITY, 
                 COMMAND nvarchar(512) NOT NULL,
                 CREATED DateTime NOT NULL DEFAULT(GetDate())                 
             )
@@ -32,7 +32,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbMetadataServices
     /// <summary>
     /// 
     /// </summary>
-    public class SqlServerDbMetadata : SqlServerExecutor, IDbMetadata
+    public class SqlServerDbMetadata : SqlServerExecutor, IdbMetadata
     {
 
         private IDictionary<string, TableMetadata> TablesMetadata { get; set; } = null;
@@ -59,7 +59,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbMetadataServices
         {
         }
 
-        public SqlServerDbMetadata(string server, string database, bool trustedConnection, string userID, string password) : base(server, database, trustedConnection, userID, password)
+        public SqlServerDbMetadata(string server, string database, bool trustedConnection, string userId, string password) : base(server, database, trustedConnection, userId, password)
         {
         }
 
@@ -70,7 +70,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbMetadataServices
         /// <returns>Наименования таблиц</returns>
         public IEnumerable<string> GetTableNames()
         {
-            Console.WriteLine($"GetTableNames()");
+            this.Info($"GetTableNames()");
             DataTable ResultSet = ExecuteQuery(@"SELECT * FROM INFORMATION_SCHEMA.TABLES");
             return DataTableService.GetTextColumn(ResultSet, "TABLE_NAME");
         }
@@ -82,7 +82,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbMetadataServices
         /// <returns>сведения о таблицах базы данных</returns>
         public IDictionary<string, TableMetadata> GetTablesMetadata()
         {
-            Console.WriteLine($"GetTablesMetadata()");
+            this.Info($"GetTablesMetadata()");
             lock (this)
             {
                 if (TablesMetadata == null)
@@ -100,7 +100,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbMetadataServices
         /// <returns>сведения о таблицах базы данных</returns>
         private IDictionary<string, TableMetadata> InitTablesMetadata()
         {
-            Console.WriteLine($"InitTablesMetadata()");
+            this.Info($"InitTablesMetadata()");
             IDictionary<string, TableMetadata> result = new Dictionary<string, TableMetadata>();
             var TablesInfoDT = ExecuteQuery(@"SELECT * FROM INFORMATION_SCHEMA.TABLES");
             IEnumerable<TableMetadata> TableMetadataArr = DataTableService.GetResultSet<TableMetadata>(TablesInfoDT);
@@ -135,7 +135,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbMetadataServices
         /// <returns>Сведения о структуре данных таблицы</returns>
         public IDictionary<string, ColumnMetadata> GetColumnsMetadata(string TableSchema, string TableName)
         {
-            Console.WriteLine($"GetColumnsMetadata({TableSchema},{TableName})");
+            this.Info($"GetColumnsMetadata({TableSchema},{TableName})");
             IDictionary<string, ColumnMetadata> Result = new Dictionary<string, ColumnMetadata>();
             DataTable ColumnsDataTable = ExecuteQuery($@"SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='{TableSchema}' AND TABLE_NAME='{TableName}'");
             IEnumerable<ColumnMetadata> ColumnsMetaData = DataTableService.GetResultSet<ColumnMetadata>(ColumnsDataTable);
@@ -153,7 +153,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbMetadataServices
         /// <returns>сведения о внешних ключах</returns>
         public IEnumerable<KeyMetadata> GetKeysMetadata()
         {
-            Console.WriteLine($"GetKeysMetadata()");
+            this.Info($"GetKeysMetadata()");
             DataTable KeysDataTable =
                 ExecuteQuery("\n SELECT " +
                                 " CCU.TABLE_NAME AS SOURCE_TABLE " +
@@ -180,7 +180,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbMetadataServices
         /// <returns>сведения о хранимых процедурах</returns>
         public IDictionary<string, ProcedureMetadata> GetProceduresMetadata(string Schema="dbo")
         {
-            Console.WriteLine($"GetProceduresMetadata({Schema})");
+            this.Info($"GetProceduresMetadata({Schema})");
             lock (this)
             {
                 if (ProceduresMetadata.ContainsKey(Schema) == false)
@@ -199,7 +199,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbMetadataServices
         private IDictionary<string, ProcedureMetadata> InitProceduresMetadata(string Schema)
         {
 
-            Console.WriteLine($"InitProceduresMetadata({Schema})");
+            this.Info($"InitProceduresMetadata({Schema})");
             IDictionary<string, ProcedureMetadata> ProceduresMetadataDictionary = new Dictionary<string, ProcedureMetadata>();
             DataTable SPDataTable = ExecuteQuery(@"EXEC sp_stored_procedures");
             int proceduresCount = SPDataTable.Rows.Count;
@@ -234,7 +234,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbMetadataServices
         /// <returns>Сведения о хранимой процедуре</returns>
         public ProcedureMetadata GetProcedureMetadata(string SchemaName, string ProcedureName)
         {
-            Console.WriteLine($"GetProcedureMetadata({SchemaName},{ProcedureName})");
+            this.Info($"GetProcedureMetadata({SchemaName},{ProcedureName})");
             ProcedureMetadata ProcedureMetadata = new ProcedureMetadata()
             {
                 ProcedureName = ProcedureName,
@@ -253,7 +253,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbMetadataServices
         /// <returns>Информация о параметрах</returns>
         public IDictionary<string, ParameterMetadata> GetParametersMetadata(string SchemaName, string ProcedureName)
         {
-            Console.WriteLine($"GetParameterMetadata({SchemaName},{ProcedureName})");
+            this.Info($"GetParameterMetadata({SchemaName},{ProcedureName})");
             IDictionary<string, ParameterMetadata> result = new Dictionary<string, ParameterMetadata>();
             var TablesInfoDT = ExecuteQuery($@"SELECT * FROM INFORMATION_SCHEMA.PARAMETERS WHERE SPECIFIC_SCHEMA='{SchemaName}' AND SPECIFIC_NAME='{ProcedureName}'");
             IEnumerable<ParameterMetadata> ParameterMetadataArr = DataTableService.GetResultSet<ParameterMetadata>(TablesInfoDT);

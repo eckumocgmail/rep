@@ -21,35 +21,78 @@ namespace Console_DataConnector.DataModule.DataADO.ADOWebApiService
         public SqlServerWebApi(): base()  
         {
             Services = new HashSet<IEntityFasade>();
-            Init();
+            
         }
+
+        public IEntityFasade<T> GetFasade<T>() where T : BaseEntity
+        {
+            Services.Select(f => f.GetEntityName()).ToJsonOnScreen().WriteToConsole();
+            var fasade = Services.FirstOrDefault(f => f.GetEntityName().ToSingleCount() == typeof(T).GetTypeName());
+            
+            if(fasade is null)
+            {
+                throw new Exception("Не удалось найти "+typeof(T).GetTypeName()+ " В "+ Services.Select(f => f.GetEntityName()).ToJsonOnScreen());
+            }
+            return fasade.ToFasade<T>();
+        }
+             
 
         public SqlServerWebApi(string server, string database) : base(server, database)
         {
             Services = new HashSet<IEntityFasade>();
-            Init();
+         
         }
 
-        public SqlServerWebApi(string server, string database, bool trustedConnection, string userID, string password) : base(server, database, trustedConnection, userID, password)
+        public SqlServerWebApi(string server, string database, bool trustedConnection, string userId, string password) : base(server, database, trustedConnection, userId, password)
         {
             Services = new HashSet<IEntityFasade>();
-            Init();
+           
         }
 
-        protected void Init()
+        public void Init()
         {
-            foreach (var tmd in GetTablesMetadata().Values)
+            foreach (var cmd in DropAndCreate())
             {
-                var tableName = tmd.TableName.ToSingleCount().ToLower();
+                try
+                {
+                    this.PrepareQuery(cmd.Down);
+
+                }
+                catch (Exception ex) 
+                { 
+                }
+                try
+                {
+                    this.PrepareQuery(cmd.Up);
+                }
+                catch (Exception ex)
+                {
+
+                }
+            };
+            foreach(Type entity in this.EntityTypes)
+            {
+                var rmd = GetTablesMetadata();
+                if (rmd.ContainsKey(entity.GetTypeName()) == false)
+                {
+                    throw new Exception($"Не найдены метаданные сущности {entity}");
+                }
+                var tmd = rmd[entity.GetTypeName()];
+                var tableName = tmd.TableName.ToSingleCount();
                 this.Info(tableName);
-                this.Info(this.EntityTypes.Select(entity => entity.GetTypeName().ToLower().ToSingleCount()).ToJsonOnScreen());
-                this.EntityTypes.First(entity => entity.GetTypeName().ToLower().ToSingleCount().Equals(tableName));
+                this.Info(this.EntityTypes.Select(entity => entity.GetTypeName().ToSingleCount()).ToJsonOnScreen());
+                var et = this.EntityTypes.FirstOrDefault(entity => entity.GetTypeName().ToLower().Equals(tableName));
                 Services.Add(new global::EntityFasade(this, tmd, typeof(BaseEntity)));
+                Services.Select(s => s.GetEntityName()).ToJsonOnScreen().WriteToConsole();
             }
+             
+                    
+             
             foreach(var pmd in GetProceduresMetadata())
             {
                 Procedures.Add(new ProcedureExecuter(this, pmd.Value ));
             }
+
         }
 
         public async Task<Tuple<int, object>> Request(string url, Dictionary<string, string> args=null, Dictionary<string, string> headers = null, byte[] body=null)

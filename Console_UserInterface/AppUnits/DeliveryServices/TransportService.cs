@@ -21,7 +21,7 @@ namespace Console_BlazorApp.AppUnits.DeliveryServices
 
         public IEnumerable<Order> GetAvailableOrders(int transportId)
         {
-            return _deliveryDbContext.Orders.Include(Order => Order.Holder).Where(order => order.OrderStatus == 2 && order.TransportID == null).ToList();
+            return _deliveryDbContext.Orders.Include(Order => Order.Holder).Where(order => order.OrderStatus == 2 && order.TransportId == null).ToList();
         }
 
         public IEnumerable<Order> GetOrders(int transportId)
@@ -34,7 +34,7 @@ namespace Console_BlazorApp.AppUnits.DeliveryServices
             {
                 throw new NullReferenceException($"Нет ссылки на объект Transport для пользователя с ид {userId}");
             }*/
-            return _deliveryDbContext.Orders.Where(order => order.TransportID == transportId).ToList();
+            return _deliveryDbContext.Orders.Where(order => order.TransportId == transportId).ToList();
         }
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace Console_BlazorApp.AppUnits.DeliveryServices
         public void TakeOrder(int orderId, int transportId)
         {
             _deliveryDbContext.Orders.First(order => order.Id == orderId).OnOrderIsDelivering();
-            _deliveryDbContext.Orders.First(order => order.Id == orderId).TransportID = transportId;
+            _deliveryDbContext.Orders.First(order => order.Id == orderId).TransportId = transportId;
             _deliveryDbContext.SaveChanges();
         }
 
@@ -57,7 +57,7 @@ namespace Console_BlazorApp.AppUnits.DeliveryServices
         public void PutOrder(int orderId, int transportId)
         {
             _deliveryDbContext.Orders.First(order => order.Id == orderId).OnOrderDelivered();
-            _deliveryDbContext.Orders.First(order => order.Id == orderId).TransportID = transportId;
+            _deliveryDbContext.Orders.First(order => order.Id == orderId).TransportId = transportId;
             _deliveryDbContext.SaveChanges();
         }
 
@@ -69,7 +69,7 @@ namespace Console_BlazorApp.AppUnits.DeliveryServices
         public void CancelOrder(int orderId, int transportId)
         {
             _deliveryDbContext.Orders.First(order => order.Id == orderId).OnOrderCanceled();
-            _deliveryDbContext.Orders.First(order => order.Id == orderId).TransportID = transportId;
+            _deliveryDbContext.Orders.First(order => order.Id == orderId).TransportId = transportId;
             _deliveryDbContext.SaveChanges();
         }
 
@@ -87,27 +87,27 @@ namespace Console_BlazorApp.AppUnits.DeliveryServices
                 throw new NullReferenceException($"Нет ссылки на объект Transport для пользователя с ид {userId}");
             }*/
 
-            return _deliveryDbContext.Orders.Include(Order => Order.Holder).Where(order => order.TransportID == transportId && new int[] { 4, 5, 7 }.Contains(order.OrderStatus)).ToList();
+            return _deliveryDbContext.Orders.Include(Order => Order.Holder).Where(order => order.TransportId == transportId && new int[] { 4, 5, 7 }.Contains(order.OrderStatus)).ToList();
         }
 
         public IEnumerable<Order> GetActiveList(int transportId)
         {
-            return _deliveryDbContext.Orders.Include(Order => Order.Holder).Where(order => order.OrderStatus == 3 && order.TransportID == transportId).ToList();
+            return _deliveryDbContext.Orders.Include(Order => Order.Holder).Where(order => order.OrderStatus == 3 && order.TransportId == transportId).ToList();
         }
 
         public IEnumerable<Order> GetCompletedList(int transportId)
         {
-            return _deliveryDbContext.Orders.Include(Order => Order.Holder).Where(order => order.OrderStatus>=4 && order.TransportID == transportId).ToList();
+            return _deliveryDbContext.Orders.Include(Order => Order.Holder).Where(order => order.OrderStatus>=4 && order.TransportId == transportId).ToList();
         }
 
         public IEnumerable<Order> GetAvailableList(int transportId)
         {
-            return _deliveryDbContext.Orders.Include(Order => Order.Holder).Where(order => order.OrderStatus == 2 && order.TransportID == null).ToList();
+            return _deliveryDbContext.Orders.Include(Order => Order.Holder).Where(order => order.OrderStatus == 2 && order.TransportId == null).ToList();
         }
 
         public IEnumerable<Order> GetCancelledList(int transportId)
         {
-            return _deliveryDbContext.Orders.Include(Order => Order.Holder).Where(order => order.OrderStatus == 6 && order.TransportID == null).ToList();
+            return _deliveryDbContext.Orders.Include(Order => Order.Holder).Where(order => order.OrderStatus == 6 && order.TransportId == null).ToList();
         }
     }
 }

@@ -17,7 +17,7 @@ public static class ConsoleExtensions
     public static string WriteOrangle(this string path)
     {
         Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine(path);
+        AppProviderService.GetInstance().Info(path);
         Console.ResetColor();
         return path;
     }

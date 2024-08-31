@@ -53,7 +53,7 @@ public class UniqValueAttribute : BaseValidationAttribute, MyValidation
                 {
                     continue;
                 }
-                int id = (int)new ReflectionService().GetValue(model, "ID");
+                int id = (int)new ReflectionService().GetValue(model, "Id");
                 bool isUniq = true;
                 foreach (var record in ((IEnumerable<dynamic>)dbsetObj))
                 {

@@ -117,7 +117,7 @@ namespace Console_BlazorApp.AppUnits.DeliveryTests
         public void DoOrder(int orderId, int transportId )
         {
             _deliveryDbContext.Orders.First( order => order.Id == orderId ).OnOrderIsDelivering();
-            _deliveryDbContext.Orders.First( order => order.Id == orderId ).TransportID = transportId;
+            _deliveryDbContext.Orders.First( order => order.Id == orderId ).TransportId = transportId;
             _deliveryDbContext.SaveChanges();
             Messages.Add("Транспортная компания взяла в работу заказ на доставку");
         }
@@ -125,7 +125,7 @@ namespace Console_BlazorApp.AppUnits.DeliveryTests
         public void DoneOrder(int orderId, int transportId)
         {
             _deliveryDbContext.Orders.First(order => order.Id == orderId).OnOrderDelivered();
-            _deliveryDbContext.Orders.First(order => order.Id == orderId).TransportID = transportId;
+            _deliveryDbContext.Orders.First(order => order.Id == orderId).TransportId = transportId;
             _deliveryDbContext.SaveChanges();
             Messages.Add("Транспортная компания выполнила заказ на доставку");
         }*/

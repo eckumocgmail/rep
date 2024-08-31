@@ -26,7 +26,7 @@
         "infrared": false, 
         "wifi": "802.11 b/g/n"
     }, 
-    "description": "Access your work directory, email or calendar with DROID Pro by Motorola., an Android-for-business smartphone with corporate-level security. It features both a QWERTY keyboard and touchscreen, a speedy 1 GHz processor and Adobe\u00ae Flash\u00ae Player 10.", 
+    "description": "Access your work directory, email or calendar with DROId Pro by Motorola., an Android-for-business smartphone with corporate-level security. It features both a QWERTY keyboard and touchscreen, a speedy 1 GHz processor and Adobe\u00ae Flash\u00ae Player 10.", 
     "display": {
         "screenResolution": "HVGA (480 x 320)", 
         "screenSize": "3.1 inches", 
@@ -45,7 +45,7 @@
         "img/phones/droid-pro-by-motorola.0.jpg", 
         "img/phones/droid-pro-by-motorola.1.jpg"
     ], 
-    "name": "DROID\u2122 Pro by Motorola", 
+    "name": "DROId\u2122 Pro by Motorola", 
     "sizeAndWeight": {
         "dimensions": [
             "61.0 mm (w)", 

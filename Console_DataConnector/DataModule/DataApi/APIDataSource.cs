@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Console_DataConnector.DataModule.DataApi
 {
-    public interface APIDataSource
+    public interface APIdataSource
     {
         DatabaseMetadata GetDatabaseMetadata();
         JArray GetJsonResult(string sql);

@@ -98,7 +98,7 @@ public static class AttributesInfoExtensions
 
         return res;
     }
-    public static IDictionary<string, string> GetMethodAttributes(
+    public static Dictionary<string, string> GetMethodAttributes(
         this Type ptype, string method)
 
     {

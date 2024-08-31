@@ -28,7 +28,7 @@
             <b>@product.ProductName </b>
         </div>
         <div style="height: 20px; width: 100%; font-size: 14px; text-align: center;">
-            (осталось: <b>@db.ProductsInStock.Where(instock => instock.ProductID == product.Id).Sum(p => p.ProductCount)</b> шт)
+            (осталось: <b>@db.ProductsInStock.Where(instock => instock.ProductId == product.Id).Sum(p => p.ProductCount)</b> шт)
         </div>
     </div>
     
@@ -76,9 +76,9 @@
             <div style="width: 600px; overflow-y: auto; height: 480px;">
                 <h3>В наличии</h3>
                 <ul class="list-group" style="font-size: 14px;">
-                    @foreach (var instock in db.ProductsInStock.Where(ins => ins.ProductID == product.Id).ToList())
+                    @foreach (var instock in db.ProductsInStock.Where(ins => ins.ProductId == product.Id).ToList())
                     {
-                        <li class="list-group-item" style="padding: 5px; margin: 5px;">@instock.ProductCount шт. @(db.Holders.First(h => h.Id == instock.HolderID).HolderLocation)</li>
+                        <li class="list-group-item" style="padding: 5px; margin: 5px;">@instock.ProductCount шт. @(db.Holders.First(h => h.Id == instock.HolderId).HolderLocation)</li>
                     }                  
                 </ul>
             </div>

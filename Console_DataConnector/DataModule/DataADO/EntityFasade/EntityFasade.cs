@@ -46,20 +46,25 @@ public class EntityFasade: IEntityFasade
         });
     }
 
-    public Task<int> Update(object model)
+    public async Task<int> Update(object model)
     {
-        return Task.Run(() => {
-            string Settings = $"";
+        await Task.CompletedTask ;
+        string Settings = $"";
             
-            foreach (string key in _metadata.ColumnsMetadata.Keys)
+        foreach (string key in _metadata.ColumnsMetadata.Keys)
+        {
+            if (key.ToLower()!="id")
             {
+                string Constant = GetValueContant(GetValue(model, key), _metadata.ColumnsMetadata[key]);
+                Settings += $"\t[{key}]={Constant},\n";
+            }
+        }
+        if( Settings.EndsWith(",\n"))
+        {
+            Settings = Settings.Substring(0, Settings.Length - ",\n".Length) + "\n";
+        }
+        return _api.PrepareQuery($"UPDATE [{_metadata.TableSchema}].[{_metadata.TableName}]\n SET \n{Settings} WHERE {_metadata.PrimaryKey}={GetValue(model,_metadata.PrimaryKey)}");
       
-                string Constant = GetValueContant(GetValue(model,key), _metadata.ColumnsMetadata[key]);
-                Settings += $"{key}=Constant \n";
-
-            }                        
-            return _api.PrepareQuery($"UPDATE [{_metadata.TableSchema}].[{_metadata.TableName}]\n SET \n{Settings} WHERE {_metadata.PrimaryKey}={GetValue(model,_metadata.PrimaryKey)}");
-        });
     }
 
     private object GetValue(object model, string key)
@@ -70,27 +75,31 @@ public class EntityFasade: IEntityFasade
 
     public Task<int> Create(object model)
     {
+        string Values = $"(";
+        string Columns = $"(";
+        foreach (string key in _metadata.ColumnsMetadata.Keys)
+        {
+            var f = IsUserInput(_metadata.ColumnsMetadata[key]);
+            if (f)
+            {
+                var ckey = key.ToCapitalStyle();
+                var val = model.GetValue(ckey);
+                string Constant = GetValueContant(val, _metadata.ColumnsMetadata[key]);
+                Columns += $"[{key}],";
+                Values += $"{Constant},";
+                this.Info(Columns);
+                this.Info(Values);
+            }                        
+        }
+        if (Columns.EndsWith(","))
+        {
+            Columns = Columns.Substring(0, Columns.Length - 1);
+            Values = Values.Substring(0, Values.Length - 1);
+        }
+        Values += ")";
+        Columns += ")";
         return Task.Run(() => {
-            string Values = $"(";
-            string Columns = $"(";
-            foreach(string key in _metadata.ColumnsMetadata.Keys)
-            {
-                if (IsUserInput(_metadata.ColumnsMetadata[key]))
-                {
-                    Columns += $"[{key.ToTSQLStyle()}],";
-                    string Constant = GetValueContant(GetValue(model, key), _metadata.ColumnsMetadata[key]);
-                    Values += $"{Constant},";
-
-                }
-
-            }
-            if (Columns.EndsWith(","))
-            {
-                Columns = Columns.Substring(0, Columns.Length - 1);
-                Values = Values.Substring(0, Values.Length - 1);
-            }
-            Values += ")";
-            Columns += ")";
+            
 
             return _api.PrepareQuery($"INSERT INTO [{_metadata.TableSchema}].[{_metadata.TableName}] {Columns} VALUES {Values}");
         });
@@ -98,7 +107,7 @@ public class EntityFasade: IEntityFasade
 
     private bool IsUserInput(ColumnMetadata columnMetadata)
     {
-        return columnMetadata.ColumnName != "ID";
+        return columnMetadata.ColumnName != "Id";
     }
 
     /// <summary>
@@ -106,6 +115,8 @@ public class EntityFasade: IEntityFasade
     /// </summary>
     private string GetValueContant(object value, ColumnMetadata metadata)
     {
+        if (value == null)
+            return "NULL";
         switch(metadata.DataType.ToLower())
         {
             case "date":
@@ -123,8 +134,10 @@ public class EntityFasade: IEntityFasade
             case "nvarchar(max)":
             case "varchar":
                 return value!=null?"'" + value   + "'": "";
-                
+            case "bit":
+                return value is true ? "1" : "0";
             case "smallint":
+            
             case "int":
             case "float":
                 return "" + value.ToString().Replace(",", ".") + "";
@@ -167,5 +180,10 @@ public class EntityFasade: IEntityFasade
             Create(record).Wait();
             return record;
         });
+    }
+
+    public IEntityFasade<T> ToFasade<T>() where T : BaseEntity
+    {
+        return new EntityFasade<T>(this);
     }
 }

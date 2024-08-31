@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Console_DataConnector.DataModule.DataADO.ADODbMigBuilderService
 {
-    public class SqlServerDDLFactory : IDDLFactory
+    public class SqlServerDDLFactory : IdDLFactory
     {
 
         public TableMetaData CreateTableMetaData(Type typeofEntity)
@@ -24,12 +24,12 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbMigBuilderService
                     var propertyType = typeofEntity.GetProperty(p.Name).PropertyType;
                     var meta = new ColumnMetaData()
                     {
-                        primary = p.Name == "ID",
-                        incremental = p.Name == "ID",
+                        primary = p.Name == "Id",
+                        incremental = p.Name == "Id",
                         nullable = false,
                         caption = typeofEntity.GetPropertyLabel(p.Name),
                         description = typeofEntity.GetPropertyDescription(p.Name),
-                        name = p.Name.ToTSQLStyle(),
+                        name = p.Name,// p.Name.ToTSQLStyle(),
                         unique = typeofEntity.IsPropertyUniq(p.Name),
                         cstype = p.PropertyType.GetTypeName(),
                         input_type = typeofEntity.GetPropertyInputType(p.Name)
@@ -38,7 +38,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbMigBuilderService
 
                     meta.EnsureIsValide();
                     meta.type =
-                        p.Name == "ID" ? "int" :
+                        p.Name == "Id" ? "int" :
                             GetDataTypeFor(propertyType);
                     tmd.columns[p.Name] = meta;
                 }
@@ -95,12 +95,12 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbMigBuilderService
             sql += "(";
             Action<KeyValuePair<string, ColumnMetaData>> AddColumnDefinition = (p) =>
             {
-                sql += $"\n  {p.Key.ToTSQLStyle()} {p.Value.type} ";
+                sql += $"\n  {p.Key/*.ToTSQLStyle()*/} {p.Value.type} ";
                 if (p.Key.ToLower() == metadata.pk.ToLower())
                 {
                     if (p.Value.incremental)
                     {
-                        sql += " IDENTITY(1,1) ";
+                        sql += " IdENTITY(1,1) ";
                     }
                     sql += p.Value.nullable ? " NULL " : "NOT NULL ";
                     sql += " PRIMARY KEY,";
@@ -113,12 +113,12 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbMigBuilderService
             };
             foreach (var p in metadata.columns)
             {
-                if (p.Key == "ID")
+                if (p.Key == "Id")
                     AddColumnDefinition(p);
             }
             foreach (var p in metadata.columns)
             {
-                if (p.Key != "ID")
+                if (p.Key != "Id")
                     AddColumnDefinition(p);
             }
             if (metadata.columns.Count > 0)

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Console_DataConnector.DataModule.DataADO.ADODbMetadataServices
 {
-    public class MySqlDbMetadata : MySqlExecutor, IDbMetadata
+    public class MySqlDbMetadata : MySqlExecutor, IdbMetadata
     {
         public MySqlDbMetadata()
         {

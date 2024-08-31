@@ -22,7 +22,7 @@ public class OdbcDataConnector
         if (_connectionString == null) throw new Exception("Строка подключения Default не зарегистрирована в конфигурации приложения.");
         var resultset = 
             _sqlserver.ExecuteQuery(_connectionString,
-                $"select * from BusinessDatasources where ID={id}");
+                $"select * from BusinessDatasources where Id={id}");
         string remotecConnectionString = resultset.Rows[0]["ConnectionString"].ToString();    
         return OdbcDatabaseManager.GetOdbcDatabaseManager(remotecConnectionString);
     }

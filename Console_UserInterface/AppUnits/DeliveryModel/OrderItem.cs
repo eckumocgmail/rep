@@ -4,10 +4,10 @@
     public class OrderItem : BaseEntity
     {
         [NotInput]
-        public int OrderID { get; set; }
+        public int OrderId { get; set; }
 
         [InputDictionary($"{nameof(Product)},ProductName")]
-        public int ProductID { get; set; }
+        public int ProductId { get; set; }
 
 
         public Product Product { get; set; }

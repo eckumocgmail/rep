@@ -33,11 +33,11 @@
             <li class="list-group-item bg-secondary text-white" style="margin: 20px;">
                 <div style="font-size: 16px"    >
                     <span class="text-warning">@order.OrderStatus @(order.GetStatusText()) Заказ #@(order.Id)</span>
-                    <b class="text text-info" style=" font-size:14px;">@(order.HolderID is not null? db.Holders.Find(order.HolderID).HolderLocation: "")</b>
+                    <b class="text text-info" style=" font-size:14px;">@(order.HolderId is not null? db.Holders.Find(order.HolderId).HolderLocation: "")</b>
                     <div style="float: right; font-size:13px;">изменён: #@(order.OrderUpdated)</div></div>
-                @if (order.HolderID is not null)
+                @if (order.HolderId is not null)
                 {
-                    <div style="font-size: 14px">Получение заказа: @db.Holders.First(h=>h.Id==order.HolderID).HolderLocation</div>
+                    <div style="font-size: 14px">Получение заказа: @db.Holders.First(h=>h.Id==order.HolderId).HolderLocation</div>
                 }
                 <label class="text-light" style="font-size: 14px">Содержимое заказа: </label>
                 <ul class="list-group d-flex flex-row flex-wrap">
@@ -50,7 +50,7 @@
                                     <b>@item.Product.ProductName </b>
                                 </div>
                                 <div style="height: 20px; width: 100%; font-size: 14px; text-align: center;">
-                                    (осталось: <b>@db.ProductsInStock.Where(instock => instock.ProductID == item.Product.Id).Sum(p => p.ProductCount)</b> шт)
+                                    (осталось: <b>@db.ProductsInStock.Where(instock => instock.ProductId == item.Product.Id).Sum(p => p.ProductCount)</b> шт)
                                 </div>
 
                             </div>
@@ -71,7 +71,7 @@
                 </div>
 
                 <div class="d-flex flex-row flex-nowrap">
-                    <div style="font-size: 12px; width: 100%;">Получатель: @(db.Customers.First(c => c.Id == order.CustomerID).PhoneNumber)</div>
+                    <div style="font-size: 12px; width: 100%;">Получатель: @(db.Customers.First(c => c.Id == order.CustomerId).PhoneNumber)</div>
                     <button class="btn btn-info btn-sm" style="width: 320px; font-size: 13px; height: 25px; padding: 2px;">
                         @switch(order.OrderStatus)
                         {

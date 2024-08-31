@@ -437,7 +437,7 @@ public static List<MyMessageProperty> ParseActions(Type type)
             .Where(type => IsEng(GetTypeName(type)))
             .Select(type => ToDocument(type))
             .ToList()
-            .ForEach(text => Console.WriteLine(text));
+            .ForEach(text => AppProviderService.GetInstance().Info(text));
     }
 
     private static bool IsEng(string Text)

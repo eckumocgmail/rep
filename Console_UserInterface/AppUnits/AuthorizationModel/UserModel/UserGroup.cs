@@ -19,7 +19,7 @@ public class UserGroup: DictionaryTable
 
     /* [Label("Бизнес-процесс")]
     [InputDictionary(nameof(BusinessProcess)+",Name")]
-    public int? BusinessProcessID { get; set; }
+    public int? BusinessProcessId { get; set; }
 
     [Label("Бизнес-процесс")]
     public virtual BusinessProcess BusinessProcess { get; set; }*/

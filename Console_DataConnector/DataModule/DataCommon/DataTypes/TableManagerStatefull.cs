@@ -114,7 +114,7 @@ namespace Console_DataConnector.DataModule.DataCommon.DataTypes
             {
                 throw new NullReferenceException(pk);
             }
-            if (true) Console.WriteLine(dataRecords);
+            if (true) this.Info(dataRecords);
             return (from r in dataRecords where r[pk].Value<long>() == id select r).SingleOrDefault();
         }
 
@@ -260,7 +260,7 @@ namespace Console_DataConnector.DataModule.DataCommon.DataTypes
             {
                 try
                 {
-                    Console.WriteLine(record);
+                    this.Info(record);
                     int id = record[pk].Value<int>();
 
                     Dictionary<string, int> statisticsForThisRecord = new Dictionary<string, int>();
@@ -268,7 +268,7 @@ namespace Console_DataConnector.DataModule.DataCommon.DataTypes
                     {
                         if (record[column] != null)
                         {
-                            Console.WriteLine(record.ToString());
+                            this.Info(record.ToString());
                             string textValue = record[column].Value<string>();
                             if (string.IsNullOrEmpty(textValue)) continue;
                             foreach (string word in textValue.Split(" "))
@@ -302,7 +302,7 @@ namespace Console_DataConnector.DataModule.DataCommon.DataTypes
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex);
+                    this.Info(ex);
                     continue;
                 }
             }

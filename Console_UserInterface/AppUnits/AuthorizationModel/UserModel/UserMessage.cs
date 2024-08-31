@@ -26,9 +26,9 @@ public class UserMessage : BaseEntity
     }
 
     [Label("Источник")]
-    //[NotNullNotEmpty("Свойство " + nameof(FromUserID) + " дожно иметь действительное значение" )]
-    //[NotInput("Свойство " + nameof(FromUserID) + " не вводится пользователем, оно устанавливается системой перед созданием сообщения на эл. почту пользорвателя с инструкциями по активации")]    
-    public int? FromUserID { get; set; }
+    //[NotNullNotEmpty("Свойство " + nameof(FromUserId) + " дожно иметь действительное значение" )]
+    //[NotInput("Свойство " + nameof(FromUserId) + " не вводится пользователем, оно устанавливается системой перед созданием сообщения на эл. почту пользорвателя с инструкциями по активации")]    
+    public int? FromUserId { get; set; }
 
     [Label("Источник")]        
     [NotInput("Свойство " + nameof(FromUser) + " не вводится пользователем, оно устанавливается системой перед созданием сообщения на эл. почту пользорвателя с инструкциями по активации")]
@@ -38,7 +38,7 @@ public class UserMessage : BaseEntity
 
     [Label("Назначение")]
     //[InputDictionary(nameof(UserContext ) + ",GetFullName()")]   
-    public int? ToUserID { get; set; }
+    public int? ToUserId { get; set; }
 
         
     [Label("Создано")]

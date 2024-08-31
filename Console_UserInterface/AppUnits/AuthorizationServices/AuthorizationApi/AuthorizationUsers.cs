@@ -39,7 +39,7 @@ public class AuthorizationUsers: AuthorizationCollection<UserContext>, APIUsers
     {
         using (var db = new DbContextUser())
         {
-            return db.UserGroups_.Where(g => user.UserGroups.Select(group => group.GroupID).Contains(g.Id)).Select(g => g.Name);
+            return db.UserGroups_.Where(g => user.UserGroups.Select(group => group.GroupId).Contains(g.Id)).Select(g => g.Name);
         }            
     }
     private IEnumerable<string> GetUserRoles(UserContext user)

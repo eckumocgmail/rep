@@ -19,7 +19,7 @@ namespace Console_DataConnector.DataModule.DataCommon.Metadata
             ColumnName = columnMetaData.name;
         }
 
-        public int ID { get; set; }
+        public int Id { get; set; }
 
         //[NotNullNotEmpty]
         public string TableCatalog { get; set; }

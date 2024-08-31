@@ -65,8 +65,8 @@ namespace Console_BlazorApp.AppUnits.DeliveryTests
                     var offer2 = holder.GetProductOffer(pholder.Id);
                     foreach (var line in offer2)
                     {
-                        var p = offer1.FirstOrDefault(p => p.ProductID == line.ProductID);
-                        var p2 = order.OrderItems.FirstOrDefault(p => p.ProductID == line.ProductID);
+                        var p = offer1.FirstOrDefault(p => p.ProductId == line.ProductId);
+                        var p2 = order.OrderItems.FirstOrDefault(p => p.ProductId == line.ProductId);
                         if ((p is not null ? p.ProductCount : 0) !=
                             (line.ProductCount + (p2 is not null ? p2.ProductCount : 0)))
                         {

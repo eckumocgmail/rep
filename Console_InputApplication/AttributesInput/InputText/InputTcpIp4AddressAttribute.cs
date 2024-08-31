@@ -1,6 +1,7 @@
 ﻿[Label("Адрибут помечает своства в которых долны сохраняться IP-адреса")]
 public class InputTcpIp4AddressAttribute: BaseInputAttribute
 {
+    public InputTcpIp4AddressAttribute() : base(InputTypes.Text) { }
     public InputTcpIp4AddressAttribute(string mask = "255.255.255.0"):base(InputTypes.Text)
     {
     }

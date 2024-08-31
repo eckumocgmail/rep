@@ -4,6 +4,7 @@ using System.Linq;
 
 public class InputSelectEnumAttribute : BaseInputAttribute
 {
+    public InputSelectEnumAttribute() : base(InputTypes.Custom) { }
     public InputSelectEnumAttribute(string enumType) : base(enumType)
     {
         this.EnumType = enumType;

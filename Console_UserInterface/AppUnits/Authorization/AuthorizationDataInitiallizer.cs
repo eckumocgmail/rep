@@ -33,7 +33,7 @@ public class AuthorizationDataInitiallizer
             {
                 throw new Exception("Индекс не может быть меньше нуля");
             }
-            Console.WriteLine($"{i1},{i2},{i3}");
+            AppProviderService.GetInstance().Info($"{i1},{i2},{i3}");
             string[] names = MANS_NAMES.ToArray();
             string name = names[i1];
             string[] surnames = MANS_SURNAMES.ToArray();
@@ -135,11 +135,11 @@ public class AuthorizationDataInitiallizer
             Exception p = ex;
             while (p != null)
             {
-                Console.WriteLine(p.Message);
+                AppProviderService.GetInstance().Info(p.Message);
                 p = p.InnerException;
             }
 
-            Console.WriteLine(ex);
+            AppProviderService.GetInstance().Info(ex);
         }
     }
 
@@ -159,7 +159,7 @@ public class AuthorizationDataInitiallizer
 
     private static void InitBusinessResources(AuthorizationDbContext db)
     {
-        Console.WriteLine("Инициаллизация пользовательских прав доступа к функциям приложения");
+        AppProviderService.GetInstance().Info("Инициаллизация пользовательских прав доступа к функциям приложения");
         if (db.UserRoles_.Count() < 3)
         {
             UserRole users;
@@ -216,7 +216,7 @@ public class AuthorizationDataInitiallizer
         if (db.UserAccounts_.Where(a => a.Email.ToLower() == "eckumocuk@gmail.com").Any() == false)
         {
 
-            Console.WriteLine("\n\nРегистрация тестовой учетной записи...");
+            AppProviderService.GetInstance().Info("\n\nРегистрация тестовой учетной записи...");
             //var role = (from r in db.UserRoles where r.Code == "Developer" select r).SingleOrDefault();
             var account = new UserAccount("eckumocuk@gmail.com", "eckumocuk@gmail.com");
             account.Activated = DateTime.Now;
@@ -255,8 +255,8 @@ public class AuthorizationDataInitiallizer
             db.SaveChanges();
 
             db.UserGroups_UserGroup.Add(new UserGroups() { 
-                GroupID = db.UserGroups_.First().Id,
-                UserID = db.UserContexts_.First().Id
+                GroupId = db.UserGroups_.First().Id,
+                UserId = db.UserContexts_.First().Id
             });
             db.SaveChanges();
         }

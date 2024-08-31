@@ -62,7 +62,7 @@ public class DbContextUser: DbContext {
 
         //uniq constraint
         builder.Entity<UserGroups>()
-               .HasIndex(u => new { u.UserID, u.GroupID })
+               .HasIndex(u => new { u.UserId, u.GroupId })
                .IsUnique();
 
         //uniq constraint

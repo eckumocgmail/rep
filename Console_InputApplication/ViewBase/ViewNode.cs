@@ -67,7 +67,7 @@ public class ViewNode: ViewPane
         {
             return;
         }
-        Console.WriteLine(GetType().Name + " Children Node Removed " + GetHashCode());
+        this.Info(GetType().Name + " Children Node Removed " + GetHashCode());
         if (this.Parent != null)
         {
             this.Parent.Children.Remove(this);
@@ -80,7 +80,7 @@ public class ViewNode: ViewPane
     //public event EventHandler OnDropped;
     public void Drop(ViewNode draggable)
     {
-        Console.WriteLine(GetType().Name + " Children Node Dropped " + GetHashCode());
+        this.Info(GetType().Name + " Children Node Dropped " + GetHashCode());
         draggable.RemoveFromParent();
         Append(draggable);
     }

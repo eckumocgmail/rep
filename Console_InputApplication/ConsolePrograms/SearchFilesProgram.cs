@@ -39,7 +39,7 @@ public class SearchFilesProgram
 
 
 
-        Console.WriteLine($"SearchFile({dir},{pattern},{level})");
+        AppProviderService.GetInstance().Info($"SearchFile({dir},{pattern},{level})");
 
         List<string> dirs = new List<string>() { dir };
         var result = new ConcurrentBag<string>();
@@ -81,7 +81,7 @@ public class SearchFilesProgram
             }
             catch(Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                AppProviderService.GetInstance().Info(ex.Message);
             }
         }
         return results;

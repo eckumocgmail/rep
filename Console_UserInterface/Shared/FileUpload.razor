@@ -48,7 +48,7 @@
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"File: {file.Name} \n Exception: {ex.Message} \n Stack: {ex.StackTrace}");
+                this.Info($"File: {file.Name} \n Exception: {ex.Message} \n Stack: {ex.StackTrace}");
             }
         }
         await OnChanged.InvokeAsync(Files);

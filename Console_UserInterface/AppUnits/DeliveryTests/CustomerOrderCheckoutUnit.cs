@@ -45,9 +45,9 @@ namespace Console_BlazorApp.AppUnits.DeliveryTests
 
                 var order = new Order()
                 {
-                    CustomerID = customer.Id
+                    CustomerId = customer.Id
                 };
-                order.HolderID = db.Holders.First().Id;
+                order.HolderId = db.Holders.First().Id;
                 db.Add(order);
                 db.SaveChanges();
 

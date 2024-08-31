@@ -25,7 +25,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADOServices
         public SqlServerADOService(string server, string database) : base(server, database)
         {
         }
-        public SqlServerADOService(string server, string database, bool trustedConnection, string userID, string password) : base(server, database, trustedConnection, userID, password)
+        public SqlServerADOService(string server, string database, bool trustedConnection, string userId, string password) : base(server, database, trustedConnection, userId, password)
         {
         }
 
@@ -47,7 +47,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADOServices
             {
 
 
-                Console.WriteLine($"CanConnect({ConnectionString})");
+                this.Info($"CanConnect({ConnectionString})");
                 var tables = new List<string>();
                 using (SqlConnection con = new SqlConnection(ConnectionString))
                 {
@@ -66,7 +66,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADOServices
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Ошибка при попытки установить соединение");
+                this.Info("Ошибка при попытки установить соединение");
                 this.Error(ex);
                 return false;
             }
@@ -82,7 +82,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADOServices
         public DataTable ExecuteQuery(string SQL) => ExecuteQuery(ToString(), SQL);
         public DataTable ExecuteQuery(string ConnectionString, string SQL)
         {
-            Console.WriteLine($"ExecuteQuery({ConnectionString},{SQL})");
+            this.Info($"ExecuteQuery({ConnectionString},{SQL})");
             using (SqlConnection con = new SqlConnection(ConnectionString))
             {
                 SqlCommand command = new SqlCommand(SQL, con);
@@ -107,7 +107,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADOServices
         public int PrepareQuery(string ConnectionString, string SQL)
         {
             int resultPrepareQuery = 0;
-            Console.WriteLine($"PrepareQuery({ConnectionString},{SQL})");
+            this.Info($"PrepareQuery({ConnectionString},{SQL})");
             SQL.Split("GO").ToList().ForEach(operation =>
             {
                 using (SqlConnection con = new SqlConnection(ConnectionString))
@@ -130,7 +130,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADOServices
             {
                 // Create a SqlDataAdapter based on a SELECT query.
                 SqlDataAdapter adapter = new SqlDataAdapter(
-                    "SELECT CategoryID, CategoryName FROM dbo.Categories", connection);
+                    "SELECT CategoryId, CategoryName FROM dbo.Categories", connection);
 
                 // Create a SqlCommand to execute the stored procedure.
                 adapter.InsertCommand = new SqlCommand("InsertCategory", connection);
@@ -145,7 +145,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADOServices
                 adapter.InsertCommand.Parameters.Add("@CategoryName", SqlDbType.NChar, 15, "CategoryName");
 
                 // Create an output parameter for the new identity value.
-                parameter = adapter.InsertCommand.Parameters.Add("@Identity", SqlDbType.Int, 0, "CategoryID");
+                parameter = adapter.InsertCommand.Parameters.Add("@Identity", SqlDbType.Int, 0, "CategoryId");
                 parameter.Direction = ParameterDirection.Output;
 
                 // Create a DataTable and fill it.
@@ -163,11 +163,11 @@ namespace Console_DataConnector.DataModule.DataADO.ADOServices
                 // Retrieve the ReturnValue.
                 Int rowCount = (Int)adapter.InsertCommand.Parameters["@RowCount"].Value;
 
-                System.Console.WriteLine("ReturnValue: {0}", rowCount.ToString());
-                System.Console.WriteLine("All Rows:");
+                this.Info("ReturnValue: {0}", rowCount.ToString());
+                this.Info("All Rows:");
                 foreach (DataRow row in categories.Rows)
                 {
-                    System.Console.WriteLine("  {0}: {1}", row[0], row[1]);
+                    this.Info("  {0}: {1}", row[0], row[1]);
                 }
             }*/
         }
@@ -181,7 +181,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADOServices
         /// <returns>список таблиц</returns>
         public IEnumerable<string> GetTables(string ConnectionString)
         {
-            Console.WriteLine($"GetTables({ConnectionString})");
+            this.Info($"GetTables({ConnectionString})");
             var tables = new List<string>();
             using (SqlConnection con = new SqlConnection(ConnectionString))
             {
@@ -210,7 +210,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADOServices
         }
         public IEnumerable<string> GetStoredProcedures()
         {
-            Console.WriteLine($"GetStoredProcedures({base.ToString()})");
+            this.Info($"GetStoredProcedures({base.ToString()})");
             var proceduresList = new List<string>();
             using (SqlConnection con = new SqlConnection(base.ToString()))
             {
@@ -239,7 +239,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADOServices
         public IEnumerable<string> GetDatabases() => GetDatabases(base.ToString());
         public IEnumerable<string> GetDatabases(string connectionString)
         {
-            Console.WriteLine($"Databases({connectionString})");
+            this.Info($"Databases({connectionString})");
             using (SqlConnection con = new SqlConnection(connectionString))
             {
                 SqlCommand command = new SqlCommand("SELECT name FROM sys.databases", con);

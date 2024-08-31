@@ -131,7 +131,7 @@ public sealed class MailRuService2
                             FileName = fileName,
                             Data = binData 
                         };
-                        Console.WriteLine($"{fileName} {binData.Length}");
+                        this.Info($"{fileName} {binData.Length}");
                     }
                 }
                 messages.Add(new MessageModel()
@@ -142,7 +142,7 @@ public sealed class MailRuService2
                     Text = text,
                     Files = files
                 });
-                Console.WriteLine($"{message.Date} {message.Sender} {message.Subject}");
+                this.Info($"{message.Date} {message.Sender} {message.Subject}");
             }
             client.Disconnect(true);
         }

@@ -26,7 +26,7 @@ using Console_AuthModel.AuthorizationModel.UserModel;
 
 namespace pickpoint_delivery_service
 {
-    public class DeliveryDbContextInitiallizer : IDeliveryDbContextInitiallizer
+    public class DeliveryDbContextInitiallizer : IdeliveryDbContextInitiallizer
     {
 
         
@@ -73,13 +73,13 @@ namespace pickpoint_delivery_service
                 context.ProductCatalogs.Add( new()
                 {
                     ProductCatalogName = "Автозапчасти",
-                    ParentId = root.ID
+                    ParentId = root.Id
                 });
                 result += context.SaveChanges();
                 context.ProductCatalogs.Add(new()
                 {
                     ProductCatalogName = "Мобильные телефоны",
-                    ParentId = root.ID
+                    ParentId = root.Id
                 });
                 result += context.SaveChanges();
             }
@@ -102,8 +102,8 @@ namespace pickpoint_delivery_service
                         var product = context.Products.ToList()[index];
                         context.ProductsInStock.Add(new()
                         {
-                            HolderID = holder.Id,
-                            ProductID = product.Id,
+                            HolderId = holder.Id,
+                            ProductId = product.Id,
                             ProductCount = count,
                             StoreSize = count
                         });
@@ -1421,8 +1421,8 @@ namespace pickpoint_delivery_service
                     var pis = new ProductsInStock()
                     {
 
-                        HolderID = holder.Id,
-                        ProductID = product.Id,
+                        HolderId = holder.Id,
+                        ProductId = product.Id,
                         ProductCount = GetRandomNumber(100)
                     };
                     _deliveryDbContext.ProductsInStock.Add(pis);
@@ -1511,7 +1511,7 @@ namespace pickpoint_delivery_service
                     ProductName = item.Product_name,
                     ProductCost = product.Price,                    
                     ProductDesc = item.Description,
-                    ProductCatalogId = context.ProductCatalogs.ToList().First(p => p.ProductCatalogName == "Автозапчасти").ID
+                    ProductCatalogId = context.ProductCatalogs.ToList().First(p => p.ProductCatalogName == "Автозапчасти").Id
                 };
                 context.Add(target);
                 
@@ -1530,7 +1530,7 @@ namespace pickpoint_delivery_service
                         context.SaveChanges();
                         context.Add(new ProductImage()
                         {
-                            ProductID = target.Id,
+                            ProductId = target.Id,
                             ImageData = Data,
                             ContentType = ContentType
                         });
@@ -1546,14 +1546,14 @@ namespace pickpoint_delivery_service
                 context.ProductCatalogs.ToList().Add(p = new ProductCatalog()
                 {
                     ProductCatalogName = "Мобильные телефоны",
-                    ParentId = context.ProductCatalogs.ToList().First(p => p.ParentId is null).ID
+                    ParentId = context.ProductCatalogs.ToList().First(p => p.ParentId is null).Id
                 });
                 context.SaveChanges();
-                catalogId = p.ID;
+                catalogId = p.Id;
             }
             else
             {
-                catalogId = context.ProductCatalogs.ToList().First(p => p.ProductCatalogName == "Мобильные телефоны").ID;
+                catalogId = context.ProductCatalogs.ToList().First(p => p.ProductCatalogName == "Мобильные телефоны").Id;
             }
 
             int ctn = 0;             
@@ -1593,7 +1593,7 @@ namespace pickpoint_delivery_service
                     {
                         ContentType = $"image/{contentType}",
                         ImageData = imgData,
-                        ProductID = production.Id,
+                        ProductId = production.Id,
                     };
                     context.ProductImages.Add(phoneImage);
                     context.SaveChanges();

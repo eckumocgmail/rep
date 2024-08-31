@@ -46,8 +46,8 @@ namespace Console_BlazorApp.AppUnits.AuthorizationTests
             {
                 Subject = "Тест",
                 Text = "Это тестовое сообщение",
-                FromUserID = context.UserContexts_.First().Id,// context.UserContexts_.Include(u => u.Account).FirstOrDefault(user => user.Account.Email.ToLower() == "eckumoc@gmail.com").Id,
-                ToUserID = context.UserContexts_.First().Id//context.UserContexts_.Include(u => u.Account).FirstOrDefault(user => user.Account.Email.ToLower() == "eckumocuk@gmail.com").Id
+                FromUserId = context.UserContexts_.First().Id,// context.UserContexts_.Include(u => u.Account).FirstOrDefault(user => user.Account.Email.ToLower() == "eckumoc@gmail.com").Id,
+                ToUserId = context.UserContexts_.First().Id//context.UserContexts_.Include(u => u.Account).FirstOrDefault(user => user.Account.Email.ToLower() == "eckumocuk@gmail.com").Id
             });
             context.SaveChanges();
             Messages.Add("Регистрация отправки сообщения прошла успешно");

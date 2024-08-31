@@ -23,7 +23,7 @@ namespace Console_BlazorApp.AppUnits.DeliveryModel
     public class ProductImage : BaseEntity
     {
 
-        public int ProductID { get; set; }
+        public int ProductId { get; set; }
         [JsonIgnore]
         public Product Product { get; set; }
         public string ContentType { get; set; }

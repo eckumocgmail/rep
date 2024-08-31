@@ -16,8 +16,8 @@ public class FromAttributes: MyValidatableObject
     /// <param name="ex">исключение</param>
     public virtual void LogError(Exception ex)
     {
-        Console.WriteLine($"[{GetType().GetNameOfType()}]: {ex.Message}");
-        Console.WriteLine($"[{GetType().GetNameOfType()}]: {ex.StackTrace}");
+        this.Info($"[{GetType().GetNameOfType()}]: {ex.Message}");
+        this.Info($"[{GetType().GetNameOfType()}]: {ex.StackTrace}");
     }
 
     /// <summary>
@@ -25,7 +25,7 @@ public class FromAttributes: MyValidatableObject
     /// </summary>
     public virtual void Info(object item)
     {
-        Console.WriteLine($"[{GetType().GetNameOfType()}]: {item}");
+        this.Info($"[{GetType().GetNameOfType()}]: {item}");
     }
     
     public void Init(Type type)
@@ -60,8 +60,8 @@ public class FromAttributes: MyValidatableObject
         Dictionary<string, string> attrs = new Dictionary<string, string>();
         if (p == null)
         {
-            Console.WriteLine($"Вам слендует передать ссылку на Type в метод Utils.GetEntityContrainsts() вместо null");
-            Console.WriteLine($"{new ArgumentNullException("p")}");
+            this.Info($"Вам слендует передать ссылку на Type в метод Utils.GetEntityContrainsts() вместо null");
+            this.Info($"{new ArgumentNullException("p")}");
             return attrs;
         }
         foreach (var data in p.GetCustomAttributesData())

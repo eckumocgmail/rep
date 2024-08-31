@@ -70,7 +70,7 @@ public class GroupingUser : BaseGrouping<UserContext, UserGroup, UserGroups>
 
  
     public override IEnumerable<UserGroup> GetAvailableOptions(UserContext item)    
-        => _model.UserGroups_.Where( g => (_model.UserGroups_UserGroup.Select(ug => ug.GroupID)).Contains(g.Id) == false);
+        => _model.UserGroups_.Where( g => (_model.UserGroups_UserGroup.Select(ug => ug.GroupId)).Contains(g.Id) == false);
 
 
     public override string[] GetGroups()
@@ -107,12 +107,12 @@ public class GroupingUser : BaseGrouping<UserContext, UserGroup, UserGroups>
 
 
     public override string[] GetGroupsForItem(UserContext item)
-        => _model.UserGroups_.Where( g => (_model.UserGroups_UserGroup.Select(ug => ug.GroupID)).Contains(g.Id)).Select(g => g.Name).ToArray();
+        => _model.UserGroups_.Where( g => (_model.UserGroups_UserGroup.Select(ug => ug.GroupId)).Contains(g.Id)).Select(g => g.Name).ToArray();
 
 
      
     public override IEnumerable<UserGroup> GetSelectedOptions(UserContext item)
-        => _model.UserGroups_.Where( g => (_model.UserGroups_UserGroup.Select(ug => ug.GroupID)).Contains(g.Id) == true);
+        => _model.UserGroups_.Where( g => (_model.UserGroups_UserGroup.Select(ug => ug.GroupId)).Contains(g.Id) == true);
 
 
   
@@ -120,7 +120,7 @@ public class GroupingUser : BaseGrouping<UserContext, UserGroup, UserGroups>
     {
         try
         {
-            var ug = _model.UserGroups_UserGroup.FirstOrDefault( ug => ug.UserID==item.Id && ug.GroupID == parent.Id);
+            var ug = _model.UserGroups_UserGroup.FirstOrDefault( ug => ug.UserId==item.Id && ug.GroupId == parent.Id);
             if(ug == null){
                 return MethodResult<UserGroups>.OnError(new ArgumentException());
             }
@@ -138,7 +138,7 @@ public class GroupingUser : BaseGrouping<UserContext, UserGroup, UserGroups>
     {
     
         var group = _model.UserGroups_.FirstOrDefault( g => g.Name==name);
-        var ug = _model.UserGroups_UserGroup.FirstOrDefault( ug => ug.UserID==item.Id && ug.GroupID == group.Id);
+        var ug = _model.UserGroups_UserGroup.FirstOrDefault( ug => ug.UserId==item.Id && ug.GroupId == group.Id);
         if(ug == null){
             return false;
         }

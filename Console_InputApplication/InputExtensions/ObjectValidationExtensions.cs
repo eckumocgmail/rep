@@ -27,7 +27,7 @@ public static class ObjectValidationExtensions
     }
     public static IDictionary<string, IEnumerable<string>> Validate(this MethodBase methodInfo, object[] arguments)
     {
-        Console.WriteLine($"Валидация аргументов метода {methodInfo.Name} {arguments.ToJson()}");
+        AppProviderService.GetInstance().Info($"Валидация аргументов метода {methodInfo.Name} {arguments.ToJson()}");
         IDictionary<string, IEnumerable<string>> result = new Dictionary<string, IEnumerable<string>>();
 
         int argumentIndex = 0;
@@ -207,7 +207,7 @@ public static class ObjectValidationExtensions
         return
             fieldInfo != null ? fieldInfo.GetValue(target) :
             propertyInfo != null ? propertyInfo.GetValue(target) :
-            null;
+            throw new Exception($"Свойство {name} Не найдено в {target.GetType()}");
     }
 
     /// <summary>

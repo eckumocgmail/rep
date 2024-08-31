@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 public class InputAttribute<T> : BaseInputAttribute, MyValidation
 {
+    public InputAttribute() : base(InputTypes.Custom) { }
     public InputAttribute(string InputType) : base(InputType)
     {
     }
@@ -16,12 +17,14 @@ public class InputAttribute<T> : BaseInputAttribute, MyValidation
         return true;
     }
 }
-public abstract class BaseInputAttribute : DataTypeAttribute, MyValidation
+public class BaseInputAttribute : DataTypeAttribute, MyValidation
 {
+
+
     public int Order { get; set; } = 0;
     public override bool IsValid(object value)
         => base.IsValid(value) && this.IsValidValue(value);
-    public abstract bool IsValidValue(object? value);
+    public virtual bool IsValidValue(object? value) => true;
     public static DataType GetDataType( string type)
     {
         switch (type)
@@ -104,6 +107,10 @@ public abstract class BaseInputAttribute : DataTypeAttribute, MyValidation
     {
 
         _InputType = InputType;
+    }
+
+    public BaseInputAttribute(): base(InputTypes.Custom)
+    {
     }
 
     public string GetCSTypeName()

@@ -28,7 +28,7 @@ namespace Console_DataConnector.DataModule.DataModels
             Init();
         }
 
-        public SqlServerAuthApi(string server, string database, bool trustedConnection, string userID, string password) : base(server, database, trustedConnection, userID, password)
+        public SqlServerAuthApi(string server, string database, bool trustedConnection, string userId, string password) : base(server, database, trustedConnection, userId, password)
         {
             Init();
         }

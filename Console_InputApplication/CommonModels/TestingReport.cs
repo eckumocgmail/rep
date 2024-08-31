@@ -185,7 +185,7 @@ public class TestingReport
             string space = "";
             for (int i = 0; i <= level; i++)
                 space += "    ";
-            Console.WriteLine("\n\t" + space + message + "");
+            this.Info("\n\t" + space + message + "");
         }
         int number = 1;
         foreach (var pair in this.SubReports)

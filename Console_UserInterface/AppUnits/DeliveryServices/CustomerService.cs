@@ -30,7 +30,7 @@ namespace Console_BlazorApp.AppUnits.DeliveryServices
         /// <param name="customerId">ид-клиента</param>        
         public List<Order> GetOrders(int customerId)
         {
-            return _deliveryUnit.Orders.Include(o => o.OrderItems).Where(o => o.CustomerID == customerId).ToList();
+            return _deliveryUnit.Orders.Include(o => o.OrderItems).Where(o => o.CustomerId == customerId).ToList();
         }
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace Console_BlazorApp.AppUnits.DeliveryServices
         /// <param name="holderId">точка вывоза</param>        
         public Order CreateOrder(int customerId, IDictionary<Product, int> productCounts, int holderId)
         {
-            var order = new Order() { CustomerID = customerId };
+            var order = new Order() { CustomerId = customerId };
             order.OnOrderCreated();
             _deliveryUnit.Orders.Add(order);
             _deliveryUnit.SaveChanges();
@@ -51,14 +51,14 @@ namespace Console_BlazorApp.AppUnits.DeliveryServices
                 {
                     Product = products.Key,
                     ProductCount = products.Value,
-                    OrderID = order.Id
+                    OrderId = order.Id
                 };
                 _deliveryUnit.OrderItems.Add(item);
                 order.OrderItems.Add(item);
             }
             _deliveryUnit.SaveChanges();
 
-            order.HolderID = holderId;
+            order.HolderId = holderId;
             _deliveryUnit.SaveChanges();
             order.Holder = _deliveryUnit.Holders.FirstOrDefault(holder => holder.Id == holderId);
             return order;
@@ -104,15 +104,15 @@ namespace Console_BlazorApp.AppUnits.DeliveryServices
                 }
                 order.OrderItems.Add(new OrderItem()
                 {
-                    ProductID = first.Id,
+                    ProductId = first.Id,
                     ProductCount = 1,
-                    OrderID = orderId
+                    OrderId = orderId
                 });
                 _deliveryUnit.SaveChanges();
             }
             catch(Exception ex)
             {
-                Console.WriteLine("Ошибка при добавлении товара в заказ", ex);
+                this.Error("Ошибка при добавлении товара в заказ", ex);
             }
         }
 
@@ -134,14 +134,14 @@ namespace Console_BlazorApp.AppUnits.DeliveryServices
         /// </summary>
         public Dictionary<int, int> SearchProductHolders(int productId, int count)
         {
-            var instocks = _deliveryUnit.ProductsInStock.Where(instock => instock.ProductID == productId && instock.ProductCount - instock.ProductsInReserve >= count);
-            var result = instocks.Select(instock => new KeyValuePair<int, int>(instock.HolderID, instock.ProductCount - instock.ProductsInReserve)).ToList();
+            var instocks = _deliveryUnit.ProductsInStock.Where(instock => instock.ProductId == productId && instock.ProductCount - instock.ProductsInReserve >= count);
+            var result = instocks.Select(instock => new KeyValuePair<int, int>(instock.HolderId, instock.ProductCount - instock.ProductsInReserve)).ToList();
             return new(result);
         }
 
         public int SetProductReserved(int productId, int count, int stockId)
         {
-            ProductsInStock instock = _deliveryUnit.ProductsInStock.FirstOrDefault(instock => instock.HolderID == stockId && productId == productId);
+            ProductsInStock instock = _deliveryUnit.ProductsInStock.FirstOrDefault(instock => instock.HolderId == stockId && productId == productId);
             /*if (instock.ProductsInReserve + count > instock.ProductCount)
             {
                 throw new ArgumentException("count");
@@ -176,7 +176,7 @@ namespace Console_BlazorApp.AppUnits.DeliveryServices
 
         public Order CreateOrder(int customerId)
         {
-            var order = new Order() {  CustomerID = customerId };
+            var order = new Order() {  CustomerId = customerId };
             _deliveryUnit.Orders.Add(order);
             _deliveryUnit.SaveChanges();
             var customer = _deliveryUnit.Customers.Find(customerId);

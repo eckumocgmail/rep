@@ -13,7 +13,7 @@
     {
         using(var ddb = new DeliveryDbContext())
         {
-            return ddb.ProductsInStock.Where(instock => instock.ProductID == Item.Id).Sum(p => p.ProductCount);
+            return ddb.ProductsInStock.Where(instock => instock.ProductId == Item.Id).Sum(p => p.ProductCount);
         }
     }
 
@@ -37,7 +37,7 @@
             (<b>@GetHoldersCount( )</b> шт)
         </div>
 
-        <div style="font-size: 14px;"> в @( db.ProductsInStock.Where(instock => instock.ProductID == Item.Id).Count() ) магазинах, Продано @Item.NumberOfSales </div>
+        <div style="font-size: 14px;"> в @( db.ProductsInStock.Where(instock => instock.ProductId == Item.Id).Count() ) магазинах, Продано @Item.NumberOfSales </div>
         <div style="height: 20px;">@Item.ProductRate<StarsView Value="@((int)Math.Floor(Item.ProductRate))" Editable="false"></StarsView></div>
 
     </div>
@@ -66,12 +66,12 @@
                 <span class="oi oi-info" aria-hidden="true"></span>
                 @Item.ProductName
             </b>
-            (<b>@db.ProductsInStock.Where(instock => instock.ProductID == Item.Id).Sum(p => p.ProductCount)</b> шт)
+            (<b>@db.ProductsInStock.Where(instock => instock.ProductId == Item.Id).Sum(p => p.ProductCount)</b> шт)
 
         </div>
 
         <div style="font-size: 14px;"> в наличии @(
-        db.ProductsInStock.Where(instock => instock.ProductID == Item.Id).Count()
+        db.ProductsInStock.Where(instock => instock.ProductId == Item.Id).Count()
         ) мест, Продано @Item.NumberOfSales штук </div>
         <div style="height: 20px;"><StarsView Value="@((int)Math.Floor(Item.ProductRate))" Editable="false"></StarsView></div>
 

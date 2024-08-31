@@ -37,7 +37,7 @@ namespace Console_DataConnector.DataModule.DataCommon.Metadata
                         $@" ALTER TABLE {Reference.Key} WITH CHECK ADD CONSTRAINT [FK__{ReferenceTableName}_{SourceTableName}=>{Source.Value}{Source.Key}] FOREIGN KEY([{Source.Value}])
                            REFERENCES {Source.Key} ({Source.Value})
                            ON DELETE {OnDelete} ON UPDATE {OnUpdate}",
-                        $@" ALTER TABLE [dbo].[Authors] CHECK CONSTRAINT [FK_Authors_Resources_ResourceID]"
+                        $@" ALTER TABLE [dbo].[Authors] CHECK CONSTRAINT [FK_Authors_Resources_ResourceId]"
                     };
                 case "MySql":
                     throw new NotImplementedException();

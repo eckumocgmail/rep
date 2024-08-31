@@ -39,7 +39,8 @@ public class InputEngWordAttribute : BaseInputAttribute, MyValidation
     /// Конструктор
     /// </summary>
     /// <param name="message"> сообщение в случае возникновения исключения </param>
-    public InputEngWordAttribute(string message = ""):base(InputTypes.Text)
+    public InputEngWordAttribute() : base(InputTypes.Text) { }
+    public InputEngWordAttribute(string message = "") :base(InputTypes.Text)
     {
         _message = message;
     }

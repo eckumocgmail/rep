@@ -26,8 +26,8 @@ namespace Console_BlazorApp.AppUnits.DeliveryServices
         /// <returns></returns>
         public List<Product> GetProducts(int holderId)
         {
-            var holdersInstock = _deliveryDbContext.ProductsInStock.Where(instock => instock.HolderID == holderId);
-            var products = holdersInstock.Select(instock => _deliveryDbContext.Products.FirstOrDefault(product => product.Id == instock.ProductID)).ToList();
+            var holdersInstock = _deliveryDbContext.ProductsInStock.Where(instock => instock.HolderId == holderId);
+            var products = holdersInstock.Select(instock => _deliveryDbContext.Products.FirstOrDefault(product => product.Id == instock.ProductId)).ToList();
             return products;
         }
 
@@ -38,7 +38,7 @@ namespace Console_BlazorApp.AppUnits.DeliveryServices
         /// <returns>кол-во которого не хватает</returns>
         public Dictionary<int, int> CreateOrder(int holderId)
         {
-            var kvlist = _deliveryDbContext.ProductsInStock.Where(instock => instock.HolderID == holderId).Select(instock => new KeyValuePair<int, int>(instock.ProductID, instock.StoreSize)).ToList();
+            var kvlist = _deliveryDbContext.ProductsInStock.Where(instock => instock.HolderId == holderId).Select(instock => new KeyValuePair<int, int>(instock.ProductId, instock.StoreSize)).ToList();
             return new Dictionary<int, int>(kvlist);
         }
         public Dictionary<int, int> CreateOrder(int holderId, Dictionary<int, int> targetProductsCount)
@@ -78,7 +78,7 @@ namespace Console_BlazorApp.AppUnits.DeliveryServices
         /// </summary>
         public int GetProductCount(int holderId, int productId)
         {
-            var holdersInstock = _deliveryDbContext.ProductsInStock.Where(instock => instock.HolderID == holderId && instock.ProductID == productId);
+            var holdersInstock = _deliveryDbContext.ProductsInStock.Where(instock => instock.HolderId == holderId && instock.ProductId == productId);
             if (holdersInstock.Count() == 0)
                 throw new ArgumentException("productId", "Товар не найден на этом складе");
             if (holdersInstock.Count() > 1)
@@ -88,7 +88,7 @@ namespace Console_BlazorApp.AppUnits.DeliveryServices
 
         public IEnumerable<ProductsInStock> GetProductOffer(int holderId)
         {
-            return _deliveryDbContext.ProductsInStock.Include(pis => pis.Product).Include(pis => pis.Product.ProductComments).Include(pis => pis.Product.ProductImages).Where(instock => instock.HolderID == holderId).ToList();
+            return _deliveryDbContext.ProductsInStock.Include(pis => pis.Product).Include(pis => pis.Product.ProductComments).Include(pis => pis.Product.ProductImages).Where(instock => instock.HolderId == holderId).ToList();
         }
 
         /// <summary>
@@ -103,14 +103,14 @@ namespace Console_BlazorApp.AppUnits.DeliveryServices
                 .Include(pis => pis.Product)
                 .Include(pis => pis.Product.ProductComments)
                 .Include(pis => pis.Product.ProductImages)
-                .Where(instock => instock.HolderID == holderId)
-                .Select( ins => new KeyValuePair<int,int>(ins.ProductID, ins.ProductCount-ins.ProductsInReserve)).ToList() );
+                .Where(instock => instock.HolderId == holderId)
+                .Select( ins => new KeyValuePair<int,int>(ins.ProductId, ins.ProductCount-ins.ProductsInReserve)).ToList() );
             return result;
         }
 
         public void SetOrderStored(int holderId, Order order)
         {            
-            _deliveryDbContext.Orders.Find(order.Id).HolderID = holderId;
+            _deliveryDbContext.Orders.Find(order.Id).HolderId = holderId;
             _deliveryDbContext.Orders.Find(order.Id).OnOrderStored();
             _deliveryDbContext.SaveChanges();
         }
@@ -122,9 +122,9 @@ namespace Console_BlazorApp.AppUnits.DeliveryServices
         public int PaymentDelivery(int orderId)
         {
             var order = _deliveryDbContext.Orders.First(o => o.Id == orderId);
-            order.OrderItems = _deliveryDbContext.OrderItems.Include(item => item.Product).Where(o => o.OrderID == orderId).ToList();
-            var holder = order.HolderID;
-            var transport = order.TransportID;
+            order.OrderItems = _deliveryDbContext.OrderItems.Include(item => item.Product).Where(o => o.OrderId == orderId).ToList();
+            var holder = order.HolderId;
+            var transport = order.TransportId;
 
             var holderUserId = _deliveryDbContext.Holders.First(t => t.Id == holder).UserId;
             var holderUser = _userDbContext.UserContexts_.First(u => u.Id == holderUserId);
@@ -169,12 +169,12 @@ namespace Console_BlazorApp.AppUnits.DeliveryServices
 
         public IEnumerable<ProductsInStock> GetProductsInStock(int Id)
         {
-            return _deliveryDbContext.ProductsInStock.Where(instock => instock.HolderID == Id).ToList();
+            return _deliveryDbContext.ProductsInStock.Where(instock => instock.HolderId == Id).ToList();
         }
 
         public ProductsInStock GetProductInStockInfo(int HolderId, int ProductId)
         {
-            return _deliveryDbContext.ProductsInStock.Include(instock => instock.Product).FirstOrDefault(instock => instock.HolderID == HolderId && instock.ProductID == ProductId);
+            return _deliveryDbContext.ProductsInStock.Include(instock => instock.Product).FirstOrDefault(instock => instock.HolderId == HolderId && instock.ProductId == ProductId);
         }
 
         public UserPerson GetCustomerPerson(int id)
@@ -192,7 +192,7 @@ namespace Console_BlazorApp.AppUnits.DeliveryServices
 
         public List<Order> GetOrderInDelivery(int holderId)
         {
-            return _deliveryDbContext.Orders.Where(order => order.HolderID == holderId && 3 == order.OrderStatus).ToList();
+            return _deliveryDbContext.Orders.Where(order => order.HolderId == holderId && 3 == order.OrderStatus).ToList();
         }
     }
 }

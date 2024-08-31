@@ -29,8 +29,8 @@ public class ProgressProgram: ProgramBase
             while(notInterrupted)
             {
                 Clear();
-                Console.WriteLine(notInterrupted);
-                Console.WriteLine(title);
+                AppProviderService.GetInstance().Info(notInterrupted);
+                AppProviderService.GetInstance().Info(title);
                 for (int i = 0; i < n; i++)
                     Console.Write("*");
                 n++;

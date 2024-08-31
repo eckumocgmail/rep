@@ -60,7 +60,7 @@ public class Attrs: Utils
 
     public static string GetInputImageUrlExpression()
     {     
-        return @"/api/Resource/Image?entity={{GetType().Name}}&id={{ID}}";
+        return @"/api/Resource/Image?entity={{GetType().Name}}&id={{Id}}";
     }
 
     public static string GetInputImageUrl(object target)
@@ -69,7 +69,7 @@ public class Attrs: Utils
         if (prop != null)
         {
             string entity = target.GetType().Name;
-            int id = int.Parse(ReflectionService.GetValueFor(target, "ID").ToString());
+            int id = int.Parse(ReflectionService.GetValueFor(target, "Id").ToString());
             return $"/api/Resource/Image?entity={entity}&id={id}";
         }
         else 
@@ -85,7 +85,7 @@ public class Attrs: Utils
                         if(target != null)
                         {
                             string entity = target.GetType().Name;
-                            int id = int.Parse(ReflectionService.GetValueFor(target, "ID").ToString());
+                            int id = int.Parse(ReflectionService.GetValueFor(target, "Id").ToString());
                             return $"/api/Resource/Image?entity={entity}&id={id}";
                         }
                         else

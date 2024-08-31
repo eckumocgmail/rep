@@ -38,7 +38,7 @@
         <CardBody>
             <ListEditor ItemType="@(type.ToType())" OnAdd="(evt => { var db = DataService.GetDbContext(type.ToType()); db.Add(evt); db.SaveChanges(); db.Dispose(); StateHasChanged(); })"></ListEditor>
             @*<FormEditor Model="@(TargetObjects.ContainsKey(type)? TargetObjects[type]: (TargetObjects[type]=type.New()))">
-                <button class="btn btn-sm btn-primary" @onclick="(evt => { Console.WriteLine(TargetObjects[type].ToJsonOnScreen()); StateHasChanged(); } )">сохранить</button>                
+                <button class="btn btn-sm btn-primary" @onclick="(evt => { this.Info(TargetObjects[type].ToJsonOnScreen()); StateHasChanged(); } )">сохранить</button>                
             </FormEditor>*@
         </CardBody>
     </CardContainer>

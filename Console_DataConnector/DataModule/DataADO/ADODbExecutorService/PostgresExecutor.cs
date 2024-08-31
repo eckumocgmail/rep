@@ -15,7 +15,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbExecutorService
         {
         }
 
-        public PostgresExecutor(string dataSource, int port, string database, string userID, string password) : base(dataSource, port, database, userID, password)
+        public PostgresExecutor(string dataSource, int port, string database, string userId, string password) : base(dataSource, port, database, userId, password)
         {
         }
 

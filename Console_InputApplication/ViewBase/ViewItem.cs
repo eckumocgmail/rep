@@ -342,7 +342,7 @@ public class ViewItem : StyledItem, ClientAPI
         };*/
         /*this.Children.OnChange += (sender, args) =>
         {
-            Console.WriteLine("Children changed");
+            this.Info("Children changed");
         };*/
     }
 

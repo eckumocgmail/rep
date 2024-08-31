@@ -43,7 +43,7 @@ public class ResourcesService: IResource
             //catalogInfo.Join("Files");
             catalogInfo.Files.ForEach(file =>
             {
-                Console.WriteLine($"{filePath}\\{file.Data}");
+                this.Info($"{filePath}\\{file.Data}");
             });
         }        
     }
@@ -98,6 +98,6 @@ public class ResourcesService: IResource
     {
         string message = $"[{GetType().Name}][{DateTime.Now}] => {item}";
         Debug.WriteLine(message);
-        Console.WriteLine(message);
+        this.Info(message);
     }
 } 

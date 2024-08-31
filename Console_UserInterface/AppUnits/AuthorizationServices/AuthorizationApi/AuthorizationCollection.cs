@@ -220,7 +220,7 @@ public abstract class AuthorizationCollection<T>: APIActiveCollection<T> where T
             item.LastActive = GetTimestamp();
             item.LastActiveTime = DateTime.Now;
             item.SecretKey = key;
-            //Console.WriteLine($"{GetType().GetTypeName()} Put {key} user {item.Id}");
+            //this.Info($"{GetType().GetTypeName()} Put {key} user {item.Id}");
             return key;
         }
     }

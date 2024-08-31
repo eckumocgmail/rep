@@ -63,7 +63,7 @@
 
 @code 
 {
-    string groupName;
+    string groupName = "Пользователи";
     public List<string> Groups { get; set; }
     protected override void OnInitialized()
     {
@@ -89,7 +89,7 @@
         var userId = signin.Verify().Id;
         grouping.AddToGroup(signin.Verify(), groupName);
         groupName = "";
-        var groupIds = dbu.UserGroups_UserGroup.Where(p => p.UserID == userId).Select(p => p.GroupID).ToList();
+        var groupIds = dbu.UserGroups_UserGroup.Where(p => p.UserId == userId).Select(p => p.GroupId).ToList();
         signin.Verify().Groups = dbu.UserGroups_.Where(g => groupIds.Contains(g.Id)).ToList();
         OnInitialized();
         StateHasChanged();

@@ -19,12 +19,12 @@ public class ViewBuilder: ViewFactory
 
     [Label("Источник")]
     [InputCombobox("BusinessDatasource,Name")]
-    public int DatasourceID { get; set; }
+    public int DatasourceId { get; set; }
 
     
     [Label("Набор данных")]
     [InputCombobox("BusinessDataset,Name")]
-    public int DatasetID { get; set; }
+    public int DatasetId { get; set; }
 
 
 

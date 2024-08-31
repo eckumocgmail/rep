@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace Console_DataConnector.DataModule.DataADO.ADODbConnectorService
 {
     public class PostgresDbConnector : PostgresConnectionString,
-        IDbConnector<NpgsqlConnection>,
+        IdbConnector<NpgsqlConnection>,
         IDisposable
     {
         /// <summary>
@@ -27,7 +27,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbConnectorService
         {
         }
 
-        public PostgresDbConnector(string dataSource, int port, string database, string userID, string password) : base(dataSource, port, database, userID, password)
+        public PostgresDbConnector(string dataSource, int port, string database, string userId, string password) : base(dataSource, port, database, userId, password)
         {
         }
 
@@ -64,7 +64,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbConnectorService
 
         private void OnStateChanged(object sender, StateChangeEventArgs evt)
         {
-            Console.WriteLine($"{evt.OriginalState}=>{evt.CurrentState}");
+            this.Info($"{evt.OriginalState}=>{evt.CurrentState}");
         }
 
     }

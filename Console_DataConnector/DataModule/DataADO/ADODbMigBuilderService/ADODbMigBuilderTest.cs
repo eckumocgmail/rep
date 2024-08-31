@@ -14,19 +14,19 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbMigBuilderService
 
         class Account
         {
-            public int ID { get; set; }
+            public int Id { get; set; }
             public string Email { get; set; }
         }
         class Person
         {
-            public int ID { get; set; }
+            public int Id { get; set; }
             public string Email { get; set; }
         }
         class AppUser
         {
-            public int ID { get; set; }
-            public int AccountID { get; set; }
-            public int PersonID { get; set; }
+            public int Id { get; set; }
+            public int AccountId { get; set; }
+            public int PersonId { get; set; }
             public Account Account { get; set; }
             public Person Person { get; set; }
         }

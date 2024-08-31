@@ -13,7 +13,7 @@ namespace Mvc_Apteka.Entities
     {
         
         [Key]
-        public int ID { get; set; }
+        public int Id { get; set; }
  
         public int? ParentId { get; set; }
         public ProductCatalog Parent { get; set; }

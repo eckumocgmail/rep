@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Console_DataConnector.DataModule.DataApi
 {
-    public interface IDBControlSystem
+    public interface IdBControlSystem
     {
         public IEnumerable<string> GetDatabases(string connectionString);
         public IEnumerable<string> GetDatabases();

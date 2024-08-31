@@ -42,7 +42,7 @@ public class MyMessageModel
                 text = text.Substring(text.IndexOf("[[") + 2);
                 text = text.Substring(0, text.IndexOf(","));
                 TypeName = text.Substring(text.LastIndexOf(".") + 1);
-                //Console.WriteLine(property.Name + " " +text);
+                //this.Info(property.Name + " " +text);
             }
             this.Properties.Add(new MyMessageProperty {
                 Name = property.Name,

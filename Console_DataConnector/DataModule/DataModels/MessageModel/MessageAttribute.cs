@@ -11,8 +11,7 @@ public class MessageAttribute: IObjectWithId
 {
 
     [Label("Наименование")]
-    [NotNullNotEmpty("Необходимо указать наименование")]
-    [InputRusText("Используйте символы русского алфавита")]
+    [NotNullNotEmpty("Необходимо указать наименование")]    
     public override string Name { get; set; }
 
     [Label("Системный")]

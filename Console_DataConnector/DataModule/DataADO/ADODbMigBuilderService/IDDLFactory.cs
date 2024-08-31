@@ -3,7 +3,7 @@ using System;
 
 namespace Console_DataConnector.DataModule.DataADO.ADODbMigBuilderService
 {
-    public interface IDDLFactory
+    public interface IdDLFactory
     {
         string CreateForeignkey(string relativeTable, string table, string column, bool? onDeleteCascade = false, bool? onUpdateCascade = null);
         string CreateTable(Type metadata);

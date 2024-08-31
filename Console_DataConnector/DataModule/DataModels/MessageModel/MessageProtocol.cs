@@ -11,19 +11,19 @@ public class MessageProtocol : BusinessEntity<MessageProtocol>
 
     [Label("Источник")]     
     [SingleSelectApi("BusinessFunction" + ",Name")]
-    public int? FromID { get; set; }
+    public int? FromId { get; set; }
   
 
 
-    public int? FromBusinessFunctionID { get; set; }
-    public int? ToBusinessFunctionID { get; set; }
+    public int? FromBusinessFunctionId { get; set; }
+    public int? ToBusinessFunctionId { get; set; }
 
 
 
 
     [Label("Приёмник")]
     [SingleSelectApi("BusinessFunction,Name")]
-    public int? ToID { get; set; }
+    public int? ToId { get; set; }
  
 
 

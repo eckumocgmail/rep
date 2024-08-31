@@ -7,15 +7,15 @@ using System.Text.Json.Serialization;
 public class UserGroupMessage: BaseEntity
 {
     
-    public int GroupID { get; set; }
+    public int GroupId { get; set; }
     public virtual UserGroup Group { get; set; }
 
 
     [Label("Источник")]
-    [NotNullNotEmpty("Свойство " + nameof(FromUserID) + " дожно иметь действительное значение" )]
-    [NotInput("Свойство " + nameof(FromUserID) + " не вводится пользователем, оно устанавливается системой перед созданием сообщения на эл. почту пользорвателя с инструкциями по активации")]
+    [NotNullNotEmpty("Свойство " + nameof(FromUserId) + " дожно иметь действительное значение" )]
+    [NotInput("Свойство " + nameof(FromUserId) + " не вводится пользователем, оно устанавливается системой перед созданием сообщения на эл. почту пользорвателя с инструкциями по активации")]
     [NotMapped]
-    public int FromUserID { get; set; }
+    public int FromUserId { get; set; }
 
     [Label("Источник")]        
     [NotInput("Свойство " + nameof(FromUser) + " не вводится пользователем, оно устанавливается системой перед созданием сообщения на эл. почту пользорвателя с инструкциями по активации")]

@@ -20,12 +20,12 @@ public class TestProgram: ConsoleProgram<TestRunner>
             {
                 if (node == p)
                 {
-                    for (int i = 0; i < node.GetLevel(); i++) Console.WriteLine("    ");
+                    for (int i = 0; i < node.GetLevel(); i++) this.Info("    ");
                     this.WriteYellowLine(print(node.NodeItem));
                 }
                 else
                 {
-                    for (int i = 0; i < node.GetLevel(); i++) Console.WriteLine("    ");
+                    for (int i = 0; i < node.GetLevel(); i++) this.Info("    ");
                     this.WriteLine(print(node.NodeItem));
                 }
             });
@@ -55,7 +55,7 @@ public class TestProgram: ConsoleProgram<TestRunner>
                 case ConsoleKey.UpArrow:        ConfirmExecute("Сохранить и выйти?", () => completed = true); break;
                 case ConsoleKey.LeftArrow:      ConfirmExecute("Сохранить и выйти?", () => completed = true); break;
                 case ConsoleKey.RightArrow:     ConfirmExecute("Сохранить и выйти?", () => completed = true); break;
-                default: Console.WriteLine("Используйте стрелки клавиатуры для навигации и ENTER для завершения выбора"); break;
+                default: this.Info("Используйте стрелки клавиатуры для навигации и ENTER для завершения выбора"); break;
             }
         } while (completed==false);
         return p;

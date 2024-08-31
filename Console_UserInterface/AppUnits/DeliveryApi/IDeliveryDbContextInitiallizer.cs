@@ -21,7 +21,7 @@ using Microsoft.AspNetCore.Builder;
 
 namespace Console_BlazorApp.AppUnits.DeliveryApi
 {
-    public interface IDeliveryDbContextInitiallizer
+    public interface IdeliveryDbContextInitiallizer
     {
 
         /// <summary>

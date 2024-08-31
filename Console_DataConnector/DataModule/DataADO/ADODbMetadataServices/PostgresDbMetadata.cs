@@ -9,13 +9,13 @@ using System.Threading.Tasks;
 
 namespace Console_DataConnector.DataModule.DataADO.ADODbMetadataServices
 {
-    public class PostgresDbMetadata : PostgresExecutor, IDbMetadata
+    public class PostgresDbMetadata : PostgresExecutor, IdbMetadata
     {
         public PostgresDbMetadata()
         {
         }
 
-        public PostgresDbMetadata(string dataSource, int port, string database, string userID, string password) : base(dataSource, port, database, userID, password)
+        public PostgresDbMetadata(string dataSource, int port, string database, string userId, string password) : base(dataSource, port, database, userId, password)
         {
         }
 

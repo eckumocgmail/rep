@@ -24,7 +24,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADOServices
         public PostgresADOService() : base()
         {
 
-            Console.WriteLine("Create");
+            this.Info("Create");
         }
 
 
@@ -38,7 +38,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADOServices
         {
             try
             {
-                Console.WriteLine($"CanConnect({ConnectionString})");
+                this.Info($"CanConnect({ConnectionString})");
                 var tables = new List<string>();
                 using (NpgsqlConnection con = new NpgsqlConnection(ConnectionString))
                 {
@@ -57,7 +57,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADOServices
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Ошибка при попытки установить соединение");
+                this.Info("Ошибка при попытки установить соединение");
                 this.Error(ex);
                 return false;
             }
@@ -72,7 +72,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADOServices
         /// <returns>результирующий набор</returns>
         public DataTable ExecuteQuery(string ConnectionString, string SQL)
         {
-            Console.WriteLine($"ExecuteQuery({ConnectionString},{SQL})");
+            this.Info($"ExecuteQuery({ConnectionString},{SQL})");
             using (NpgsqlConnection con = new NpgsqlConnection(ConnectionString))
             {
                 NpgsqlCommand command = new NpgsqlCommand(SQL, con);
@@ -95,7 +95,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADOServices
         /// <returns>список таблиц</returns>
         public IEnumerable<string> GetTables(string ConnectionString)
         {
-            Console.WriteLine($"GetTables({ConnectionString})");
+            this.Info($"GetTables({ConnectionString})");
             throw new NotImplementedException();
         }
 
@@ -112,7 +112,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADOServices
         /// <param name="SQL">текст sql-команды</param>   
         public int PrepareQuery(string ConnectionString, string SQL)
         {
-            Console.WriteLine($"PrepareQuery({ConnectionString},{SQL})");
+            this.Info($"PrepareQuery({ConnectionString},{SQL})");
             using (NpgsqlConnection con = new NpgsqlConnection(ConnectionString))
             {
                 NpgsqlCommand command = new NpgsqlCommand(SQL, con);

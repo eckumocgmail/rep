@@ -111,8 +111,8 @@ namespace Console_DataConnector
         public static void CreateAction()
         {
 
-            Console.WriteLine($"Вызов: {Assembly.GetCallingAssembly().GetName().Name}");
-            Console.WriteLine($"Впроцессе: {Assembly.GetExecutingAssembly().GetName().Name}");
+            AppProviderService.GetInstance().Info($"Вызов: {Assembly.GetCallingAssembly().GetName().Name}");
+            AppProviderService.GetInstance().Info($"Впроцессе: {Assembly.GetExecutingAssembly().GetName().Name}");
 
             foreach (var type in Assembly.GetExecutingAssembly().GetDataContexts())
             {
@@ -133,7 +133,7 @@ namespace Console_DataConnector
         {
             SqlServerExecutor Executor = null;
 
-            IDbMetadata DataSource = null;
+            IdbMetadata DataSource = null;
             switch (ProgramDialog.SingleSelect("Какая база нужна?", new string[] {
                 "SqlServer",
                 "MySql",
@@ -171,7 +171,7 @@ namespace Console_DataConnector
             string procedure = ProgramDialog.SingleSelect("Выберите процедуру",
                 procedurecs.Keys.ToList(), ref args);
             ProcedureMetadata procdureMetadata = procedurecs[procedure];
-            Console.WriteLine($"ExecuteProcedure({procdureMetadata.ProcedureName})");
+            AppProviderService.GetInstance().Info($"ExecuteProcedure({procdureMetadata.ProcedureName})");
 
 
 
@@ -383,7 +383,7 @@ namespace Console_DataConnector
                 var reader = command.ExecuteReader();
                 foreach(var column in reader.GetColumnSchema().Select(item => item.ColumnName))
                 {
-                    Console.WriteLine(column+"\t");
+                    AppProviderService.GetInstance().Info(column+"\t");
                 }
                 while (reader.Read())
                 {
@@ -393,7 +393,7 @@ namespace Console_DataConnector
                         while (s.Length < 20) s += " ";
                         Console.Write(s + "\t");
                     }
-                    Console.WriteLine();
+                    Console.WriteLine("");
                 }
 
                 outparams.ForEach(p => results[p.ParameterName] = p.Value.ToString());

@@ -7,7 +7,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbMigBuilderService
 {
     public class DbMigCommand
     {
-        public int ID { get; set; }
+        public int Id { get; set; }
         public int Version { get; set; }
         public string Up { get; set; }
         public string Down { get; set; }

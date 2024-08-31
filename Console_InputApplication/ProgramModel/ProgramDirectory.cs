@@ -25,16 +25,16 @@ public class ProgramDirectory : ProgramDialog
                 (
                     System.IO.Directory.GetCurrentDirectory(), 
                     (sender, evt) => {
-                        Console.WriteLine($"{evt.ChangeType}{evt.FullPath}");
+                        AppProviderService.GetInstance().Info($"{evt.ChangeType}{evt.FullPath}");
                     },
                     (sender, evt) =>
                     {
-                        Console.WriteLine($"{evt.GetException()}");
+                        AppProviderService.GetInstance().Info($"{evt.GetException()}");
                     }
                 );
             else foreach (var dir in args)
                 WatchDir(dir, (sender, evt) => {
-                    Console.WriteLine($"{evt.ChangeType}{evt.FullPath}");
+                    AppProviderService.GetInstance().Info($"{evt.ChangeType}{evt.FullPath}");
                 }, ProgramDirectory.OnError );
         }                        
     }
@@ -143,7 +143,7 @@ public class ProgramDirectory : ProgramDialog
             do
             {
                 ch = Console.ReadKey().KeyChar;
-                Console.WriteLine("Нажатие клавиши: "+ch);
+                AppProviderService.GetInstance().Info("Нажатие клавиши: "+ch);
             } while (ch!= '←');
         }
     }        

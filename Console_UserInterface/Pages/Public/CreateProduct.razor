@@ -34,7 +34,7 @@
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"File: {file.Name} \n Exception: {ex.Message} \n Stack: {ex.StackTrace}");
+                this.Info($"File: {file.Name} \n Exception: {ex.Message} \n Stack: {ex.StackTrace}");
             }
         }
 
@@ -176,7 +176,7 @@
             db.SaveChanges();
             foreach (var data in loadedDatas)
             {
-                data.ProductID = product.Id;
+                data.ProductId = product.Id;
                 db.ProductImages.Add(data);
                 db.SaveChanges();
             }
@@ -214,14 +214,14 @@
                                 ContentType = file.ContentType,
                                 VideoName = "test"
                             });
-                        //product.ProductImages = db.ProductImages.Where(image => image.ProductID == product.Id).ToList();
+                        //product.ProductImages = db.ProductImages.Where(image => image.ProductId == product.Id).ToList();
                     }
                 }
                 loadedFiles.Add(file);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"File: {file.Name} \n Exception: {ex.Message} \n Stack: {ex.StackTrace}");
+                this.Info($"File: {file.Name} \n Exception: {ex.Message} \n Stack: {ex.StackTrace}");
             }
         }
 
@@ -249,14 +249,14 @@
                             ImageData = data,
                             ContentType = file.ContentType,
                         });                                                                         
-                        //product.ProductImages = db.ProductImages.Where(image => image.ProductID == product.Id).ToList();
+                        //product.ProductImages = db.ProductImages.Where(image => image.ProductId == product.Id).ToList();
                     }
                 }
                 loadedFiles.Add(file);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"File: {file.Name} \n Exception: {ex.Message} \n Stack: {ex.StackTrace}");
+                this.Info($"File: {file.Name} \n Exception: {ex.Message} \n Stack: {ex.StackTrace}");
             }
         }
 

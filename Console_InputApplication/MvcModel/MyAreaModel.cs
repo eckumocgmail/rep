@@ -18,7 +18,7 @@ public class MyAreaModel : Dictionary<string, MyControllerModel>
         var controllers = GetControllers(Assembly.GetExecutingAssembly());
         if (controllers == null || controllers.Count == 0)
         {
-            Console.WriteLine("Контроллеры не найдены в приложении");
+            this.Info("Контроллеры не найдены в приложении");
         }
         foreach (Type controllerType in controllers)
         {

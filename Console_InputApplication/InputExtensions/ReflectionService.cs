@@ -302,8 +302,8 @@ public class ReflectionService
             }
             catch (Exception)
             {
-                Console.WriteLine($"Обнаружено несколько типов с именем {type}");
-                Console.WriteLine(Assembly.GetExecutingAssembly().GetTypes().Where(p => p.Name == type).Select(t => t.FullName));
+                AppProviderService.GetInstance().Info($"Обнаружено несколько типов с именем {type}");
+                AppProviderService.GetInstance().Info(Assembly.GetExecutingAssembly().GetTypes().Where(p => p.Name == type).Select(t => t.FullName));
                 throw new Exception($"Обнаружено несколько типов с именем {type}");
             }
             if (t == null)
@@ -775,7 +775,7 @@ public class ReflectionService
         }
         catch (Exception ex)
         {
-            Console.WriteLine("Error in controller function: " + ex.Message);
+            AppProviderService.GetInstance().Info("Error in controller function: " + ex.Message);
             throw;
         }
     }

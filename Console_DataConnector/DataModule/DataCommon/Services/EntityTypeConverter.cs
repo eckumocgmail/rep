@@ -20,7 +20,7 @@ namespace Console_DataConnector.DataModule.DataCommon.Services
             {
                 tmd.columns[p.Name] = new ColumnMetaData()
                 {
-                    primary = p.Name == "ID",
+                    primary = p.Name == "Id",
                     caption = Utils.LabelFor(typeofEntity, p.Name),
                     description = Utils.DescriptionFor(typeofEntity, p.Name),
                     name = p.Name,
@@ -62,7 +62,7 @@ namespace Console_DataConnector.DataModule.DataCommon.Services
                 {
                     if (p.Value.incremental)
                     {
-                        sql += " IDENTITY(1,1) ";
+                        sql += " IdENTITY(1,1) ";
                     }
                     sql += " PRIMARY KEY,";
                 }
@@ -97,7 +97,7 @@ namespace Console_DataConnector.DataModule.DataCommon.Services
             {
                 tmd.columns[p.Name] = new ColumnMetaData()
                 {
-                    primary = p.Name == "ID",
+                    primary = p.Name == "Id",
                     caption = Utils.LabelFor(typeofEntity, p.Name),
                     description = Utils.DescriptionFor(typeofEntity, p.Name),
                     name = p.Name,

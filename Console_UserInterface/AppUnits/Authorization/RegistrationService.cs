@@ -90,7 +90,7 @@ public class RegistrationService : APIRegistration
                                 .Include(a => a.Person)
                                 //.Include(a => a.Role)
                                 .Include(a => a.UserGroups)
-                    where p.AccountID == account.Id select p).SingleOrDefault();
+                    where p.AccountId == account.Id select p).SingleOrDefault();
         }
 
     }
@@ -116,7 +116,7 @@ public class RegistrationService : APIRegistration
                                 .Include(a => a.Person)
                                 //.Include(a => a.Role)
                                 .Include(a => a.UserGroups)
-                    where p.PersonID == person.Id
+                    where p.PersonId == person.Id
                     select p).SingleOrDefault();
         }
     }

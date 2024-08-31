@@ -469,7 +469,7 @@ else
                     var pdbsetref = pdbset.GetValue(dbc);
                     foreach (object item in (dynamic)pdbsetref)
                     {
-                        var id = item.GetValue("ID");
+                        var id = item.GetValue("Id");
                         if (id is null)
                         {
                             id = item.GetValue("Id");

@@ -9,7 +9,7 @@ public class MyValidatableObject<TContext> : MyValidatableObject
 {
 
 }
-public class MyValidatableObject : IValidatableObject
+public class MyValidatableObject : BaseEntity, IValidatableObject
 {
     IEnumerable<ValidationResult> IValidatableObject.Validate(ValidationContext validationContext)
     {

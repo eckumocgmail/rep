@@ -4,13 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-[Label("Текстовое поле")]
-public class Text : InputTextAttribute
-{
-    public Text(string message = null) : base(message)
-    {
-    }
-}
+ 
 public class InputTextAttribute : BaseInputAttribute, MyValidation
 {
     private string _message;

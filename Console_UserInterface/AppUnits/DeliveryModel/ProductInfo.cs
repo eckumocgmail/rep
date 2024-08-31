@@ -10,7 +10,7 @@ namespace Mvc_Apteka.Entities
     public class ProductInfo: BaseEntity
     {
     
-        public int? ProductCatalogID { get; set; }
+        public int? ProductCatalogId { get; set; }
 
         [Display(Name = "Наименование продукции")]
         [Required(ErrorMessage = "Необходимо указать наименование продукции")]

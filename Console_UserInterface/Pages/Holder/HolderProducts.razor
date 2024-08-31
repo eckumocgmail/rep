@@ -63,7 +63,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        var productIds = db.ProductsInStock.Where(instock => instock.HolderID == HolderId).Select(instock => instock.ProductID);
+        var productIds = db.ProductsInStock.Where(instock => instock.HolderId == HolderId).Select(instock => instock.ProductId);
         this.Products = db.Products.Include(p => p.ProductImages).Where(p => productIds.Contains(p.Id)).ToList();
         IsReady = true;
     }

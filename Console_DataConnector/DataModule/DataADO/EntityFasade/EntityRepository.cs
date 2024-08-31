@@ -25,7 +25,7 @@ public abstract class EntityRepository<TEntity> :
 
     public void LogInformation(string message)
     {
-        System.Console.WriteLine($"[{DateTime.Now}][{TypeExtensions2.GetTypeName(GetType())}]: {message}");
+        this.Info($"[{DateTime.Now}][{TypeExtensions2.GetTypeName(GetType())}]: {message}");
     }
 
  
@@ -59,7 +59,7 @@ public abstract class EntityRepository<TEntity> :
         var ISuperSer = this.GetISuperSer(_context);
         foreach (TEntity next in ISuperSer.ToArray())
         {
-            result += Delete(next.ID);
+            result += Delete(next.Id);
         }
         foreach (TEntity next in dataset)
         {
@@ -92,7 +92,7 @@ public abstract class EntityRepository<TEntity> :
         }
         else
         {
-            return this.GetISuperSer(_context).Where(record => record.ID == id).ToArray();
+            return this.GetISuperSer(_context).Where(record => record.Id == id).ToArray();
         }
     }
     public async Task Create(TEntity target)

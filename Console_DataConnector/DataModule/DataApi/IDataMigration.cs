@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Console_DataConnector.DataModule.DataApi
 {
-    public class IDataMigration
+    public class IdataMigration
     {
     }
 }

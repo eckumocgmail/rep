@@ -17,4 +17,5 @@ public interface IEntityFasade
     public Task<object[]> Page(int page, int size);
     public Task<object[]> Page(int page, int size, params string[] sorting);
     public Task<object> CreateNew();
+    public IEntityFasade<T> ToFasade<T>() where T : BaseEntity;
 }

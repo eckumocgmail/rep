@@ -48,10 +48,10 @@
             </tr>
             @foreach(var instock in instock)
             {
-                <tr class="highlight-on-hover" @onclick='(evt => nav.NavigateTo($"/holder/holder/{HolderId}/product/{instock.ProductID}"))'>
+                <tr class="highlight-on-hover" @onclick='(evt => nav.NavigateTo($"/holder/holder/{HolderId}/product/{instock.ProductId}"))'>
                     <td>@(ctn++)</td>
-                    <td>@(instock.ProductID)</td>
-                    <td>@((db.Products.First(p => p.Id == instock.ProductID)).ProductName)</td>
+                    <td>@(instock.ProductId)</td>
+                    <td>@((db.Products.First(p => p.Id == instock.ProductId)).ProductName)</td>
                     <td>@instock.ProductCount</td>
                     <td>@instock.ProductsInReserve</td>
                     <td>@(instock.ProductCount-instock.ProductsInReserve)</td>

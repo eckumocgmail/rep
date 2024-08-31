@@ -14,7 +14,7 @@ namespace Console_BlazorApp.AppUnits.DeliveryServices
         {
             _holder = holder;
         }
-        protected override IQueryable<Product> GetDbSet() => _context.Set<Product>().Where(product => ((DeliveryDbContext)_context).ProductsInStock.Where(instock => instock.HolderID == _holder.Id).Select(instock => instock.ProductID).Contains(product.Id));
+        protected override IQueryable<Product> GetDbSet() => _context.Set<Product>().Where(product => ((DeliveryDbContext)_context).ProductsInStock.Where(instock => instock.HolderId == _holder.Id).Select(instock => instock.ProductId).Contains(product.Id));
 
     }
 }

@@ -47,7 +47,7 @@ namespace Console_DataConnector.DataModule.DataCommon.DatabaseMetadata
 
         [NotNullNotEmpty]
         [Required(ErrorMessage = "Необходимо задать первичный ключ")]
-        public string pk = "ID";
+        public string pk = "Id";
 
 
         // таблицы в которых возможны множественные ссылки на уникальный обьект тек. таблицы
@@ -196,9 +196,9 @@ namespace Console_DataConnector.DataModule.DataCommon.DatabaseMetadata
 
         public string getPrimaryKey()
         {
-            string primaryKey = name.ToUpper() + "ID";
-            string singleIdName = singlecount_name.ToUpper() + "ID";
-            string multiIdName = multicount_name.ToUpper() + "ID";
+            string primaryKey = name.ToUpper() + "Id";
+            string singleIdName = singlecount_name.ToUpper() + "Id";
+            string multiIdName = multicount_name.ToUpper() + "Id";
             if (pk == null)
             {
 
@@ -209,7 +209,7 @@ namespace Console_DataConnector.DataModule.DataCommon.DatabaseMetadata
                         return pk = columnEntry.Value.name;
 
                     }
-                    else if (columnEntry.Key.ToUpper() == "ID")
+                    else if (columnEntry.Key.ToUpper() == "Id")
                     {
                         return pk = columnEntry.Value.name;
                     }
@@ -225,7 +225,7 @@ namespace Console_DataConnector.DataModule.DataCommon.DatabaseMetadata
             {
                 return pk;
             }
-            return "ID";
+            return "Id";
             //throw new Exception($"Метаданные талицы: {this.name} не содержат определние первичного ключа");        
         }
 

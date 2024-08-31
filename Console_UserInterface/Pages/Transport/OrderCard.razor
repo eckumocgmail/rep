@@ -31,7 +31,7 @@
             <li>-выполнить проверку груза на повреждения</li>
         </ul>
         <p>
-        <p>Адрес получения товара: @(Order is not null ? Order.Holder.HolderLocation: "")</p>
+        <p>Адрес получения товара: @(Order is not null && Order.Holder is not null ? Order.Holder.HolderLocation : "")</p>
             <b>Состав товаров для транспортировки:</b>
             <ul class="list-group">
                 @foreach (var item in orders.GetOrderItems(OrderId))
@@ -65,6 +65,13 @@
     protected override Task OnInitializedAsync()
     {
         return base.OnInitializedAsync();
-        this.Order = orders.GetOrder(OrderId);
+        try
+        {
+            this.Order = orders.GetOrder(OrderId);
+        }
+        catch(Exception ex)
+        {
+            this.Error(ex.Message);
+        }
     }
 }

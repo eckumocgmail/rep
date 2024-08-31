@@ -14,7 +14,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbConnectorService
     /// Сервис выполнения sql-запросов 
     /// </summary>
     public class MySqlDbConnector : MySqlConnectionString,
-        IDbConnector<MySqlConnection>,
+        IdbConnector<MySqlConnection>,
         IDisposable
     {
 
@@ -26,7 +26,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbConnectorService
 
         public MySqlDbConnector() : base()
         {
-            Console.WriteLine("Create");
+            this.Info("Create");
         }
 
         public MySqlConnection GetConnection()
@@ -61,7 +61,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbConnectorService
 
         private void OnStateChanged(object sender, StateChangeEventArgs evt)
         {
-            Console.WriteLine($"{evt.OriginalState}=>{evt.CurrentState}");
+            this.Info($"{evt.OriginalState}=>{evt.CurrentState}");
         }
     }
 }

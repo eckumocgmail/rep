@@ -50,16 +50,16 @@ namespace Console_BlazorApp.AppUnits.DeliveryControllers
             db.SaveChanges();
             var order = new Order()
             {
-                CustomerID = customer.Id
+                CustomerId = customer.Id
             };
-            order.HolderID = holder_id;
+            order.HolderId = holder_id;
             db.Add(order);
             db.SaveChanges();
             var items = signin.GetFromSession<List<Product>>("selected-products").Select(product => new OrderItem()
             {
-                ProductID = product.Id,
+                ProductId = product.Id,
                 ProductCount = 1,
-                OrderID = order.Id
+                OrderId = order.Id
             }).ToList();
             foreach (var item in items)
             {
@@ -83,7 +83,7 @@ namespace Console_BlazorApp.AppUnits.DeliveryControllers
         public IActionResult CheckoutOrder([FromServices] DeliveryDbContext db, [FromRoute] int OrderId)
         {
             var order = db.Orders.Include(o => o.OrderItems).First(o => o.Id == OrderId);
-            return View("Checkout", order.OrderItems.Select(item => db.Products.Find(item.ProductID)).ToList());
+            return View("Checkout", order.OrderItems.Select(item => db.Products.Find(item.ProductId)).ToList());
         }
 
         [HttpGet]

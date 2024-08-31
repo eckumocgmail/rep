@@ -214,7 +214,7 @@ public class TypeNode<T> : IDictionary<string, ITypeNode<T>>, ITypeNode<T> where
             List<string> path = Parent.GetPath();
             path.Add(NodeName);
 
-            path.ForEach(id => Console.Write($"/{id}")); Console.WriteLine("");
+            path.ForEach(id => Console.Write($"/{id}")); this.Info("");
             return path;
         }
         return new List<string> { NodeName };
@@ -325,7 +325,7 @@ public class TypeNode<T> : IDictionary<string, ITypeNode<T>>, ITypeNode<T> where
         if (this.Parent != null)
         {
             string path = this.Parent.GetIntPath() + "." + (Parent.GetChildren().IndexOf(this) + 1);
-            Console.WriteLine($"{NodeName} => {SerializeObject(GetPath(), Formatting.Indented)} => {path}");
+            this.Info($"{NodeName} => {SerializeObject(GetPath(), Formatting.Indented)} => {path}");
 
             Console.Write("\n");
             for (int i = 0; i < GetLevel(); i++)

@@ -31,7 +31,7 @@ namespace Console_BlazorApp.AppUnits.DeliveryTests
                 }
                 var product = products.First( p => p.ProductName.IndexOf("streak")!=-1);
                 Dictionary<int, int> instocks = customerService.SearchProductHolders(product.Id, 1);
-                Console.WriteLine(instocks.ToJsonOnScreen());
+                this.Info(instocks.ToJsonOnScreen());
                 if (instocks.Count() == 0)
                     return;
                 var holderId = instocks.Keys.First();
@@ -39,8 +39,8 @@ namespace Console_BlazorApp.AppUnits.DeliveryTests
                 customerService.SetProductReserved(product.Id, 1, holderId);
                 var instocks2 = customerService.SearchProductHolders(product.Id, 1);
 
-                Console.WriteLine(instocks[holderId]);
-                Console.WriteLine(instocks2[holderId]);
+                this.Info(instocks[holderId]);
+                this.Info(instocks2[holderId]);
                 if ((instocks[holderId] - instocks2[holderId]) != 1)
                 {
 

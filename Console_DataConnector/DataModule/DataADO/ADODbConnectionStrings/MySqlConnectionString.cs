@@ -19,7 +19,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbConnectionStrings
 
         [Display(Name = "Пользователь")]
         [Required(ErrorMessage = "Обязательное поле")]
-        public string UserID { get; set; }
+        public string UserId { get; set; }
 
 
         [Display(Name = "Пароль")]
@@ -41,10 +41,10 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbConnectionStrings
         {
         }
 
-        public MySqlConnectionString(string server, int port, string database, string userID, string password)
+        public MySqlConnectionString(string server, int port, string database, string userId, string password)
         {
             Server = server;
-            UserID = userID;
+            UserId = userId;
             Password = password;
             Port = port;
             Database = database;
@@ -56,7 +56,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbConnectionStrings
         /// <returns> строка соединения </returns>
         public override string ToString()
         {
-            return $"Server={Server};Port={Port};Database={Database};User ID={UserID};Password={Password};PersistSecurityInfo=True;CharSet=utf8;SslMode=none";
+            return $"Server={Server};Port={Port};Database={Database};User Id={UserId};Password={Password};PersistSecurityInfo=True;CharSet=utf8;SslMode=none";
         }
     }
 }

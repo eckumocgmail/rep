@@ -172,6 +172,6 @@ public class ProgramHistory: ProgramDirectory
 
         Clear();
         WriteLine("История");
-        History.ForEach(Console.WriteLine);
+        History.ForEach(AppProviderService.GetInstance().Info);
     }
 }

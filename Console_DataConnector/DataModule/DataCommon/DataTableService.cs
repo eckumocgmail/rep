@@ -10,7 +10,7 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
-public interface IDataTableService
+public interface IdataTableService
 {
     public IEnumerable<string> GetColumnsNames(DataTable dataTable);
     public IDictionary<string, string> GetColumnsCaptions(DataTable dataTable);
@@ -22,7 +22,7 @@ public interface IDataTableService
     public JArray GetJArray(DataTable dataTable);
     public IEnumerable<dynamic> GetResultSet(DataTable dataTable, Type entity);
 }
-public class DataTableService: MyValidatableObject,IDataTableService
+public class DataTableService: MyValidatableObject,IdataTableService
 { 
     public IEnumerable<string> GetColumnsNames(DataTable dataTable)
     {
@@ -234,7 +234,7 @@ public class DataTableService: MyValidatableObject,IDataTableService
                 foreach (var name in properties)
                 {
 
-                    string columnName = name.ToTSQLStyle();
+                    string columnName = name .ToTSQLStyle();
                     string key = columns.Contains(columnName) ? columnName : columnName.ToCapitalStyle();
                     if (columns.Contains(key) == false)
                         continue;
@@ -298,7 +298,7 @@ public class DataTableService: MyValidatableObject,IDataTableService
             object next = type.New();
             foreach (var name in properties)
             {
-                string columnName = name.ToTSQLStyle();
+                string columnName = name;//.ToTSQLStyle();
                 string key = columns.Contains(columnName) ? columnName : columnName.ToCapitalStyle();
                 if (columns.Contains(key) == false)
                     continue;

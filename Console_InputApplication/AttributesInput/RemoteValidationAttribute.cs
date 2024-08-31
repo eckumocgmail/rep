@@ -20,7 +20,7 @@ namespace NetCoreConstructorAngular.Data.DataAttributes
             }
             catch(Exception ex)
             {
-                Console.WriteLine("Ошибка при разбре URI="+uri+": "+ex.Message);
+                AppProviderService.GetInstance().Info("Ошибка при разбре URI="+uri+": "+ex.Message);
                 throw new Exception("Ошибка при разбре URI=" + uri + ": " + ex.Message, ex );
             }
         }

@@ -493,7 +493,7 @@ public static class CommonUtils
 
     public static string GetInputImageUrlExpression()
     {
-        return @"/api/Resource/Image?entity={{GetType().Name}}&id={{ID}}";
+        return @"/api/Resource/Image?entity={{GetType().Name}}&id={{Id}}";
     }
     /*
     public static string GetInputImageUrl(object target)
@@ -502,7 +502,7 @@ public static class CommonUtils
         if (prop != null)
         {
             string entity = target.GetType().Name;
-            int id = int.Parse(ReflectionService.GetValueFor(target, "ID").ToString());
+            int id = int.Parse(ReflectionService.GetValueFor(target, "Id").ToString());
             return $"/api/Resource/Image?entity={entity}&id={id}";
         }
         else 
@@ -518,7 +518,7 @@ public static class CommonUtils
                         if(target != null)
                         {
                             string entity = target.GetType().Name;
-                            int id = int.Parse(ReflectionService.GetValueFor(target, "ID").ToString());
+                            int id = int.Parse(ReflectionService.GetValueFor(target, "Id").ToString());
                             return $"/api/Resource/Image?entity={entity}&id={id}";
                         }
                         else
@@ -668,7 +668,7 @@ public static class CommonUtils
             text = text.Substring(text.IndexOf("[[") + 2);
             text = text.Substring(0, text.IndexOf(","));
             TypeName = text.Substring(text.LastIndexOf(".") + 1);
-            Console.WriteLine(property.Name + " " + text);
+            AppProviderService.GetInstance().Info(property.Name + " " + text);
         }
         return TypeName;
     }
@@ -685,7 +685,7 @@ public static class CommonUtils
             text = text.Substring(text.IndexOf("[[") + 2);
             text = text.Substring(0, text.IndexOf(","));
             TypeName = text.Substring(text.LastIndexOf(".") + 1);
-            Console.WriteLine(property.Name + " " + text);
+            type.Info(property.Name + " " + text);
         }
         return IsCollection;
     }
@@ -952,7 +952,7 @@ public static class CommonUtils
         }
         catch (AmbiguousMatchException ex)
         {
-            Console.WriteLine(ex.Message);
+            AppProviderService.GetInstance().Info(ex.Message);
         }
 
         if (info == null)
@@ -1302,7 +1302,7 @@ public static class CommonUtils
             text = text.Substring(text.IndexOf("[[") + 2);
             text = text.Substring(0, text.IndexOf(","));
             TypeName = text.Substring(text.LastIndexOf(".") + 1);
-            Console.WriteLine(property.Name + " " + text);
+            AppProviderService.GetInstance().Info(property.Name + " " + text);
         }
         object prop = new
         {

@@ -114,21 +114,21 @@
             db.SaveChanges();
         }
         db.Orders.Find(OrderId).OnOrderCreated();
-        db.Orders.Find(OrderId).CustomerID = customer.Id; 
-        db.Orders.Find(OrderId).HolderID = holderId;
+        db.Orders.Find(OrderId).CustomerId = customer.Id; 
+        db.Orders.Find(OrderId).HolderId = holderId;
         db.SaveChanges();
 
         db.Orders.Find(OrderId).OnOrderCreated();
         db.SaveChanges();
-        foreach( var pitem in db.OrderItems.Where(item => item.OrderID == OrderId).ToList())
+        foreach( var pitem in db.OrderItems.Where(item => item.OrderId == OrderId).ToList())
         {
-            Console.WriteLine($"ProductId: {pitem.ProductID}");
-            Console.WriteLine($"HolderID: {holderId}");
+            this.Info($"ProductId: {pitem.ProductId}");
+            this.Info($"HolderId: {holderId}");
            
             // регистрируем уменьшение колва товара на складе
-            var instock = db.ProductsInStock.FirstOrDefault(instock => instock.ProductID == pitem.ProductID && instock.HolderID == holderId);
+            var instock = db.ProductsInStock.FirstOrDefault(instock => instock.ProductId == pitem.ProductId && instock.HolderId == holderId);
             instock.ProductCount -= pitem.ProductCount;
-            db.Products.First(p => p.Id == pitem.ProductID).NumberOfSales += pitem.ProductCount;
+            db.Products.First(p => p.Id == pitem.ProductId).NumberOfSales += pitem.ProductCount;
 
             db.SaveChanges();
             

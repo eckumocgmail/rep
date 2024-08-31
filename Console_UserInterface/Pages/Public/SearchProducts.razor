@@ -15,7 +15,7 @@
 {
     public List<Product> AvailableProducts { get; set; } = new();
     public List<string> SearchOptions { get; set; } = new() { };
-    public List<Product> SelectedProducts { get; set; } = new();
+    public HashSet<Product> SelectedProducts { get; set; } = new();
     public Order OrderRef { get; set; } = new Order();
     public int PageNumber { get; set; } = 1;
     public string SearchQuery { get; set; } = "";
@@ -36,18 +36,18 @@
         {
             Root = new()
             {
-                Id = p.ID,
+                Id = p.Id,
                 Name = p.ProductCatalogName,
             };
-            int rootId = db.ProductCatalogs.FirstOrDefault(p => p.ParentId == null).ID;
+            int rootId = db.ProductCatalogs.FirstOrDefault(p => p.ParentId == null).Id;
             Func<int?, List<TreeNode>> getChildren = (id) => null;
             getChildren = (int? id) =>
             {
                 return db.ProductCatalogs.Where(p => p.ParentId == id).ToList().Select(p => new TreeNode()
                 {
-                    Id = p.ID,
+                    Id = p.Id,
                     Name = p.ProductCatalogName,
-                    Children = getChildren(p.ID)
+                    Children = getChildren(p.Id)
                 }).ToList();
             };
 
@@ -55,8 +55,8 @@
             if(childrens is not null && Root is not null && Root.Children is not null)
                 childrens.ForEach(Root.Children.Add);
         }
-        
-         
+
+
 
         //this.OnSearch();
         if (signin.IsSignin())
@@ -78,7 +78,7 @@
 
             if (customer.CurrentOrderId is null)
             {
-                var order = new Order() { CustomerID = customer.Id };
+                var order = new Order() { CustomerId = customer.Id };
                 db.Orders.Add(order);
                 db.SaveChanges();
                 customer.CurrentOrderId = order.Id;
@@ -90,14 +90,14 @@
             }
             if (OrderRef.OrderStatus != 0)
             {
-                var order = new Order() { CustomerID = customer.Id };
+                var order = new Order() { CustomerId = customer.Id };
                 db.Orders.Add(order);
                 db.SaveChanges();
                 customer.CurrentOrderId = order.Id;
             }
             if (OrderRef is null)
             {                               
-                var order = new Order() { CustomerID = customer.Id };
+                var order = new Order() { CustomerId = customer.Id };
                 db.Orders.Add(order);
                 db.SaveChanges();
                 customer.CurrentOrderId = order.Id;
@@ -145,16 +145,16 @@
             }
             Message = $"Найдено {SearchedProducts.Count()} товаров";
             PagesCount = (SearchedProducts.Count() + SearchedProducts.Count() % PageSize) / PageSize;
-            
+
             AvailableProducts = SearchedProducts.Skip((PageNumber - 1) * PageSize).Take(PageSize).ToList();
-            AvailableProducts.ForEach(product => product.ProductImages = db.ProductImages.Where(i => i.ProductID == product.Id).ToList());
+            AvailableProducts.ForEach(product => product.ProductImages = db.ProductImages.Where(i => i.ProductId == product.Id).ToList());
             switch(sort)
             {
                 case "price":
                     AvailableProducts.Sort((p1, p2) => { return (p1.ProductCost - p2.ProductCost) > 0? 1: -1; });
                     break;
                 case "price desc" :
-                
+
                     AvailableProducts.Sort((p1, p2) => { return (p2.ProductCost - p1.ProductCost) > 0 ? 1 : -1; });
                     break;
                 case "rating":
@@ -184,12 +184,14 @@
         var p = AvailableProducts.First(p => p.Id == product_id);
         AvailableProducts.Remove(p);
         this.SelectedProducts.Add(p);
+        if (db.OrderItems.Any(item => item.ProductId == product_id) == true)
+            return;
         var item = new OrderItem()
         {
-            ProductID = product_id,
+            ProductId = product_id,
             Product = db.Products.Find(product_id),
             ProductCount = 1,
-            OrderID = OrderRef.Id
+            OrderId = OrderRef.Id
         };
         db.OrderItems.Add(item);
 

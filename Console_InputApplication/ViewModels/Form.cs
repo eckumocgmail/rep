@@ -332,7 +332,7 @@ public class Form
                 field.Label = Attrs.LabelFor(type, property.Name);
                 field.Description = Attrs.DescriptionFor(type, property.Name);
                 field.Icon = Attrs.IconFor(type, property.Name);
-                field.Visible = property.Name == "ID" ? false : Attrs.IsVisible(type, property.Name);
+                field.Visible = property.Name == "Id" ? false : Attrs.IsVisible(type, property.Name);
                 field.Help = Attrs.HelpFor(type, property.Name);
                 if (Attributes.ContainsKey(nameof(NotInputAttribute)))
                 {

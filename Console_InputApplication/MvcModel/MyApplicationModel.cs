@@ -18,7 +18,7 @@ public class MyApplicationModel
         var controllers = GetControllers(ass);
         if (controllers == null || controllers.Count == 0)
         {
-            Console.WriteLine("Контроллеры не найдены в приложении");
+            this.Info("Контроллеры не найдены в приложении");
         }    
         foreach (Type controllerType in controllers)
         {
@@ -48,6 +48,9 @@ public class MyApplicationModel
 
     private static IDictionary<string,string> ForType(Type type)
     {
+
+
+
         return type.GetAttributes();
     }
 
@@ -100,7 +103,7 @@ public class MyApplicationModel
             var methods = selfMethods.Except(parentMethods).ToList();
             foreach (string name in methods)
             {
-                Console.WriteLine(name);
+                this.Info(name);
                 MethodInfo method = controllerType.GetMethods().First(m => name==m.Name);
                 if (method.IsPublic && method.Name.StartsWith("get_") == false && method.Name.StartsWith("set_") == false)
                 {
@@ -133,7 +136,8 @@ public class MyApplicationModel
         return model;
     }
 
-    private IDictionary<string, string> ForMethod(Type controllerType, string name)
+    private 
+        IDictionary<string, string> ForMethod(Type controllerType, string name)
     {
         return controllerType.GetMethodAttributes(name);
     }

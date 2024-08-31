@@ -184,12 +184,12 @@ namespace pickpoint_delivery_service
 
         public IEnumerable<Order> GetOrders(int customerId)
         {
-            return _deliveryDbContext.Orders.Include(o => o.Holder).Include(o => o.OrderItems).Where(o => o.CustomerID == customerId).OrderByDescending(o => o.OrderCreated);
+            return _deliveryDbContext.Orders.Include(o => o.Holder).Include(o => o.OrderItems).Where(o => o.CustomerId == customerId).OrderByDescending(o => o.OrderCreated);
         }
 
         private IEnumerable<OrderItem> GetOrderItems(int orderId)
         {
-            return _deliveryDbContext.OrderItems.Where(o => o.OrderID == orderId);
+            return _deliveryDbContext.OrderItems.Where(o => o.OrderId == orderId);
         }
 
         private int UpdateOrder(Order order)
@@ -208,9 +208,9 @@ namespace pickpoint_delivery_service
 
             var item = new OrderItem()
             {
-                ProductID = productCount,
+                ProductId = productCount,
                 ProductCount = productCount,
-                OrderID = orderId
+                OrderId = orderId
             };
             _deliveryDbContext.OrderItems.Add(item);
             return _deliveryDbContext.SaveChanges();
@@ -314,7 +314,7 @@ namespace pickpoint_delivery_service
             services.AddSingleton(typeof(IEntityFasade<CustomerContext>), sp => new EntityFasade<CustomerContext>(sp.GetService<DeliveryDbContext>()));
 
             services.AddSingleton<IKeywordsParserService, StupidKeywordsParserService>();
-            services.AddSingleton<IDeliveryDbContextInitiallizer, DeliveryDbContextInitiallizer>();
+            services.AddSingleton<IdeliveryDbContextInitiallizer, DeliveryDbContextInitiallizer>();
             services.AddSingleton<DeliveryUnitOfWork>();
 
             services.AddTransient<IOrdersService, OrdersService>();
@@ -353,7 +353,7 @@ namespace pickpoint_delivery_service
             services.AddScoped(typeof(IEntityFasade<CustomerContext>), sp => new EntityFasade<CustomerContext>(sp.GetService<DeliveryDbContext>()));
             services.AddScoped<IOrdersService, OrdersService>();
             //services.AddScoped<UnitOfWork>();
-            services.AddScoped<IDeliveryDbContextInitiallizer, DeliveryDbContextInitiallizer>();
+            services.AddScoped<IdeliveryDbContextInitiallizer, DeliveryDbContextInitiallizer>();
             services.AddTransient<IProductsInStockService, ProductsInStockService>();
             services.AddScoped<IKeywordsParserService, StupidKeywordsParserService>();
             services.AddTransient<ITransportService, TransportService>();
@@ -908,7 +908,7 @@ namespace pickpoint_delivery_service
 
 
             /// <summary>
-            /// Проверка стиля записи SnakeStyle( user_id, USER_ID )
+            /// Проверка стиля записи SnakeStyle( user_id, USER_Id )
             /// </summary>
             /// <param name="name"> идентификатор </param>
             /// <returns> true, если идентификатор записан в SnakeStyle </returns>
@@ -982,7 +982,7 @@ namespace pickpoint_delivery_service
 
 
             /// <summary>
-            /// Проверка стиля записи KebabStyle( user-id, USER-ID )
+            /// Проверка стиля записи KebabStyle( user-id, USER-Id )
             /// </summary>
             /// <param name="name"> идентификатор </param>
             /// <returns> true, если идентификатор записан в KebabStyle </returns>

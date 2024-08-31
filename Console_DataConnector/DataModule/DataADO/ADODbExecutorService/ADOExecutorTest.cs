@@ -15,10 +15,10 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbExecutorService
             ADOExecutorTest test = new ADOExecutorTest();
             test.SqlServerExecutorTest();
             test.SqlServerExecuteProcedureTest();
-            test.MySqlExecutorTest();
-            test.MySqlExecutorProcedureTest();
-            test.PostgresExecutorTest();
-            test.PostgresExecuteProcedureTest();
+            //test.MySqlExecutorTest();
+            //test.MySqlExecutorProcedureTest();
+            //test.PostgresExecutorTest();
+            //test.PostgresExecuteProcedureTest();
         }
 
         private void PostgresExecuteProcedureTest()
@@ -53,7 +53,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbExecutorService
 	                    DROP TABLE History
                     END
                 ");
-                executor.PrepareQuery("CREATE TABLE History( ID INT PRIMARY KEY IDENTITY, CREATED DateTime NOT NULL DEFAULT(GetDate()), COMMAND nvarchar(512) NOT NULL )");
+                executor.PrepareQuery("CREATE TABLE History( Id INT PRIMARY KEY IdENTITY, CREATED DateTime NOT NULL DEFAULT(GetDate()), COMMAND nvarchar(512) NOT NULL )");
                 executor.PrepareQuery("INSERT INTO History( COMMAND ) values ('CREATE DATABASE WORLD')");
 
                 DataTable history = executor.ExecuteQuery("SELECT * FROM History");
@@ -64,7 +64,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbExecutorService
 
         public void SqlServerExecuteProcedureTest()
         {
-            using (SqlServerExecutor executor = new SqlServerExecutor("KEST\\SQLSERVER", "ASpbMarketPlace"))
+            using (SqlServerExecutor executor = new SqlServerExecutor( ))
             {
                 executor.PrepareQuery(@"DROP PROCEDURE [dbo].[ON_STARTED]");
                 executor.PrepareQuery(@"

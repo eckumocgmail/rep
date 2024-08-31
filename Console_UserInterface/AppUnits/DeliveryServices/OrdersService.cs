@@ -20,13 +20,13 @@ namespace pickpoint_delivery_service
         public Order GetOrder(int id)
         {
             var order = _unit.Orders.Include(o => o.Holder).FirstOrDefault(o => o.Id == id);
-            order.OrderItems = _unit.OrderItems.Include(o => o.Product).Include(o => o.Product.ProductImages).Where(item => item.OrderID == id).ToList();
+            order.OrderItems = _unit.OrderItems.Include(o => o.Product).Include(o => o.Product.ProductImages).Where(item => item.OrderId == id).ToList();
             return order;
         }
 
         public Order CreateOrder(int customerId)
         {
-            var result = new Order() { CustomerID = customerId };
+            var result = new Order() { CustomerId = customerId };
             _unit.Orders.Add(result);
             CustomerContext customer = _unit.Customers.FirstOrDefault(customer => customer.Id == customerId);
             if (customer is null)
@@ -75,12 +75,12 @@ namespace pickpoint_delivery_service
             }
             var user = _signin.Verify();
             var customer = GetCustomerByUser(user);
-            return _unit.Orders.Include(o => o.Holder).Include(o => o.OrderItems).Where(order => order.CustomerID == customer.Id).OrderByDescending(o => o.OrderCreated).ToList();
+            return _unit.Orders.Include(o => o.Holder).Include(o => o.OrderItems).Where(order => order.CustomerId == customer.Id).OrderByDescending(o => o.OrderCreated).ToList();
         }
 
         public IEnumerable<OrderItem> GetOrderItems(int orderId)
         {
-            return _unit.OrderItems.Include(o => o.Product).Include(o => o.Product.ProductImages).Where(item => item.OrderID == orderId);
+            return _unit.OrderItems.Include(o => o.Product).Include(o => o.Product.ProductImages).Where(item => item.OrderId == orderId);
         }
 
         public void CancellOrder(int orderId)
@@ -95,9 +95,9 @@ namespace pickpoint_delivery_service
             var order = _unit.Orders.Find(orderId);
             order?.OnOrderCompleted();
             _unit.SaveChanges();
-            foreach (var orderItem in _unit.OrderItems.Include(o => o.Product).Where(item => item.OrderID == orderId))
+            foreach (var orderItem in _unit.OrderItems.Include(o => o.Product).Where(item => item.OrderId == orderId))
             {
-                var instock = _unit.ProductsInStock.First(ins => ins.HolderID == order.HolderID && ins.ProductID == orderItem.ProductID);
+                var instock = _unit.ProductsInStock.First(ins => ins.HolderId == order.HolderId && ins.ProductId == orderItem.ProductId);
                 instock.ProductsInReserve -= orderItem.ProductCount;
                 instock.ProductCount -= orderItem.ProductCount;
             }

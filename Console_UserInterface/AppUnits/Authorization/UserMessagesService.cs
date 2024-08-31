@@ -45,7 +45,7 @@ public class UserMessagesService : IUserMessagesService
         if (_signin.IsSignin() == false)
             throw new UnauthorizedAccessException("Метод доступен только авторизованным пользователям");
         int userId = _signin.Verify().Id;
-        return (from p in _context.UserMessages_ where p.ToUserID == userId select p).ToList();
+        return (from p in _context.UserMessages_ where p.ToUserId == userId select p).ToList();
     }
 
     public List<UserMessage> GetOutbox()
@@ -53,7 +53,7 @@ public class UserMessagesService : IUserMessagesService
         if (_signin.IsSignin() == false)
             throw new UnauthorizedAccessException("Метод доступен только авторизованным п6ользователям");
         int userId = _signin.Verify().Id;
-        return (from p in _context.UserMessages_ where p.FromUserID == userId select p).ToList();
+        return (from p in _context.UserMessages_ where p.FromUserId == userId select p).ToList();
     }
 
     public Dictionary<string, int> GetUsers()
@@ -67,7 +67,7 @@ public class UserMessagesService : IUserMessagesService
         if (_signin.IsSignin() == false)
             throw new UnauthorizedAccessException("Метод доступен только авторизованным п6ользователям");
         int userId = _signin.Verify().Id;
-        return (from p in _context.UserMessages_ where p.FromUserID == userId && p.Readed == false select p).Count();
+        return (from p in _context.UserMessages_ where p.FromUserId == userId && p.Readed == false select p).Count();
     }
 }
 

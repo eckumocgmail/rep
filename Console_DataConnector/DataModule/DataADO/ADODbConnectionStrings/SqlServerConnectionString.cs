@@ -20,19 +20,19 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbConnectionStrings
 
 
         [Display(Name = "Пользователь")]
-        public string UserID { get; set; }
+        public string UserId { get; set; }
 
         [Display(Name = "Пароль")]
         public string Password { get; set; }
 
-        public SqlServerConnectionString() : this("DESKTOP-IHJM9RD", "www") { }
+        public SqlServerConnectionString() : this("DESKTOP-IHJM9RD", "Messages") { }
         public SqlServerConnectionString(string server, string database) : this(server, database, true, "", "") { }
-        public SqlServerConnectionString(string server, string database, bool trustedConnection, string userID, string password)
+        public SqlServerConnectionString(string server, string database, bool trustedConnection, string userId, string password)
         {
             Server = server;
             Database = database;
             TrustedConnection = trustedConnection;
-            UserID = userID;
+            UserId = userId;
             Password = password;
         }
 
@@ -46,7 +46,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbConnectionStrings
             }
             else
             {
-                constr += $"UID={UserID};PWD={Password};Trust Server Certificate=False;MultipleActiveResultSets=true;Encrypt=False;";
+                constr += $"UId={UserId};PWD={Password};Trust Server Certificate=False;MultipleActiveResultSets=true;Encrypt=False;";
             }
             return constr;
         }

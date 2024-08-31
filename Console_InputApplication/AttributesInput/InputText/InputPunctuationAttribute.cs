@@ -25,7 +25,8 @@ public class InputPunctuationAttribute : BaseInputAttribute, MyValidation
     /// Конструктор
     /// </summary>
     /// <param name="message"> сообщение в случае возникновения исключения </param>
-    public InputPunctuationAttribute( string message="" ): base(InputTypes.Text)
+    public InputPunctuationAttribute() : base(InputTypes.Text) { }
+    public InputPunctuationAttribute( string message = "" ): base(InputTypes.Text)
     {
         _message = message;
     }

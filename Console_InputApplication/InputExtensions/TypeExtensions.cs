@@ -109,14 +109,14 @@ public static class StringExtensions
 }
 public static class TypeAttributesExtensions
 {
-    public static IDictionary<string, string> GetAttributes(this Type p)
+    public static Dictionary<string, string> GetAttributes(this Type p)
     {
 
         Dictionary<string, string> attrs = new Dictionary<string, string>();
         if (p == null)
         {
-            Console.WriteLine($"Вам слендует передать ссылку на Type в метод Utils.GetEntityContrainsts() вместо null");
-            Console.WriteLine($"{new ArgumentNullException("p")}");
+            p.Info($"Вам слендует передать ссылку на Type в метод Utils.GetEntityContrainsts() вместо null");
+            p.Info($"{new ArgumentNullException("p")}");
             return attrs;
         }
         foreach (var data in p.GetCustomAttributesData())

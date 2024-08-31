@@ -6,7 +6,7 @@ namespace ValidationAnnotationsNS { }
 public class IObjectWithId: MyValidatableObject
 {
     [Key]
-    public virtual int ID { get; set; } = 0;
+    public override int Id { get; set; } = 0;
 
     [InputText]
     [NotMapped]

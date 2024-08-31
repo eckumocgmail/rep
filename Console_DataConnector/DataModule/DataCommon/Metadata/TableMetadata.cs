@@ -28,7 +28,7 @@ namespace DataCommon.DatabaseMetadata
             }
         }
 
-        public int ID { get; set; } = 1;
+        public int Id { get; set; } = 1;
 
         public string TableCatalog { get; set; }
         public string TableSchema { get; set; }
@@ -42,7 +42,7 @@ namespace DataCommon.DatabaseMetadata
         public IDictionary<string, ColumnMetadata> ColumnsMetadata { get; set; }
 
         [NotNullNotEmpty]
-        public string PrimaryKey { get; set; } = "ID";
+        public string PrimaryKey { get; set; } = "Id";
 
         /// <summary>
         /// Внешние ключи

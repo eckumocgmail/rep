@@ -35,6 +35,7 @@ public interface IEntityFasade<TEntity> where TEntity : class
     IEnumerable<object> SearchInPropertiesPage(string query, string[] properties, int page, int size);
     IEnumerable<TEntity> SearchPage(string query, int page, int size);
     int Update(params TEntity[] items);
+    int Count();
 }
 
 
@@ -64,10 +65,10 @@ public class DbEntityFasade<TEntity> : IEntityFasade<TEntity> where TEntity : cl
     }
 
     public IEnumerable<TEntity> Get(params int[] ids)
-        => GetDbSet().Where(item => ids.Contains(int.Parse(item.GetType().GetProperty("ID").ToString())));
+        => GetDbSet().Where(item => ids.Contains(int.Parse(item.GetType().GetProperty("Id").ToString())));
 
     public IEnumerable<TEntity> GetPage(int[] ids, int page, int size)
-        => GetDbSet().Where(item => ids.Contains(int.Parse(item.GetType().GetProperty("ID").ToString()))).Skip((page - 1) * size).Take(size);
+        => GetDbSet().Where(item => ids.Contains(int.Parse(item.GetType().GetProperty("Id").ToString()))).Skip((page - 1) * size).Take(size);
 
     public IEnumerable<TEntity> GetAll() => GetDbSet();
 
@@ -193,6 +194,11 @@ public class DbEntityFasade<TEntity> : IEntityFasade<TEntity> where TEntity : cl
     private Dictionary<string,int> ParseKeywords(string v)
     {
         throw new NotImplementedException();
+    }
+
+    public int Count()
+    {
+        return GetDbSet().Count();
     }
 }
 public static class StringExtensinos

@@ -42,11 +42,11 @@ namespace Console_UserInterface
             }
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            //UseApi(app);
+            
             app.UseRouting();
             app.MapControllers();
-            //UseOdbc(app);
-            
+            UseOdbc(app);
+            UseApi(app);
             app.MapBlazorHub();
             app.MapFallbackToPage("/_Host");
             app.Run();
@@ -54,6 +54,7 @@ namespace Console_UserInterface
 
         public static void ConfigureServices(WebApplicationBuilder builder)
         {
+            
             builder.Services.AddBlazorBootstrap();
 
             // Add services to the container.
@@ -163,7 +164,7 @@ namespace Console_UserInterface
 
         private static void UseOdbc(WebApplication app)
         {
-            var odbc = new OdbcSqlServerDataSource("DSN=" + "ASpbMarketPlace" + ";UID=" + "root" + ";PWD=" + "sgdf1423" + ";");
+            var odbc = new OdbcSqlServerDataSource("DSN=" + "ASpbMarketPlace" + ";UId=" + "root" + ";PWD=" + "sgdf1423" + ";");
             odbc.EnsureIsValide();
             var dm = new OdbcDatabaseManager(odbc);
 

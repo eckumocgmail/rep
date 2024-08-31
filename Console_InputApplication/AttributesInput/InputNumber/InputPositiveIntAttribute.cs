@@ -8,7 +8,8 @@ public class InputPositiveIntAttribute : InputNumberAttribute
 {
     protected string _message;
 
-    public InputPositiveIntAttribute(string message=null)
+    public InputPositiveIntAttribute() : base(InputTypes.Time) { }
+    public InputPositiveIntAttribute(string message )
     {
         _message = message;
     }

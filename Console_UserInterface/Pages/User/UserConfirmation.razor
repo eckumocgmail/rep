@@ -29,7 +29,7 @@
             if (signin.IsSignin() == false)
                 return;
             var user = signin.Verify();
-            var uid = user.AccountID;
+            var uid = user.AccountId;
             authdb.UserAccounts_.First(u => u.Id == uid).ActivationKey = code;
             authdb.SaveChanges();
         }

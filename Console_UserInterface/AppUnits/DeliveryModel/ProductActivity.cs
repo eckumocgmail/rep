@@ -11,13 +11,13 @@ namespace Mvc_Apteka.Entities
     public class ProductActivity
     {         
         [Key]
-        public int ID { get; set; }
+        public int Id { get; set; }
 
 
         /// <summary>
         /// ИД продукции
         /// </summary>
-        public int ProductID { get; set; }
+        public int ProductId { get; set; }
 
         /// <summary>
         /// Наименование изменённой продукции

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Console_DataConnector.DataModule.DataADO.ADODbMetadataServices
 {
-    public interface IDbMetadata
+    public interface IdbMetadata
     {
 
         public IEnumerable<string> GetTableNames();
@@ -21,7 +21,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbMetadataServices
         public IDictionary<string, ParameterMetadata> GetParametersMetadata(string SchemaName, string ProcedureName);
     }
 
-    public class DbMetadata : IDbMetadata
+    public class DbMetadata : IdbMetadata
     {
         public IDictionary<string, TableMetadata> Tables { get; set; } = new Dictionary<string, TableMetadata>();
         public IDictionary<string, ColumnMetadata> Columns { get; set; } = new Dictionary<string, ColumnMetadata>();

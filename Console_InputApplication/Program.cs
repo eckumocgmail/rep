@@ -45,14 +45,14 @@ namespace Console_InputApplicationTemp
 
             string text = "";
             int n = 1;
-            Console.WriteLine(cs);
+            this.Info(cs);
             int i = cs.IndexOf("class " + className);
             if (i == -1)
                 throw new ArgumentException(cs, className);
             while (cs[i] != '{')
             {
                 Console.Clear();
-                Console.WriteLine(cs.Substring(i));
+                this.Info(cs.Substring(i));
                 ++i;
             }
             ++i;
@@ -98,13 +98,13 @@ namespace Console_InputApplicationTemp
         private static string[] TestInputFunctions(string[] args)
         {
 
-            Console.WriteLine(GetMethodCsCode(
+            this.Info(GetMethodCsCode(
                 @"""
                 public class Test
                 {
                     public void Run()
                     {
-                        Console.WriteLine(1);
+                        this.Info(1);
                     }
                 """,
                 "Test", "Run"
@@ -119,13 +119,13 @@ namespace Console_InputApplicationTemp
             IEnumerable<string> options = new List<string>() { "1", "2", "3" };
             InputConsole.Interactive();
             var items = InputConsole.CheckList(title, options, ref args);
-            Console.WriteLine(items.ToJsonOnScreen());
+            this.Info(items.ToJsonOnScreen());
             Console.ReadKey();
             var selected = ProgramDialog.SingleSelect(title, options, ref args);
-            Console.WriteLine(selected);
+            this.Info(selected);
             Console.ReadKey();
 
-            Console.WriteLine(InputConsole.CheckList("Выбери", new string[] { "1", "2", "3", "4" }, ref args));
+            this.Info(InputConsole.CheckList("Выбери", new string[] { "1", "2", "3", "4" }, ref args));
             return args;
         }*/
     }

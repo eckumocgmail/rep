@@ -40,7 +40,7 @@ public class ProgramCall: ProgramDirectory
             expressions.Add(exp.Substring(x1 + 2, x2 - x1 - 2));
             exp = exp.Substring(x2 + 2);
         }
-        expressions.ForEach((p) => { Console.WriteLine(p); });
+        expressions.ForEach((p) => { AppProviderService.GetInstance().Info(p); });
         return expressions;
     }
 

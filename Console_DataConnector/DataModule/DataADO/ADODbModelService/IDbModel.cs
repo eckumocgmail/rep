@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Console_DataConnector.DataModule.DataADO.ADODbModelService
 {
-    public interface IDbModel
+    public interface IdbModel
     {
         public ISet<Type> EntityTypes { get; set; }
         public Type[] GetEntityClasses();

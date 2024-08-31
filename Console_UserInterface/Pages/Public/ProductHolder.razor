@@ -55,7 +55,7 @@
         if (this.Id is null )
             this.Id = db.Holders.First().Id;
         this.OnSearch();
-        db.Orders.Add(this.OrderRef = new Order() { CustomerID = db.Customers.First().Id });
+        db.Orders.Add(this.OrderRef = new Order() { CustomerId = db.Customers.First().Id });
         this.holder = db.Holders.FirstOrDefault(holder => holder.Id == Id);
         db.SaveChanges();
     }
@@ -71,10 +71,10 @@
         this.SelectedProducts.Add(p);
         var item = new OrderItem()
         {
-            ProductID = product_id,
+            ProductId = product_id,
             Product = db.Products.Find(product_id),
             ProductCount = 1,
-            OrderID = OrderRef.Id
+            OrderId = OrderRef.Id
         };
         db.OrderItems.Add(item);
         db.SaveChanges();
@@ -89,7 +89,7 @@
         SearchOptions = fasade.GetOptions(SearchQuery).ToList();
         PagesCount = (SearchedProducts.Count() + SearchedProducts.Count() % 10) / 10;
         AvailableProducts = SearchedProducts.Skip((PageNumber - 1) * 10).Take(10).ToList();
-        AvailableProducts.ForEach(product => product.ProductImages = db.ProductImages.Where(i => i.ProductID == product.Id).ToList());
+        AvailableProducts.ForEach(product => product.ProductImages = db.ProductImages.Where(i => i.ProductId == product.Id).ToList());
     }
        
      
@@ -155,7 +155,7 @@
                                                 <b>@product.ProductName </b>                                               
                                             </div>
                                             <div style="height: 20px; width: 100%; font-size: 14px; text-align: center;">
-                                                (осталось: <b>@db.ProductsInStock.First(instock => instock.ProductID == product.Id && instock.HolderID == Id).ProductCount</b> шт)
+                                                (осталось: <b>@db.ProductsInStock.First(instock => instock.ProductId == product.Id && instock.HolderId == Id).ProductCount</b> шт)
                                             </div>
                                         </div>
 

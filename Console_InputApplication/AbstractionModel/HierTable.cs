@@ -10,7 +10,7 @@ public class HierTable<T>: DictionaryTable
 {
 
     [DisplayName("Корневой каталог")]
-    public int? ParentID { get; set; }
+    public int? ParentId { get; set; }
 
     [Newtonsoft.Json.JsonIgnore]
     [JsonIgnore]

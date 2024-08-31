@@ -66,7 +66,7 @@ public class HttpHeaderTokenProvider : ITokenProvider
     public async Task Set(string id)
     {
 
-        Console.WriteLine($"{GetType().GetTypeName()} Set {id}");
+        this.Info($"{GetType().GetTypeName()} Set {id}");
         _http.HttpContext.Request.Headers["Authorization"] = $"Basic {id}";
         /*_http.HttpContext.Response.Cookies.Append(
                            "Authorization", id,

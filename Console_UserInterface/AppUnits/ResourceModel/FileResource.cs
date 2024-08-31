@@ -23,7 +23,7 @@ namespace ApplicationCommon.CommonResources
 
  
         [Label("Каталог")]
-        public int CatalogID { get; set; }
+        public int CatalogId { get; set; }
         public virtual FileCatalog Catalog { get; set; }
         
     }

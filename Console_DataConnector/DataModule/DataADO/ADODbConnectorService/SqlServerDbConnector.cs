@@ -12,27 +12,27 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbConnectorService
     /// Сервис выполнения sql-запросов 
     /// </summary>
     public class SqlServerDbConnector : SqlServerConnectionString,
-        IDbConnector<Microsoft.Data.SqlClient.SqlConnection>, IDisposable
+        IdbConnector<Microsoft.Data.SqlClient.SqlConnection>, IDisposable
     {
         private Microsoft.Data.SqlClient.SqlConnection _Connection;
 
 
         public SqlServerDbConnector() : base()
         {
-            Console.WriteLine("Create");
+            this.Info("Create");
         }
 
         public SqlServerDbConnector(string server, string database) : base(server, database)
         {
         }
 
-        public SqlServerDbConnector(string server, string database, bool trustedConnection, string userID, string password) : base(server, database, trustedConnection, userID, password)
+        public SqlServerDbConnector(string server, string database, bool trustedConnection, string userId, string password) : base(server, database, trustedConnection, userId, password)
         {
         }
 
         public Microsoft.Data.SqlClient.SqlConnection GetConnection()
         {
-            Console.WriteLine("GetConnection()");
+            
             if (_Connection == null)
             {
                 _Connection = CreateAndOpenConnection();
@@ -43,7 +43,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbConnectorService
 
         public new void Dispose()
         {
-            Console.WriteLine("Dispose()");
+            this.Info("Dispose()");
             if (_Connection != null)
             {
                 _Connection.Close();
@@ -53,7 +53,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbConnectorService
 
         public Microsoft.Data.SqlClient.SqlConnection CreateAndOpenConnection()
         {
-            Console.WriteLine($"CreateAndOpenConnection() => {base.ToString()}");
+            this.Info($"CreateAndOpenConnection() => {base.ToString()}");
             var connection = new Microsoft.Data.SqlClient.SqlConnection(base.ToString());
             connection.StateChange += OnStateChanged;
             connection.Open();
@@ -63,7 +63,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbConnectorService
 
         private void OnStateChanged(object sender, StateChangeEventArgs evt)
         {
-            Console.WriteLine($"{evt.OriginalState}=>{evt.CurrentState}");
+            this.Info($"{evt.OriginalState}=>{evt.CurrentState}");
         }
     }
 }

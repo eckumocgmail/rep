@@ -10,11 +10,12 @@ public class InputComboboxAttribute : BaseInputAttribute
     private readonly string entity;
     private readonly string property;
 
+    public InputComboboxAttribute() : base("Custom") { }
     public InputComboboxAttribute(string pair): base("Custom")
     {
         /*if( string.IsNullOrEmpty(pair) || pair.IndexOf(",") == -1)
         {
-            pair = "{{GetType().Name}},ID";
+            pair = "{{GetType().Name}},Id";
         }*/
         string[] spices = pair.Split(",");
         if (spices.Length != 2)

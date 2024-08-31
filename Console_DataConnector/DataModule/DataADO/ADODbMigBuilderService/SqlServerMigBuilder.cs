@@ -15,14 +15,14 @@ using System.Threading.Tasks;
 
 namespace Console_DataConnector.DataModule.DataADO.ADODbMigBuilderService
 {
-    public class SqlServerMigBuilder : SqlServerDbModel, IDbMigBuilder
+    public class SqlServerMigBuilder : SqlServerDbModel, IdbMigBuilder
     {
 
 
 
 
 
-        protected IDDLFactory DDLFactory = new SqlServerDDLFactory();
+        protected IdDLFactory DDLFactory = new SqlServerDDLFactory();
 
 
 
@@ -34,7 +34,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbMigBuilderService
         {
         }
 
-        public SqlServerMigBuilder(string server, string database, bool trustedConnection, string userID, string password) : base(server, database, trustedConnection, userID, password)
+        public SqlServerMigBuilder(string server, string database, bool trustedConnection, string userId, string password) : base(server, database, trustedConnection, userId, password)
         {
         }
 
@@ -46,8 +46,27 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbMigBuilderService
 
         public void CreateDatabase()
         {
-            foreach (var sql in DropAndCreate())            
-                PrepareQuery(sql.Up);            
+            foreach (var sql in DropAndCreate())
+            {
+                this.Info(sql.Up);
+                try
+                {
+                    PrepareQuery(sql.Down);
+                }
+                catch (Exception ex)
+                {
+                    this.Error($"Ошибка при выполнении {sql.Down}: {ex.Message}");
+                }
+                try
+                {
+                    PrepareQuery(sql.Up);
+                }
+                catch (Exception ex)
+                {
+                    this.Error($"Ошибка при выполнении {sql.Up}: {ex.Message}");
+
+                }
+            }
         }
 
 
@@ -57,46 +76,50 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbMigBuilderService
         /// </summary>       
         public DbMigCommand[] DropAndCreate()
         {
-            Console.WriteLine($"DropAndCreate()");
+            this.Info($"DropAndCreate()");
             List<DbMigCommand> commands = new List<DbMigCommand>();
-            try
+            InputConsole.Clear();
+            //таблицы
+            foreach (Type EntityType in EntityTypes)
             {
-                //таблицы
-                foreach (Type EntityType in EntityTypes)
+                var TableMetaData = DDLFactory.CreateTableMetaData(EntityType);
+                string TableSchema = TableMetaData.schema;
+                string TableName = TableMetaData.name;
+                string DropTable = @"DROP TABLE " + TableName;                                
+                var table = CreateTable(EntityType);
+                this.Info(table);
+
+                commands.Add(new DbMigCommand($"{"\n"}" +
+                    table,
+                    DropTable, commands.Count()));
+
+                //PrepareQuery(DropTable);
+                //PrepareQuery(table);
+            }
+
+
+            //внешние ключи
+            foreach (Type EntityType in EntityTypes)
+            {
+                foreach (var ForeignKey in GetForeignKeys(EntityType))
                 {
-                    var TableMetaData = DDLFactory.CreateTableMetaData(EntityType);
-                    string TableSchema = TableMetaData.schema;
-                    string TableName = TableMetaData.name;
-                    string DropTable = @"DROP TABLE " + TableName;
-
-                    commands.Add(new DbMigCommand($"{"\n"}" +
-                        CreateTable(EntityType),
-                        DropTable, commands.Count()));
-                }
-
-
-                //внешние ключи
-                foreach (Type EntityType in EntityTypes)
-                {
-                    foreach (var ForeignKey in GetForeignKeys(EntityType))
-                    {
-                        commands.Add(new DbMigCommand(
-                            $@"ALTER TABLE {ForeignKey.SourceTable}
-                                        ADD CONSTRAINT FK_{ForeignKey.SourceTable.Split(".")[1].ReplaceAll("[", "").ReplaceAll("]", "")}_{ForeignKey.SourceColumn} 
-                                        FOREIGN KEY ({ForeignKey.SourceColumn}) REFERENCES {ForeignKey.TargetTable.Split(".")[1]}({ForeignKey.TargetColumn});",
-                            $@"ALTER TABLE {ForeignKey.SourceTable}
-                                        DROP CONSTRAINT FK_{ForeignKey.SourceTable.Split(".")[1]}_{ForeignKey.SourceColumn} ", commands.Count()));
-                        //commands.Add($"ALTER TABLE {ForeignKey.SourceTable} "+
-                        //    $@"ADD CONSTRAINT FK_{ForeignKey.SourceTable.ReplaceAll(".","_")}_{ForeignKey.TargetTable.ReplaceAll(".","_")} FOREIGN KEY ({ForeignKey.SourceColumn}) REFERENCE {ForeignKey.TargetTable}({ForeignKey.TargetColumn})");
-                    }
+                    commands.Add(new DbMigCommand(
+                        $@"ALTER TABLE {ForeignKey.SourceTable}
+                                    ADD CONSTRAINT FK_{ForeignKey.SourceTable.Split(".")[1].ReplaceAll("[", "").ReplaceAll("]", "")}_{ForeignKey.SourceColumn} 
+                                    FOREIGN KEY ({ForeignKey.SourceColumn}) REFERENCES {ForeignKey.TargetTable.Split(".")[1]}({ForeignKey.TargetColumn});",
+                        $@"ALTER TABLE {ForeignKey.SourceTable}
+                                    DROP CONSTRAINT FK_{ForeignKey.SourceTable.Split(".")[1]}_{ForeignKey.SourceColumn} ", commands.Count()));
+                    //commands.Add($"ALTER TABLE {ForeignKey.SourceTable} "+
+                    //    $@"ADD CONSTRAINT FK_{ForeignKey.SourceTable.ReplaceAll(".","_")}_{ForeignKey.TargetTable.ReplaceAll(".","_")} FOREIGN KEY ({ForeignKey.SourceColumn}) REFERENCE {ForeignKey.TargetTable}({ForeignKey.TargetColumn})");
                 }
             }
+            /*}
             catch (Exception ex)
             {
                 var TypeName = MethodBase.GetCurrentMethod().DeclaringType.GetTypeName();
                 var MethodName = MethodBase.GetCurrentMethod().Name;                                                
                 this.Error($"Метод действия {TypeName}.{MethodName} не выполнен", ex);
-            }
+            }*/
 
             return commands.ToArray();
         }
@@ -120,9 +143,9 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbMigBuilderService
                 .Select(property => new KeyMetadata()
                 {
                     SourceTable = $"[{TableSchema}]" + "." + $"[{TableName}]",
-                    SourceColumn = property.Name.ToTSQLStyle() + "_ID",
+                    SourceColumn = property.Name/*.ToTSQLStyle()*/ + "_Id",
                     TargetTable = GetRefenceTableName(property),
-                    TargetColumn = "ID"
+                    TargetColumn = "Id"
                 }).ToArray();
         }
 
@@ -176,7 +199,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbMigBuilderService
 
                     //exec
                     Catch(() => PrepareQuery(message), (ex) => { this.Error(ex); });
-                    Console.WriteLine(message.Split("/n"));
+                    this.Info(message.Split("/n"));
                 };
 
 

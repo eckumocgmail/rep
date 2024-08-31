@@ -54,13 +54,13 @@ public class UserBusinessResourcesService
         while (prole != null)
         {
             codes.Add(prole.Code);
-            if (prole.ParentID == null)
+            if (prole.ParentId == null)
             {
                 break;
             }
             else
             {
-                prole = _context.Roles.Find((int)prole.ParentID);
+                prole = _context.Roles.Find((int)prole.ParentId);
             }
         }
         return codes;

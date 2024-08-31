@@ -9,7 +9,7 @@ namespace Console_DataConnector.DataModule.DataODBC.Manager
     public class OdbcTableManager : MyValidatableObject, ITableManager
     {
         [NotNullNotEmpty]
-        private APIDataSource datasource { get; set; }
+        private APIdataSource datasource { get; set; }
 
         [NotNullNotEmpty]
         private TableMetaData metadata { get; set; }
@@ -17,7 +17,7 @@ namespace Console_DataConnector.DataModule.DataODBC.Manager
 
         public OdbcTableManager() { }
 
-        public OdbcTableManager(string name, APIDataSource datasource, TableMetaData metadata)
+        public OdbcTableManager(string name, APIdataSource datasource, TableMetaData metadata)
         {
             this.datasource = datasource;
             this.metadata = metadata;
@@ -116,7 +116,7 @@ namespace Console_DataConnector.DataModule.DataODBC.Manager
                 string sql = "insert into " + metadata.name + "(" + keys + ") values (" + valuesstr + ")";
                 datasource.GetJsonResult(sql);
                 return 0;
-                //return this.datasource.ExecuteSingle(" SELECT LAST_INSERT_ID( ) as ID;")["ID"].Value<int>();
+                //return this.datasource.ExecuteSingle(" SELECT LAST_INSERT_Id( ) as Id;")["Id"].Value<int>();
             }
             else
             {
@@ -148,7 +148,7 @@ namespace Console_DataConnector.DataModule.DataODBC.Manager
                 string sql = "insert into " + metadata.name + "(" + keys + ") values (" + valuesstr + ")";
                 datasource.InsertBlob(sql, "@bin_data", data);
                 return 0;
-                //return this.datasource.ExecuteSingle(" SELECT LAST_INSERT_ID( ) as ID;")["ID"].Value<int>();
+                //return this.datasource.ExecuteSingle(" SELECT LAST_INSERT_Id( ) as Id;")["Id"].Value<int>();
 
             }
         }

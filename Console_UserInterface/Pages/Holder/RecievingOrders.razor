@@ -49,8 +49,8 @@
                         <td>@(ctn++)</td>
                         <td>@(((DateTime)order.OrderCreated).ToString("d"))</td>
                         <td>#@(order.Id)</td>
-                       @* <td>@(holdersService.GetCustomerPerson(order.CustomerID).GetFullName())</td>
-                <td>@(holdersService.GetCustomerPerson(order.CustomerID).Tel)</td>*@
+                       @* <td>@(holdersService.GetCustomerPerson(order.CustomerId).GetFullName())</td>
+                <td>@(holdersService.GetCustomerPerson(order.CustomerId).Tel)</td>*@
                         <td>@(((DateTime)order.OrderUpdated).ToString("d"))</td>
                         <td>@(order.OrderItems.Sum( item => item.ProductCount))</td>
                     </tr>

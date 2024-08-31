@@ -4,7 +4,7 @@
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        MessageModel.ToUserID = userMessages.GetUsers().First().Value;
+        MessageModel.ToUserId = userMessages.GetUsers().First().Value;
     }
 }
 <div class="card">
@@ -12,7 +12,7 @@
         <h2>Новое сообщение</h2>
         <div class="form-group">
             <label>Кому</label>
-            <select class="form-control" @onchange="(evt => { MessageModel.ToUserID = int.Parse(evt.Value.ToString()); } )">
+            <select class="form-control" @onchange="(evt => { MessageModel.ToUserId = int.Parse(evt.Value.ToString()); } )">
                 @foreach (var kv in userMessages.GetUsers())
                 {
                     <option value="@kv.Value">@kv.Key</option>
@@ -86,7 +86,7 @@
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"File: {file.Name} \n Exception: {ex.Message} \n Stack: {ex.StackTrace}");
+                this.Info($"File: {file.Name} \n Exception: {ex.Message} \n Stack: {ex.StackTrace}");
             }
         }
 
