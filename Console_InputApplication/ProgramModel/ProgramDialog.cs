@@ -47,7 +47,10 @@ public class ProgramDialog: ProgramBase
         string text = "";
         do
         {
-            text = InputConsole.InputString(name, value => value!=null & value.ToString().IsNumber() ? new List<string>() : new List<string>() {
+            text = InputConsole.InputString(name, 
+                value => value!=null & value.ToString().IsNumber() ? 
+                    new List<string>() : 
+                    new List<string>() {
                 "Значение не является числовым"
             }, ref args);
         } while (text.IsInt() == false);

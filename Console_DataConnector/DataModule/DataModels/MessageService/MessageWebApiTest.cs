@@ -4,22 +4,22 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Console_DataConnector.DataModule.DataModels.MessageModel
+namespace Console_DataConnector.DataModule.DataModels.MessageService
 {
-    public class MessageWebApiTest: TestingElement<MessageWebApi>
+    public class MessageWebApiTest : TestingElement<MessageWebApi>
     {
         public override void OnTest()
         {
             var api = new MessageWebApi();
             api.DropAndCreate();
-            
+
             api.InitMessageAttributes();
             var protocolFasade = api.GetMessageProtocol();
             this.Info(protocolFasade.GetAll().ToJsonOnScreen());
             int protocolId = 0;
             this.Info(protocolId = protocolFasade.Create(new MessageProtocol()
             {
-                Name = "Logs"                
+                Name = "Logs"
             }));
 
             var properetyFasade = api.GetMessageProperty();
@@ -42,7 +42,7 @@ namespace Console_DataConnector.DataModule.DataModels.MessageModel
                 Id = properetyFasade.GetAll().First().Id,
                 Label = "ТЕст"
             });
-            this.Info(properetyFasade.GetAll().ToJsonOnScreen());            
+            this.Info(properetyFasade.GetAll().ToJsonOnScreen());
         }
     }
 }

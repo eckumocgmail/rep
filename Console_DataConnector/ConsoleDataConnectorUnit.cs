@@ -1,4 +1,5 @@
-using Console_DataConnector.DataModule.DataModels.MessageModel;
+
+using Console_DataConnector.DataModule.DataModels.MessageService;
 
 using System.Linq;
 

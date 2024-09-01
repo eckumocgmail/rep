@@ -24,6 +24,7 @@ using Microsoft.Extensions.Logging;
 using static ConsoleProgram;
 using static System.Net.Mime.MediaTypeNames;
 using AngleSharp.Common;
+using Microsoft.AspNetCore.Components.Forms;
 
 [Label("Программма ввода данных")]
 public class InputConsole: ProgramDialog   
@@ -529,7 +530,7 @@ public class InputConsole: ProgramDialog
             {
                 foreach(var error in errors)
                     AppProviderService.GetInstance().Info(error);
-            }            
+            }           
         } while (errors != null && errors.Count() != 0);
         return value;
     }
@@ -862,7 +863,7 @@ public class InputConsole: ProgramDialog
 
     public static object InputDateTime(string v, object value, ref string[] args)
     {
-        throw new NotImplementedException();
+        return InputDate(v, val => null, ref args);
     }
 
     public static object InputSmallMoney(string v, object value, ref string[] args)
@@ -897,12 +898,18 @@ public class InputConsole: ProgramDialog
 
     public static object InputTinyInt(string v, object value, ref string[] args)
     {
-        throw new NotImplementedException();
+        return InputNumber(v,val => null,ref args);
     }
 
-    public static object InputDateTimeOffset(string v, object value, ref string[] args)
+    public static string InputDateTimeOffset(string v, object fx, ref string[] args)
     {
-        throw new NotImplementedException();
+        string value = null;
+        do
+        {
+            value = InputText(v, null, ref args);
+        }
+        while (value is not null && value.IsDate() == false);
+        return value;
     }
 
     public static object InputUniqueIdentifier(string v, object value, ref string[] args)
@@ -917,7 +924,7 @@ public class InputConsole: ProgramDialog
 
     public static object InputSmallInt(string v, object value, ref string[] args)
     {
-        throw new NotImplementedException();
+        return InputNumber(v, val => null, ref args);
     }
 
     public static object InputDateTime2(string v, object value, ref string[] args)

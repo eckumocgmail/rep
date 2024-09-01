@@ -5,7 +5,7 @@ using Console_DataConnector.DataModule.DataADO.ADODbExecutorService;
 using Console_DataConnector.DataModule.DataADO.ADODbMetadataServices;
 using Console_DataConnector.DataModule.DataADO.ADODbMigBuilderService;
 using Console_DataConnector.DataModule.DataADO.ADOWebApiService;
-using Console_DataConnector.DataModule.DataModels.MessageModel;
+using Console_DataConnector.DataModule.DataModels.MessageService;
 
 using System;
 using System.Collections.Generic;
@@ -17,13 +17,13 @@ namespace Console_DataConnector
     {
         public static void Main(string[] args)
         {
-            new ConsoleDataConnectorUnit().Test();
+            /*new ConsoleDataConnectorUnit().Test();
             ADODbConnectorsTest.Run();
             ADOExecutorTest.Run();
             ADODbMetadataTest.Run();
-            ADODbMigBuilderTest.Run();
+            ADODbMigBuilderTest.Run();*/
           
-            //DataProgram.Run(args);
+            DataProgram.Run(ref args);
 
             /*var api = new MessageWebApi();
             api.Info(api.GetProceduresMetadata());

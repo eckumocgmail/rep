@@ -59,19 +59,23 @@ namespace Console_DataConnector.DataModule.DataADO.ADOWebApiService
 
                 }
                 catch (Exception ex) 
-                { 
+                {
+                    this.Error($"Выполнение: {cmd.Down} привело к исключению: {ex.Message}\n{ex.StackTrace}");
                 }
+
                 try
                 {
                     this.PrepareQuery(cmd.Up);
                 }
                 catch (Exception ex)
                 {
-
+                    this.Error($"Выполнение: {cmd.Up} привело к исключению: {ex.Message}\n{ex.StackTrace}");
                 }
             };
-            foreach(Type entity in this.EntityTypes)
+            Services.Clear();
+            foreach (Type entity in this.EntityTypes)
             {
+                
                 var rmd = GetTablesMetadata();
                 if (rmd.ContainsKey(entity.GetTypeName()) == false)
                 {

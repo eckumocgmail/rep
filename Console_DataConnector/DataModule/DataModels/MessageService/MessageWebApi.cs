@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Console_DataConnector.DataModule.DataModels.MessageModel
+namespace Console_DataConnector.DataModule.DataModels.MessageService
 {
     public class MessageWebApi : SqlServerWebApi
     {
@@ -17,10 +17,8 @@ namespace Console_DataConnector.DataModule.DataModels.MessageModel
             AddEntityType(typeof(MessageProperty));
             AddEntityType(typeof(MessageProtocol));
             AddEntityType(typeof(ValidationModel));
-            //CreateDatabase();
-            //DropAndCreate();
-            this.Init();
-         
+
+            Init();
         }
 
         public void InitMessageAttributes()
@@ -37,12 +35,12 @@ namespace Console_DataConnector.DataModule.DataModels.MessageModel
                     var at = ConvertToMessageAttribute(attribute);
                     GetMessageAttribute().Create(at);
                 }
-            }            
+            }
         }
 
         private IEnumerable<Type> GetBaseInputAttributes()
         {
-            return typeof(AppProviderService).Assembly.GetTypes<BaseInputAttribute>().Where( t => t.IsAbstract == false && t.GetTypeName().IndexOf("ControlAttribute")==-1 && t.GetTypeName().IndexOf("InputAttribute") == -1 && t.GetTypeName().IndexOf("BaseInput")==-1);
+            return typeof(AppProviderService).Assembly.GetTypes<BaseInputAttribute>().Where(t => t.IsAbstract == false && t.GetTypeName().IndexOf("ControlAttribute") == -1 && t.GetTypeName().IndexOf("InputAttribute") == -1 && t.GetTypeName().IndexOf("BaseInput") == -1);
         }
 
         private static MessageAttribute ConvertToMessageAttribute(Type attribute)
@@ -62,7 +60,7 @@ namespace Console_DataConnector.DataModule.DataModels.MessageModel
                 OracleDataType = attr.GetOracleDataType(),
                 Description = attribute.GetLabel() + ":\n" + attribute.GetDescription(),
                 //Icon = attribute.GetIcon(),
-                Name = attribute.GetTypeName(),                
+                Name = attribute.GetTypeName(),
                 InputType = (attribute.Name.StartsWith("Input") ? attribute.Name.Substring("Input".Length) : attribute.Name).Replace("Attribute", "")
             };
             res.ToJsonOnScreen().WriteToConsole();
@@ -74,9 +72,9 @@ namespace Console_DataConnector.DataModule.DataModels.MessageModel
             return res;
         }
 
-        public IEntityFasade<MessageProtocol> GetMessageProtocol() => this.GetFasade<MessageProtocol>();
-        public IEntityFasade<MessageProperty> GetMessageProperty() => this.GetFasade<MessageProperty>();
-        public IEntityFasade<MessageAttribute> GetMessageAttribute() => this.GetFasade<MessageAttribute>();
-        public IEntityFasade<ValidationModel> GetValidationModel() => this.GetFasade<ValidationModel>();
+        public IEntityFasade<MessageProtocol> GetMessageProtocol() => GetFasade<MessageProtocol>();
+        public IEntityFasade<MessageProperty> GetMessageProperty() => GetFasade<MessageProperty>();
+        public IEntityFasade<MessageAttribute> GetMessageAttribute() => GetFasade<MessageAttribute>();
+        public IEntityFasade<ValidationModel> GetValidationModel() => GetFasade<ValidationModel>();
     }
 }

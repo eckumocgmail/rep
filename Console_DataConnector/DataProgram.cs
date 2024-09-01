@@ -19,51 +19,7 @@ using Microsoft.Data.SqlClient;
 using System.Data;
 using Google.Protobuf.WellKnownTypes;
 using System.Drawing;
-
-public class DataConnectionManager
-{
-    public Dictionary<string, string> Connections { get; private set; }
-
-    public static void Start(ref string[] args)
-    {
-        var manager = new DataConnectionManager();
-        string filePath = @"D:\System-Config\" + nameof(DataConnectionManager) + ".json";
-        manager.GetDataSourceConnectionStringsFromFile( filePath);
-    }
-
-    public string GetByName(string name)
-    {
-
-        return Connections[name];
-    }
-
-    private void GetDataSourceConnectionStringsFromFile(string filePath)
-    {
-        if (System.IO.File.Exists(filePath) == false)
-        {
-            this.WriteDataSourceConnectionStringsToFile(filePath);
-        }
-        this.ReadDataSourceConnectionStringsFromFile(filePath);
-    }
-
-    private void ReadDataSourceConnectionStringsFromFile(string filePath)
-    {
-        this.Connections=System.IO.File.ReadAllText(filePath).FromJson<Dictionary<string, string>>();
-    }
-
-    private void WriteDataSourceConnectionStringsToFile(string filePath)
-    {
-        System.IO.File.WriteAllText(filePath, this.Connections.ToJsonOnScreen());
-    }
-
-    
-}
-
-
-
-
-
-
+ 
 namespace Console_DataConnector
 {
 
@@ -98,7 +54,7 @@ namespace Console_DataConnector
 
         static void Startup(string[] args)
         {
-            Run(args);
+            Run(ref args);
             var odbc = new OdbcDriverManager();
             odbc.GetOdbcDrivers();
             using (var sql = new SqlServerADODataSource())
@@ -129,8 +85,11 @@ namespace Console_DataConnector
             }
         }
 
-        public static void Run(string[] args)
+        public static void Run(ref string[] args)
         {
+
+          
+
             SqlServerExecutor Executor = null;
 
             IdbMetadata DataSource = null;
@@ -187,11 +146,11 @@ namespace Console_DataConnector
                 var results = new Dictionary<string, string>();
                 var arguments = new Dictionary<string, string>();
                                 
-                foreach (var kv in procdureMetadata.ParametersMetadata)
+                foreach (KeyValuePair<string,ParameterMetadata> kv in procdureMetadata.ParametersMetadata)
                 {
                     ParameterMetadata parameterMetadata = kv.Value;
                         
-
+                    
                     SqlParameter parameter = new SqlParameter();
                     parameter.ParameterName = kv.Key;
                     switch (kv.Value.ParameterMode)
@@ -202,181 +161,193 @@ namespace Console_DataConnector
                         default: throw new Exception("На удалось определить модефикатор параметра ParameterDirection");
 
                     }
-                        
-                      
-                    InputConsole.Get().Info(parameterMetadata.DataType.ToCapitalStyle());
-                    switch (parameterMetadata.DataType.ToCapitalStyle())
+
+                    InputConsole.Clear();
+                    InputConsole.Get().Info(kv.Key + " " + parameterMetadata );
+                    if (parameterMetadata.DataType is null)
+                        throw new Exception("DataType не задан");
+                    switch (parameterMetadata.DataType.ToCapitalStyle().ToLower())
                     {
-                        //     System.Int64. A 64-bit signed integer.
-                        case "Text":
+                        case "text":
                             {
                                 parameter.SqlDbType = SqlDbType.Text;
-                                if(parameter.Direction == ParameterDirection.Input )parameter.Value = InputConsole.InputText($"{kv.Key} {kv.Value.DataType}", null, ref args);
+                                if (parameter.Direction == ParameterDirection.Input)
+                                {
+                                    var test = InputConsole.InputText("test", val => null, ref args);
+                                    parameter.Value = InputConsole.InputText(
+                                        $"{kv.Key} {kv.Value.DataType}",
+                                        (val) => null,
+                                        ref args);
+                                }
                                 break;
                             }
-                        case "SmallMoney":
+                        case "smallmoney":
                             {
                                 parameter.SqlDbType = SqlDbType.SmallMoney;
-                                if(parameter.Direction == ParameterDirection.Input )parameter.Value = InputConsole.InputSmallMoney($"{kv.Key} {kv.Value.DataType}", null, ref args);
+                                if(parameter.Direction == ParameterDirection.Input  || parameter.Direction == ParameterDirection.InputOutput )parameter.Value = InputConsole.InputSmallMoney($"{kv.Key} {kv.Value.DataType}", null, ref args);
                                 break;
                             }
-                        case "Structured":
+                        case "structured":
                             {
                                 parameter.SqlDbType = SqlDbType.Structured;
-                                if(parameter.Direction == ParameterDirection.Input )parameter.Value = InputConsole.InputStructured($"{kv.Key} {kv.Value.DataType}", null, ref args);
+                                if(parameter.Direction == ParameterDirection.Input  || parameter.Direction == ParameterDirection.InputOutput )parameter.Value = InputConsole.InputStructured($"{kv.Key} {kv.Value.DataType}", null, ref args);
                                 break;
                             }
-                        case "Udt":
+                        case "udt":
                             {
                                 parameter.SqlDbType = SqlDbType.Udt;
-                                if(parameter.Direction == ParameterDirection.Input )parameter.Value = InputConsole.InputUdt($"{kv.Key} {kv.Value.DataType}", null, ref args);
+                                if(parameter.Direction == ParameterDirection.Input  || parameter.Direction == ParameterDirection.InputOutput )parameter.Value = InputConsole.InputUdt($"{kv.Key} {kv.Value.DataType}", null, ref args);
                                 break;
                             }
-                        case "Date":
+                        case "date":
                             {
                                 parameter.SqlDbType = SqlDbType.Date;
-                                if(parameter.Direction == ParameterDirection.Input )parameter.Value = InputConsole.InputDate($"{kv.Key} {kv.Value.DataType}", null, ref args);
+                                if(parameter.Direction == ParameterDirection.Input  || parameter.Direction == ParameterDirection.InputOutput )parameter.Value = InputConsole.InputDate($"{kv.Key} {kv.Value.DataType}", null, ref args);
                                 break;
                             }
-                        case "Time":
+                        case "time":
                             {
                                 parameter.SqlDbType = SqlDbType.Time;
-                                if(parameter.Direction == ParameterDirection.Input )parameter.Value = InputConsole.InputTime($"{kv.Key} {kv.Value.DataType}", null, ref args);
+                                if(parameter.Direction == ParameterDirection.Input  || parameter.Direction == ParameterDirection.InputOutput )parameter.Value = InputConsole.InputTime($"{kv.Key} {kv.Value.DataType}", null, ref args);
                                 break;
                             }
-                        case "Variant":
+                        case "variant":
                             {
                                 parameter.SqlDbType = SqlDbType.Variant;
-                                if(parameter.Direction == ParameterDirection.Input )parameter.Value = InputConsole.InputVariant($"{kv.Key} {kv.Value.DataType}", null, ref args);
+                                if(parameter.Direction == ParameterDirection.Input  || parameter.Direction == ParameterDirection.InputOutput )parameter.Value = InputConsole.InputVariant($"{kv.Key} {kv.Value.DataType}", null, ref args);
                                 break;
                             }
-                        case "Xml":
+                        case "xml":
                             {
                                 parameter.SqlDbType = SqlDbType.Xml;
-                                if(parameter.Direction == ParameterDirection.Input )parameter.Value = InputConsole.InputXml($"{kv.Key} {kv.Value.DataType}", null, ref args);
+                                if(parameter.Direction == ParameterDirection.Input  || parameter.Direction == ParameterDirection.InputOutput )parameter.Value = InputConsole.InputXml($"{kv.Key} {kv.Value.DataType}", null, ref args);
                                 break;
                             }
-                        case "VarBinary":
+                        case "varbinary":
                             {
                                 parameter.SqlDbType = SqlDbType.VarBinary;
-                                if(parameter.Direction == ParameterDirection.Input )parameter.Value = InputConsole.InputVarBinary($"{kv.Key} {kv.Value.DataType}", null, ref args);
+                                if(parameter.Direction == ParameterDirection.Input  || parameter.Direction == ParameterDirection.InputOutput )parameter.Value = InputConsole.InputVarBinary($"{kv.Key} {kv.Value.DataType}", null, ref args);
                                 break;
                             }
-                        case "Timestamp":
+                        case "timestamp":
                             {
                                 parameter.SqlDbType = SqlDbType.Timestamp;
-                                if(parameter.Direction == ParameterDirection.Input )parameter.Value = InputConsole.InputTimestamp($"{kv.Key} {kv.Value.DataType}", null, ref args);
+                                if(parameter.Direction == ParameterDirection.Input  || parameter.Direction == ParameterDirection.InputOutput )parameter.Value = InputConsole.InputTimestamp($"{kv.Key} {kv.Value.DataType}", null, ref args);
                                 break;
                             }
-                        case "TinyInt":
+                        case "tinyInt":
                             {
                                 parameter.SqlDbType = SqlDbType.TinyInt;
-                                if(parameter.Direction == ParameterDirection.Input )parameter.Value = InputConsole.InputTinyInt($"{kv.Key} {kv.Value.DataType}", null, ref args);
+                                if(parameter.Direction == ParameterDirection.Input  || parameter.Direction == ParameterDirection.InputOutput )parameter.Value = InputConsole.InputTinyInt($"{kv.Key} {kv.Value.DataType}", null, ref args);
                                 break;
                             }
-                        case "DateTimeOffset":
+                        case "datetimeoffset":
                             {
                                 parameter.SqlDbType = SqlDbType.DateTimeOffset;
-                                if(parameter.Direction == ParameterDirection.Input )parameter.Value = InputConsole.InputDateTimeOffset($"{kv.Key} {kv.Value.DataType}", null, ref args);
+                                if(parameter.Direction == ParameterDirection.Input  || parameter.Direction == ParameterDirection.InputOutput )
+                                    parameter.Value = InputConsole.InputDateTimeOffset($"{kv.Key} {kv.Value.DataType}", null, ref args);
                                 break;
                             }
-                        case "DateTime2":
+                        case "datetime2":
                             {
                                 parameter.SqlDbType = SqlDbType.DateTime2;
-                                if(parameter.Direction == ParameterDirection.Input )parameter.Value = InputConsole.InputDateTime2($"{kv.Key} {kv.Value.DataType}", null, ref args);
+                                if(parameter.Direction == ParameterDirection.Input  || parameter.Direction == ParameterDirection.InputOutput )parameter.Value = InputConsole.InputDateTime2($"{kv.Key} {kv.Value.DataType}", null, ref args);
                                 break;
                             }
-                        case "SmallInt":
+                        case "smallint":
                             {
                                 parameter.SqlDbType = SqlDbType.SmallInt;
-                                if(parameter.Direction == ParameterDirection.Input )parameter.Value = InputConsole.InputSmallInt($"{kv.Key} {kv.Value.DataType}", null, ref args);
+                                if(parameter.Direction == ParameterDirection.Input  || parameter.Direction == ParameterDirection.InputOutput )parameter.Value = InputConsole.InputSmallInt($"{kv.Key} {kv.Value.DataType}", null, ref args);
                                 break;
                             }
-                        case "SmallDateTime":
+                        case "smalldatetime":
                             {
                                 parameter.SqlDbType = SqlDbType.SmallDateTime;
-                                if(parameter.Direction == ParameterDirection.Input )parameter.Value = InputConsole.InputSmallDateTime($"{kv.Key} {kv.Value.DataType}", null, ref args);
+                                if(parameter.Direction == ParameterDirection.Input  || parameter.Direction == ParameterDirection.InputOutput )parameter.Value = InputConsole.InputSmallDateTime($"{kv.Key} {kv.Value.DataType}", null, ref args);
                                 break;
                             }
-                        case "UniqueIdentifier":
+                        case "uniqueidentifier":
                             {
                                 parameter.SqlDbType = SqlDbType.UniqueIdentifier;
-                                if(parameter.Direction == ParameterDirection.Input )parameter.Value = InputConsole.InputUniqueIdentifier($"{kv.Key} {kv.Value.DataType}", null, ref args);
+                                if(parameter.Direction == ParameterDirection.Input  || parameter.Direction == ParameterDirection.InputOutput )parameter.Value = InputConsole.InputUniqueIdentifier($"{kv.Key} {kv.Value.DataType}", null, ref args);
                                 break;
                             }
-                        case "Real":
+                        case "real":
                             {
                                 parameter.SqlDbType = SqlDbType.Real;
-                                if(parameter.Direction == ParameterDirection.Input )parameter.Value = InputConsole.InputReal($"{kv.Key} {kv.Value.DataType}", null, ref args);
+                                if(parameter.Direction == ParameterDirection.Input  || parameter.Direction == ParameterDirection.InputOutput )parameter.Value = InputConsole.InputReal($"{kv.Key} {kv.Value.DataType}", null, ref args);
                                 break;
                             }
-                        case "NVarChar":
+                        case "nvarchar":
                             {
                                 parameter.SqlDbType = SqlDbType.NVarChar;
-                                if(parameter.Direction == ParameterDirection.Input )parameter.Value = InputConsole.InputNumber($"{kv.Key} {kv.Value.DataType}", null, ref args);
+                                if (parameter.Direction == ParameterDirection.Input || parameter.Direction == ParameterDirection.InputOutput)
+                                {
+                                    parameter.Value = InputConsole.InputText($"{kv.Key} {kv.Value.DataType}", null, ref args);
+                                }                                    
                                 break;
                             }
-                        case "NCHAR":
+                        case "nchar":
                             {
                                 parameter.SqlDbType = SqlDbType.NChar;
-                                if(parameter.Direction == ParameterDirection.Input )parameter.Value = InputConsole.InputNchar($"{kv.Key} {kv.Value.DataType}", null, ref args);
+                                if(parameter.Direction == ParameterDirection.Input  || parameter.Direction == ParameterDirection.InputOutput )parameter.Value = InputConsole.InputNchar($"{kv.Key} {kv.Value.DataType}", null, ref args);
                                 break;
                             }
-                        case "Money":
+                        case "money":
                             {
                                 parameter.SqlDbType = SqlDbType.Money;
-                                if(parameter.Direction == ParameterDirection.Input )parameter.Value = InputConsole.InputMoney($"{kv.Key} {kv.Value.DataType}", null, ref args);
+                                if(parameter.Direction == ParameterDirection.Input  || parameter.Direction == ParameterDirection.InputOutput )parameter.Value = InputConsole.InputMoney($"{kv.Key} {kv.Value.DataType}", null, ref args);
                                 break;
                             }
-                        case "Int":
+                        case "int":
                             {
                                 parameter.SqlDbType = SqlDbType.Int;
                             parameter.Value = 0;
-                                if (parameter.Direction == ParameterDirection.Input )parameter.Value = InputConsole.InputInt($"{kv.Key} {kv.Value.DataType}", null, ref args);
+                                if (parameter.Direction == ParameterDirection.Input  || parameter.Direction == ParameterDirection.InputOutput )parameter.Value = InputConsole.InputInt($"{kv.Key} {kv.Value.DataType}", null, ref args);
                                 break;
                             }
-                        case "Image":
+                        case "image":
                             {
                                 parameter.SqlDbType = SqlDbType.Image;
-                                if(parameter.Direction == ParameterDirection.Input )parameter.Value = InputConsole.InputImage($"{kv.Key} {kv.Value.DataType}", null, ref args);
+                                if(parameter.Direction == ParameterDirection.Input  || parameter.Direction == ParameterDirection.InputOutput )parameter.Value = InputConsole.InputImage($"{kv.Key} {kv.Value.DataType}", null, ref args);
                                 break;
                             }
-                        case "Float":
+                        case "float":
                             {
                                 parameter.SqlDbType = SqlDbType.Float;
-                                if(parameter.Direction == ParameterDirection.Input )parameter.Value = InputConsole.InputFloat($"{kv.Key} {kv.Value.DataType}", null, ref args);
+                                if(parameter.Direction == ParameterDirection.Input  || parameter.Direction == ParameterDirection.InputOutput )parameter.Value = InputConsole.InputFloat($"{kv.Key} {kv.Value.DataType}", null, ref args);
                                 break;
                             }
-                        case "Decimal":
+                        case "decimal":
                             {
                                 parameter.SqlDbType = SqlDbType.Decimal;
-                                if(parameter.Direction == ParameterDirection.Input )parameter.Value = InputConsole.InputDecimal($"{kv.Key} {kv.Value.DataType}", null, ref args);
+                                if(parameter.Direction == ParameterDirection.Input  || parameter.Direction == ParameterDirection.InputOutput )parameter.Value = InputConsole.InputDecimal($"{kv.Key} {kv.Value.DataType}", null, ref args);
                                 break;
                             }
-                        case "DateTime":
+                        case "datetime":
                             {
                                 parameter.SqlDbType = SqlDbType.DateTime;
-                                if(parameter.Direction == ParameterDirection.Input )parameter.Value = InputConsole.InputDateTime($"{kv.Key} {kv.Value.DataType}", null, ref args);
+                                if(parameter.Direction == ParameterDirection.Input  || parameter.Direction == ParameterDirection.InputOutput )parameter.Value = InputConsole.InputDateTime($"{kv.Key} {kv.Value.DataType}", null, ref args);
                                 break;
                             }
                             //
-                        case "Char":
+                        case "char":
                             {
                                 parameter.SqlDbType = SqlDbType.Char;
-                                if(parameter.Direction == ParameterDirection.Input )parameter.Value = InputConsole.InputChar($"{kv.Key} {kv.Value.DataType}", null, ref args);
+                                if(parameter.Direction == ParameterDirection.Input  || parameter.Direction == ParameterDirection.InputOutput )parameter.Value = InputConsole.InputChar($"{kv.Key} {kv.Value.DataType}", null, ref args);
                                 break;
                             }
                         // 0 или 1
-                        case "Bit": 
+                        case "bit": 
                             {
                                 parameter.SqlDbType = SqlDbType.Bit;
-                                if(parameter.Direction == ParameterDirection.Input )parameter.Value = InputConsole.InputBool($"{kv.Key} {kv.Value.DataType}", null, ref args);
+                                if(parameter.Direction == ParameterDirection.Input  || parameter.Direction == ParameterDirection.InputOutput )parameter.Value = InputConsole.InputBool($"{kv.Key} {kv.Value.DataType}", null, ref args);
                                 break;
                             }
- 
-                        default: throw new NotSupportedException($"Тип данных хъ");
+  
+                        default: throw new NotSupportedException($"Тип данных {parameterMetadata.DataType.ToCapitalStyle()}");
                     }
-                    arguments[parameter.ParameterName] = parameter.Value.ToString();
+                    arguments[parameter.ParameterName] = parameter?.Value?.ToString();
                     command.Parameters.Add( parameter );
                 }
 
