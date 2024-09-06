@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
+﻿using System.ComponentModel;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
- 
+[Label("Иерархический справочник")]
 public class HierTable<T>: DictionaryTable
 {
 
+    [Label("Корневой каталог")]
     [DisplayName("Корневой каталог")]
     public int? ParentId { get; set; }
 

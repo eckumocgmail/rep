@@ -6,9 +6,7 @@ public class BaseEntity
 {
     [Key]
     [InputHidden()]
-    public virtual int Id { get; set; }
-     
-
+    public virtual int Id { get; set; }     
 } 
 
 

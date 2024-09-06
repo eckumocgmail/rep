@@ -1,0 +1,27 @@
+﻿@using Console_AuthModel.AuthorizationModel.UserModel;
+@using static AuthorizationDbContext;
+@inject SigninUser signin
+@inject GroupingUser userGrouping
+
+<div class="card">
+    <label>Мои группы</label>
+    <ul class="list-group">
+        @foreach (var option in userGrouping.GetSelectedOptions(signin.Verify()))
+        {
+            <li class="list-group-item" onmouseleave="this.classList.remove('active')" onmouseover="this.classList.add('active')">@option</li>
+        }
+    </ul>
+</div>
+
+
+<div class="card">
+    <h2>Доступные группы</h2>
+    <ul class="list-group">
+        @foreach (var option in userGrouping.GetAvailableOptions(signin.Verify()))
+        {
+            <li class="list-group-item" onmouseleave="this.classList.remove('active')" onmouseover="this.classList.add('active')" @onclick="evt => {userGrouping.AddToGroup(signin.Verify(), option); StateHasChanged();}">@option</li>
+        }
+    </ul>
+</div> 
+ 
+ 

@@ -13,7 +13,6 @@ using System.Text;
 public class ExecuterProgram
 {
 
-
     public static string StartDotnetApplication(string program, string wrk = null)
     {
         AppProviderService.GetInstance().Info(program);
@@ -32,8 +31,6 @@ public class ExecuterProgram
         AppProviderService.GetInstance().Info(text);
         InputConsole.ConfirmContinue();
         return text;
-
-
     }
 
 

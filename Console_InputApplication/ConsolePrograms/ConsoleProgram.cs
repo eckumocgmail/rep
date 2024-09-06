@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using static StackTraceExtensions;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 /// <summary>
 /// Программа управления объектом через консоль
@@ -515,18 +516,16 @@ public class ConsoleProgram: ProgressProgram
         try
         {
             var pType = ProgramData.GetType();
-            var methods = new Dictionary<string,string>(pType.GetOwnMethodNames().Select(name => new KeyValuePair<string, string>(pType.GetMethodLabel(name),name)));                        
-            string action = methods.SingleSelect("Выберите действие:", ref args);
-            ProgramAction = ProgramData.GetType().GetMethods().Where(m => m.Name == action).FirstOrDefault();
-            if (ProgramAction == null)
-                throw new Exception("Неправильно выполнена функция выбора из коллекции");
+            var methods = pType.GetMethodsLabels();
+
+            ProgramAction = pType.SelectMethod(ProgramData, ref args);
             RoutingProgram.Run(ProgramData.GetType().GetMethodLabel( ProgramAction.Name));
         }
         catch (CancelException)
         {
-            throw;
-        
-        }catch (Exception ex)
+            throw;        
+        }
+        catch (Exception ex)
         {
             WriteLine(ex);
         }
@@ -580,9 +579,14 @@ public class ConsoleProgram: ProgressProgram
 
             var console = new ConsoleProgram();
             console.ProgramData = instance == null ? ProgramType.New() : instance;
+
+
+            Console.Clear();
+            
             while (true)
             {
                 Console.Clear();
+                console.Info(instance is not null ? instance.GetTypeName() : "");
                 console.PrintProgramData(ref args);
                 console.SelectNextAction(ref args);
                 Console.Clear();

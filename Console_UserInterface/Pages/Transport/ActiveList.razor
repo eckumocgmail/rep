@@ -19,7 +19,7 @@
                 {
                     @foreach (var order in AvailableOrders.Where(item => item is not null))
                     {
-                        <li class="list-group-item" id="list_item_@(order.Id)" onmouseover="document.getElementById('list_item_@(order.Id)').classList.add('active')" onmouseleave="document.getElementById('list_item_@(order.Id)').classList.remove('active')" @onclick="(evt => { OnOrderSelected(order.Id);  })">@order.Id @order.Holder.HolderLocation</li>
+                        <li class="list-group-item" id="list_item_@(order.Id)" onmouseover="document.getElementById('list_item_@(order.Id)').classList.add('active')" onmouseleave="document.getElementById('list_item_@(order.Id)').classList.remove('active')" @onclick="(evt => { OnOrderSelected(order.Id);  })">@order.Id @(order is not null && order.Holder is not null ? order.Holder?.HolderLocation : "")</li>
                     }
                 }
             }
@@ -31,11 +31,11 @@
 
 @code
 {
-    List<Order> AvailableOrders = new();
+    IEnumerable<Order> AvailableOrders = new List<Order>();
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        this.AvailableOrders = user.GetActiveList().ToList();
+        this.AvailableOrders = user.GetActiveList();
     }
 
     public void OnOrderSelected(int orderId)

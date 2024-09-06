@@ -384,6 +384,7 @@ public class Attrs: Utils
         null;// 
 
 
+    public static List<string> GetInputTypes() => BaseInputAttribute.GetInputTypes();
     public static List<string> GetControlTypes()
     {
         if(CONTROL_TYPES == null)
@@ -400,8 +401,11 @@ public class Attrs: Utils
 
     public static string GetControlType(Type type, string property)
     {
+        if (type is null)
+            throw new ArgumentNullException("type");
         var attrs = Attrs.ForProperty(type, property);
-        return (from p in attrs.Keys where GetControlTypes().Contains(p) select p).SingleOrDefault();
+        var ctype=(from p in attrs.Keys where GetControlTypes().Contains(p) select p).SingleOrDefault();
+        return ctype;
     }
 
 

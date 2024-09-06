@@ -1,34 +1,19 @@
-﻿using Console_InputApplication.InputApplicationModule;
-
- 
-
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Net;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Console_InputApplication;
 using Microsoft.Extensions.Logging;
 using static ConsoleProgram;
-using static System.Net.Mime.MediaTypeNames;
 using AngleSharp.Common;
-using Microsoft.AspNetCore.Components.Forms;
 
 [Label("Программма ввода данных")]
 public class InputConsole: ProgramDialog   
 {
+
     public static int InputTcpPort(string title, ref string[] args)
     => InputConsole.InputPositiveNumber(
            title,
@@ -101,7 +86,7 @@ public class InputConsole: ProgramDialog
          
     }
     
-    private static void Test(ref string[] args)
+    private static void TestS(ref string[] args)
     {
         //ExceptionHandlingClause
         
@@ -1081,5 +1066,15 @@ public class InputConsole: ProgramDialog
                     }).ToList();
         
         return result;*/
+    }
+
+    internal static void Test(ref string[] args)
+    {
+        InputConsole.Interactive();
+        InputConsole.Input<MyActionModel>(
+            typeof(MyActionModel).GetLabel(),
+            null,
+            ref args
+        );
     }
 } 

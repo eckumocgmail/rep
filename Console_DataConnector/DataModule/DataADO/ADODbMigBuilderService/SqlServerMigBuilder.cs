@@ -1,30 +1,17 @@
-﻿
-
-
-using Console_DataConnector.DataModule.DataADO.ADODbModelService;
+﻿using Console_DataConnector.DataModule.DataADO.ADODbModelService;
+using Console_DataConnector.DataModule.DataADO.ADOWebApiService;
 using Console_DataConnector.DataModule.DataCommon.Metadata;
-
-using DataModule;
-
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 
 namespace Console_DataConnector.DataModule.DataADO.ADODbMigBuilderService
 {
     public class SqlServerMigBuilder : SqlServerDbModel, IdbMigBuilder
     {
-
-
-
-
-
         protected IdDLFactory DDLFactory = new SqlServerDDLFactory();
-
-
 
         public SqlServerMigBuilder(): base()
         {
@@ -38,9 +25,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbMigBuilderService
         {
         }
 
-
-
-        private string CreateTable(Type EntityType) 
+        private string CreateTable(System.Type EntityType) 
             => DDLFactory.CreateTable(EntityType);
 
 
@@ -177,7 +162,16 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbMigBuilderService
 
 
 
-
+        public void TestProcedures()
+        {
+            var api = new SqlServerWebApi();
+            foreach (var p in api.GetProceduresMetadata())
+            {
+                var input = new Dictionary<string, string>(p.Value.ParametersMetadata.Keys.Select(key => new KeyValuePair<string, string>(key, "1")));
+                api.Info(input.ToJsonOnScreen());
+                api.Info(api.Request($"/{p.Key}", input).Result);
+            }
+        }
         public void UpdateDatabase()
         {
             TryPrepareQuery(CreateTable(typeof(DbMigCommand)));

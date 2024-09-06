@@ -17,7 +17,7 @@
             {
                 @foreach (var order in AvailableOrders)
                 {
-                    <li class="list-group-item" id="list_item_@(order.Id)" onmouseover="document.getElementById('list_item_@(order.Id)').classList.add('active')" onmouseleave="document.getElementById('list_item_@(order.Id)').classList.remove('active')" @onclick="(evt => { OnOrderSelected(order.Id);  })">@order.Id @order.Holder.HolderLocation</li>
+                    <li class="list-group-item" id="list_item_@(order.Id)" onmouseover="document.getElementById('list_item_@(order.Id)').classList.add('active')" onmouseleave="document.getElementById('list_item_@(order.Id)').classList.remove('active')" @onclick="(evt => { OnOrderSelected(order.Id);  })">@order.Id @(order.Holder is not null ? order.Holder?.HolderLocation : "")</li>
                 }
             }
         </ul>

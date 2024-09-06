@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Console_AuthModel.AuthorizationModel.UserModel;
 
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 using Newtonsoft.Json;
@@ -23,11 +24,13 @@ public sealed class SignupUser : BaseSignup<UserContext, UserAccount, UserPerson
     private const string WebUserRoleCode = "customer";
     public DbContextUser _model;
 
-
-    public SignupUser(DbContextUser model)
+    private readonly IHttpContextAccessor httpContextAccessor;
+    public SignupUser(IHttpContextAccessor http, DbContextUser model)
     {
         this._model = model;
-       
+        this.httpContextAccessor = http;
+
+
     }
 
     public override bool Compare(UserAccount stored, UserAccount input) => stored.Password == input.Password;
@@ -145,16 +148,24 @@ public sealed class SignupUser : BaseSignup<UserContext, UserAccount, UserPerson
         {
             if (_model.UserAccounts_.Where(ctx => ctx.Email.ToUpper() == Email.ToUpper()).Count() > 0)
                 return MethodResult<UserContext>.OnError(new Exception("ѕользователь с таким email уже зарегистрирован"));
-            if (_model.UserPersons_.Where(ctx => ctx.Tel.ToUpper().Substring(ctx.Tel.Length-10) == Tel.ToUpper().Substring(Tel.Length - 10)).Count() > 0)
+            if (_model.UserPersons_.Where(ctx => ctx.Tel.ToUpper().Substring(ctx.Tel.Length - 10) == Tel.ToUpper().Substring(Tel.Length - 10)).Count() > 0)
                 return MethodResult<UserContext>.OnError(new Exception("ѕользователь с таким номером телефона уже зарегистрирован"));
+            if (_model.UserPersons_.Where(ctx => ctx.LastName.Trim().ToLower() == LastName.Trim().ToLower() && ctx.FirstName.Trim().ToLower() == FirstName.Trim().ToLower() && ctx.SurName.Trim().ToLower() == SurName.Trim().ToLower() ).Count() > 0)
+                return MethodResult<UserContext>.OnError(new Exception("ѕользователь с таким именем уже зарегистрирован"));
             try
             {
-                var context = new UserContext();
+                var context = new UserContext()
+                {
+                    Ip4 = "192.168.0.1",
+                    UserAgent = httpContextAccessor.HttpContext.Request.Headers.UserAgent,
+                    URL = httpContextAccessor.HttpContext.Request.GetDisplayUrl()
+                };
                 _model.Add(context.Wallet = new( ) { });
                 _model.Add(context.Account = new(Email, Password) { });
                 _model.Add(context.Person = new() { FirstName = FirstName, LastName = LastName, SurName = SurName, Birthday = Birthday, Tel = Tel });
                 _model.Add(context.Settings = new UserSettings());
                 _model.Add(context);
+                _model.SaveChanges();
 
                 Dictionary<string, List<string>> validaiton = new Dictionary<string, List<string>>();
                 context.Validate().ToList().ForEach(kv => validaiton[kv.Key]=kv.Value) ;                

@@ -1,6 +1,9 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc.RazorPages;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -98,6 +101,22 @@ public static class AttributesInfoExtensions
 
         return res;
     }
+
+    public static IDictionary<string, string> GetParameterAttributes(
+        this ParameterInfo par)
+    {
+        if (par == null)
+            throw new ArgumentException(nameof(par));
+        
+        var res = new Dictionary<string, string>(par.GetCustomAttributesData().Select(data => new KeyValuePair<string, string>(
+
+            TypeExtensions2.GetTypeName(data.AttributeType),
+            data.ConstructorArguments.First().Value.ToString()
+        )));
+
+        return res;
+    }
+
     public static Dictionary<string, string> GetMethodAttributes(
         this Type ptype, string method)
 

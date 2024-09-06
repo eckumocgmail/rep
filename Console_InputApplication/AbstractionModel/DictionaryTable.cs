@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 /// </summary>
 public class DictionaryTable: NamedObject
 {
+
     public async Task<IEnumerable<object>> SearchTag<T>(params string[] tags) where T: DictionaryTable
     {
         var dbContextType = this.GetDbContextWithEntity();
@@ -22,6 +23,10 @@ public class DictionaryTable: NamedObject
                 throw new Exception("Не найден DbSet для " + this.GetTypeName());
             return ((IQueryable<dynamic>)pdbset).Where( record => tags.Any(tag => ((object)record).ToJson().IndexOf(tag.ToLower())!=-1) ).Select(p => (object)p);
         } 
-    }   
-   
+    }
+
+    public override string? ToString()
+    {
+        return this.Name;
+    }
 }

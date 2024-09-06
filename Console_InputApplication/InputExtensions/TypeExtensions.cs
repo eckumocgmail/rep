@@ -1,22 +1,36 @@
-﻿using Console_InputApplication;
-
-using Newtonsoft.Json;
-
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
  
-
 /// <summary>
-/// расширения типов
+/// Расширения класса Type
 /// </summary>
 public static class StringExtensions
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    public static Dictionary<string, string> GetMethodsLabels(this Type ptype)
+    {
+        var methods = new Dictionary<string, string>(
+            ptype.GetOwnMethodNames().Select(name => new KeyValuePair<string, string>(ptype.GetMethodLabel(name), name)));
+        return methods;
+    }
+
+
+    public static MethodInfo SelectMethod(this Type pType, object ProgramData, ref string[] args)
+    {
+        string action = pType.GetOwnMethodNames().SingleSelect("Выберите действие:", ref args);
+        var ProgramAction = ProgramData.GetType().GetMethods().Where(m => m.Name == action).FirstOrDefault();
+        if (ProgramAction == null)
+            throw new Exception("Неправильно выполнена функция выбора из коллекции");
+        return ProgramAction;
+    }
+    
     public static bool IsDateTime(this Type ptype)
     {
         string propertyType = Typing.ParsePropertyType(ptype);

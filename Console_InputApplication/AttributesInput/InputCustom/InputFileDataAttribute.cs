@@ -12,14 +12,15 @@ public class InputFileDataAttribute: BaseInputAttribute
     {
 
     }
+
     public override bool IsValidValue(object value)
     {
-        return true;
+        return value is null? true: ((byte[]) value).Length == 0? false: true;
     }
 
     public override string OnValidate(object model, string property, object value)
     {
-        return "";
+        return null;
     }
 
     public override string OnGetMessage(object model, string property, object value)

@@ -1,0 +1,2 @@
+﻿@inject AppRouterMiddleware router
+<DataTable DataItems="@(router.GetRoutes().Select(r => r.Key).ToList())" DataType="String"></DataTable> 

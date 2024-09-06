@@ -16,26 +16,11 @@ public class UserMessagesService : IUserMessagesService
 
     public async Task<int> Send(UserMessage p, List<ProductImage> files)
     {
+        await Task.CompletedTask;
+        p.EnsureIsValide();
 
-        
-        this.Info(p.Validate().ToJsonOnScreen());
         _context.Add(p);
         _context.SaveChanges();
-
-       
-        if(files is not null ) foreach(var file in files)
-        {
-            _context.UserMessageFiles.Add( new UserMessageFile()
-            {
-                ContentType = file.ContentType,
-                FileData = file.ImageData,
-                FileName = "File",
-                UserMessageId = p.Id                    
-            });
-        }
-        _context.SaveChanges();
-        await Task.CompletedTask;
-        //_signin.PushNotifcation($"Отправлено новое сообщение пользователю: {ToUser.Person.GetFullName()}");
         return 1;      
     }
 

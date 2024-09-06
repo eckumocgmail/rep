@@ -16,33 +16,39 @@ namespace Console_DataConnector
     public class Program
     {
         public static void Main(string[] args)
-        {
-            /*new ConsoleDataConnectorUnit().Test();
-            ADODbConnectorsTest.Run();
-            ADOExecutorTest.Run();
-            ADODbMetadataTest.Run();
-            ADODbMigBuilderTest.Run();*/
-          
-            DataProgram.Run(ref args);
-
-            /*var api = new MessageWebApi();
-            api.Info(api.GetProceduresMetadata());
-            api.Info(api.GetEntitiesTypes());
-            api.AddEntityType(typeof(Program));             
-            api.UpdateDatabase();
-            foreach (var p in api.GetProceduresMetadata())
+        {           
+            if (InputConsole.Confirm("Запустить тесты ADO?"))
             {
-                var input = new Dictionary<string,string>(p.Value.ParametersMetadata.Keys.Select(key => new KeyValuePair<string, string>(key, "1")));
-                api.Info(input.ToJsonOnScreen());
-                args.Info(api.Request($"/{p.Key}", input).Result);
-            }*/
-
-            new MessageWebApiTest().DoTest().ToDocument().WriteToConsole();
-
-            //*/
-
-            //BusinessProgram.Run(args);
-
+                var unit = new ConsoleDataConnectorUnit();
+                unit.Test();
+            }
+            if (InputConsole.Confirm("Выполнить программу ODBC?"))
+            {
+                OdbcProgram.Run(ref args);
+            }
+            if (InputConsole.Confirm("Выполнить программу управления данными?"))
+            {
+                DataProgram.Run(ref args);
+            }            
+            if (InputConsole.Confirm("Проверить ADO объекты?"))
+            {
+                ADODbConnectorsTest.Run();
+                ADOExecutorTest.Run();
+                ADODbMetadataTest.Run();
+                ADODbMigBuilderTest.Run();
+            }
+            if(InputConsole.Confirm("Проверить генерацию структуры данных?"))
+            {
+                var api = new MessageWebApi();
+                api.Info(api.GetProceduresMetadata());
+                api.Info(api.GetEntitiesTypes());
+                api.AddEntityType(typeof(Program));
+                api.UpdateDatabase();
+            }
+            if (InputConsole.Confirm("Запустить тесты?"))
+            {
+                InputConsole.Info(new MessageWebApiTest().DoTest().ToDocument());
+            }             
         }
     }
 }

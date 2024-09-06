@@ -1,0 +1,14 @@
+﻿@page "/app/form-constructor"
+<h3>FormsContrustor</h3>
+
+@code 
+{
+    public InputFormModel Model { get; set; } = new InputFormModel(new InputFormField());
+
+}
+
+<FormEditor Model="Model"></FormEditor>
+
+<SelectBox Label="Тип поля ввода" Options="Attrs.GetInputTypes()"></SelectBox>
+<SelectBox Label="Тип элемента управления" Options="Attrs.GetControlTypes()"></SelectBox>
+<FormModel Form="@Model"></FormModel>

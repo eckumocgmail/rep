@@ -108,6 +108,11 @@ public class SearchFilesProgram
     public static async Task<IEnumerable<string>> DoTestAsync()
         => (await Task.WhenAll<IEnumerable<string>>(
             SearchProjectsPath.Split(':').Select(dir => SearchFile(dir, "*.csproj", 2))
-        )).Aggregate((list1, list2) => list1.Concat(list2));    
+        )).Aggregate((list1, list2) => list1.Concat(list2));
+
+    internal static void Test()
+    {
+        SearchFilesProgram.SearchFile("D:\\", "*.csproj", 3).Result.ToJsonOnScreen();
+    }
 }
  

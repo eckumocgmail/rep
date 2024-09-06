@@ -5,6 +5,8 @@ namespace Console_UserInterface
     public class ApiController
     {
         private List<Tuple<Predicate<HttpContext>, Func<HttpContext, object>>> deligates = new();
+
+
         public Action<HttpContext> GetControllerActionByRoute( string url )
         {           
             return (http) => 

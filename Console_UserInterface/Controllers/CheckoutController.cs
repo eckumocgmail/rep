@@ -1,17 +1,8 @@
 ﻿using Console_BlazorApp.AppUnits.DeliveryModel;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
 using pickpoint_delivery_service;
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Console_BlazorApp.AppUnits.DeliveryControllers
 {
@@ -22,18 +13,29 @@ namespace Console_BlazorApp.AppUnits.DeliveryControllers
     [ApiController]
     [Microsoft.AspNetCore.Mvc.Route("/api/[controller]/[action]")]
     public class CheckoutController : Controller
+
+
     {
         private readonly SigninUser signin;
+
+
         public CheckoutController(SigninUser signin) //: base(deliveryDbContext, env, products, images)
         {
             this.signin = signin;
         }
 
         [HttpGet()]
+        public IActionResult Submit()
+            => View(signin.GetFromSession<List<Product>>("selected-products"));
+
+        [HttpGet()]
+        public IActionResult Checkout()
+            => View(signin.GetFromSession<List<Product>>("selected-products"));
+
+        [HttpGet()]
         public IActionResult Back()
-        {
-            return Redirect("/");
-        }
+            => Redirect("/");
+
 
         [HttpGet()]
         [Microsoft.AspNetCore.Mvc.Route("[controller]/[action]/{holder_id:int}")]
@@ -68,15 +70,7 @@ namespace Console_BlazorApp.AppUnits.DeliveryControllers
             }            
             return View(order);
         }
-
-
-        [HttpGet()]
-        public IActionResult Submit() 
-            => View(signin.GetFromSession<List<Product>>("selected-products"));
-
-        [HttpGet()]
-        public IActionResult Checkout() 
-            => View(signin.GetFromSession<List<Product>>("selected-products"));
+        
 
         [HttpGet()]
         [Microsoft.AspNetCore.Mvc.Route("/Order/Checkout/{OrderId}")]
@@ -94,18 +88,17 @@ namespace Console_BlazorApp.AppUnits.DeliveryControllers
             Response.ContentType = image.ContentType;
             byte[] data = image.ImageData;
             await Response.Body.WriteAsync(data, 0, data.Length);
-
         }
 
-        /*public override SearchModel<Product> GetModel()
+        public SearchModel<Product> GetModel()
         {
             return signin.GetFromSession<SearchModel<Product>>(GetType().GetTypeName());            
         }
 
-        public override IEnumerable<string> GetOptions(string Query)
+        public IEnumerable<string> GetOptions([FromServices] DeliveryDbContext _deliveryDbContext, string Query)
         {
-            var fasade = new EntityFasade<Product>(this._deliveryDbContext);
+            var fasade = new EntityFasade<Product>(_deliveryDbContext);
             return fasade.GetOptions(Query);            
-        }*/
+        }
     }
 }

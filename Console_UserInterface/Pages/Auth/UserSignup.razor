@@ -13,15 +13,20 @@
         this.Info("Initialized");
     }
 }
-<PageTitle>ЕвроАвто/Регистрация</PageTitle>
- 
 
+<PageTitle>ЕвроАвто/Регистрация</PageTitle>
+<FormEditor Model="@account" OnReady="(evt => { account  = (UserAccount)evt; OnSaveButtonClicked(); } )">
+    <div class="text-danger">@message</div>
+</FormEditor>
+<FormEditor Model="@person" OnReady="(evt => { account  = (UserAccount)evt; OnSaveButtonClicked(); } )">
+</FormEditor>
+
+@((new InputFormModel(account)).ToJsonOnScreen())
 @code
 {
     string role = "customer";
-    public string message { get; set; } = "";
-    UserAccount account = new UserAccount("customer@gmail.com", "customer@gmail.com");
-    UserPerson person = new UserPerson()
+    public UserAccount account = new UserAccount("customer@gmail.com", "customer@gmail.com");
+    public UserPerson person = new UserPerson()
     {
         Tel = "7-921-090-3572",
         FirstName = "Константин",
@@ -29,9 +34,8 @@
         SurName = "Батов",
         Birthday = DateTime.Now
     };
-
+    public string message { get; set; } = "";
     
-
     public void OnSaveButtonClicked()
     {
         try
@@ -96,9 +100,11 @@
         person.Validate();
     }
 }
+
 @if(account is not null && person is not null)
-{    
-    <div style="padding: 20px; margin: 20px;" class="card">
+{
+    
+   @* <div style="padding: 20px; margin: 20px;" class="card">
         <h3>Регистрация пользователя</h3>
         @if (String.IsNullOrWhiteSpace(message) == false)
         {
@@ -123,7 +129,7 @@
         </div>
     
         <div class="form-group">
-            <label >Полное имя</label>
+            <label>Полное имя @person.GetFullName()</label>
             <input type="text" value="@person.GetFullName()" @oninput='(evt => { var arr = evt.Value.ToString().Split(" "); person.SurName = arr[0]; person.FirstName = arr.Length==1? "": arr[1]; person.LastName = arr.Length<=2? "": arr[2]; StateHasChanged();})' class="form-control">
         </div>
 
@@ -169,6 +175,10 @@
         <div>
             <button class="btn btn-primary btn-sm" @onclick="OnSaveButtonClicked">Сохранить</button>
         </div>
-    </div> 
+    </div> *@
 }
 
+
+
+
+                           

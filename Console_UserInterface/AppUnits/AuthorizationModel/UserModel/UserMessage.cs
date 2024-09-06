@@ -26,7 +26,7 @@ public class UserMessage : BaseEntity
     }
 
     [Label("Источник")]
-    //[NotNullNotEmpty("Свойство " + nameof(FromUserId) + " дожно иметь действительное значение" )]
+    [NotNullNotEmpty("Свойство " + nameof(FromUserId) + " дожно иметь действительное значение" )]
     //[NotInput("Свойство " + nameof(FromUserId) + " не вводится пользователем, оно устанавливается системой перед созданием сообщения на эл. почту пользорвателя с инструкциями по активации")]    
     public int? FromUserId { get; set; }
 
@@ -37,6 +37,7 @@ public class UserMessage : BaseEntity
     public virtual UserContext  FromUser { get; set; }
 
     [Label("Назначение")]
+    [NotNullNotEmpty]
     //[InputDictionary(nameof(UserContext ) + ",GetFullName()")]   
     public int? ToUserId { get; set; }
 

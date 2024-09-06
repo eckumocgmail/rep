@@ -3,10 +3,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 
-namespace DataModule
-{
-   
-}
 internal class Utils
 {
     internal static Dictionary<string, Dictionary<string, string>> ForAllPropertiesInType(Type type)

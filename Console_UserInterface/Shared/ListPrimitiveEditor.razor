@@ -49,6 +49,7 @@
                     
                 </CardHeader>
                 <CardBody>
+                    
                     <FormControl Model="@ItemModel" AfterInput="@OnItemValueChanged">
                     </FormControl>
                     @if (ValidationResult is not null)
@@ -169,8 +170,10 @@
 
     [Parameter]
     public PropertyInfo PropertyModel { get; set; }
+
     [Parameter]
     public Dictionary<string,string> Attributes { get; set; }
+
     public void OnAddButtonClicked()
     {
         if (ItemType is not null)

@@ -1,4 +1,5 @@
-﻿@code
+﻿@using System.Collections;
+@code
 {
     [Parameter]
     [NotNullNotEmpty]
@@ -192,11 +193,18 @@
             {
                 if (db.GetEntitiesTypes().Select(p => p.GenericTypeArguments.Count() > 0 ? p.GenericTypeArguments[0].GetTypeName() : p.GetTypeName()).ToList().Contains(ItemType.GetTypeName()))
                 {
-                    var pdbset = db.GetType().GetProperties().First(p => p.PropertyType == typeof(DbSet<>).MakeGenericType(ItemType));
-                    var pdbsetref = pdbset.GetValue(db);
-                    foreach (object item in (dynamic)pdbsetref)
+                    try
                     {
-                        result.Add(item);
+                        var pdbset = db.GetType().GetProperties().First(p => p.PropertyType == typeof(DbSet<>).MakeGenericType(ItemType));
+                        var pdbsetref = pdbset.GetValue(db);
+                        foreach (object item in ((IEnumerable)pdbsetref))
+                        {
+                            result.Add(item);
+                        }
+                    }
+                    catch(Exception ex)
+                    {
+                        this.Error(ex);
                     }
                 }
             }

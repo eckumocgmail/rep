@@ -18,6 +18,7 @@ namespace Console_UserInterface
     {
         public static void Main(string[] args)
         {
+
             ServiceFactory.Get().AddTypes(typeof(Program).Assembly);
             ServiceFactory.Get().AddTypes(typeof(Program).Assembly.Modules.Select(mod => mod.Assembly));
 
@@ -30,10 +31,7 @@ namespace Console_UserInterface
 
         public static void Configure(WebApplicationBuilder builder)
         {
-
             var app = builder.Build();
-
-
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Error");
@@ -42,11 +40,13 @@ namespace Console_UserInterface
             }
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            
+         
             app.UseRouting();
             app.MapControllers();
-            UseOdbc(app);
-            UseApi(app);
+
+            app.UseMiddleware<AppRouterMiddleware>();
+            //UseOdbc(app);
+            //UseApi(app);
             app.MapBlazorHub();
             app.MapFallbackToPage("/_Host");
             app.Run();
@@ -54,7 +54,8 @@ namespace Console_UserInterface
 
         public static void ConfigureServices(WebApplicationBuilder builder)
         {
-            
+
+            builder.Services.AddHttpContextAccessor();
             builder.Services.AddBlazorBootstrap();
 
             // Add services to the container.
@@ -63,6 +64,7 @@ namespace Console_UserInterface
             builder.Services.AddControllers();
             builder.Services.AddServerSideBlazor();
             
+            builder.Services.AddSingleton<AppRouterMiddleware>();
             builder.Services.AddScoped<SqlServerWebApi>();
             builder.Services.AddScoped<UserService>();
             builder.Services.AddScoped<UserAuthStateProvider>();

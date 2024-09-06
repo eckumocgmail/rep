@@ -1,0 +1,172 @@
+﻿@using Console_InputApplication.ViewEvents;
+@inherits LayoutComponentBase
+@using static Console_UserInterface.Shared.Forms.ValidationForm;
+@inject ILogger<ValidationForm> Logger
+@code
+{
+   
+
+    [Parameter]
+    public InputFormModel Form { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public bool Border { get; set; }
+
+    [Parameter]
+    public EventCallback OnValidated { get; set; }
+
+    [Parameter]
+    public EventCallback OnChangedCallback { get; set; }
+
+    bool Debug = true;
+}
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        try
+        {
+             
+            Form = Form is null ? new InputFormModel() : Form;
+        }
+        catch (Exception ex)
+        {
+            this.Error("Исключение при инициаллизации: ", ex);
+        }
+        await Validate();
+    }
+    public Dictionary<string, List<string>> Errors { get; set; }
+    public Dictionary<string, List<string>> Valdiate(object p) => p.Validate();
+    public void SetErrors(object model, Dictionary<string, List<string>> errors)
+    {
+        Errors = errors;
+        foreach (var field in Form.FormFields)
+        {
+            field.Errors.Clear();
+        }
+        foreach (var kv in errors)
+        {
+            Form.FormFields.First(field => field.Name == kv.Key).Errors = kv.Value;
+        }
+        StateHasChanged();
+    }
+    protected async Task Validate()
+    {
+        await Task.CompletedTask;
+        if (Form is null)
+            return;
+        var message = Form.Item.Validate();
+        SetErrors(Form, message);
+        Form.FormFields.ForEach(item =>
+        {
+            item.State = message.ContainsKey(item.Name) && message[item.Name].Count() > 0 ? "invalid" : "valid";
+        });
+        this.Info(message.ToJson());
+        if (Form.IsValid)
+        {
+            await OnValidated.InvokeAsync();
+        }
+        StateHasChanged();
+    }
+    [Parameter]
+    public string Title { get; set; }
+}
+@if (Form == null)
+{
+    <ProgressAnimation></ProgressAnimation>
+}
+else
+{
+
+    <div class="btn" align="left"
+         style="width: 100%; height: 90%;
+                   overflow-y: auto;
+                   padding: 20px;
+                   border-radius: 2px; box-shadow: 0px 4px 3px -2px rgba(0, 0, 0, 0.4), 0px 2px 2px 0px rgba(0, 0, 0, 0.24), 0px 2px 6px 0px rgba(0, 0, 0, 0.22);">
+        <p class="text-body-header">@(Title is not null ? Title : Form.Title)</p>
+        <div class="text-black-50 text-info">@Form.Description</div>
+        <div align="left">
+            <CheckBox Label="Режим отладки" Checked="@Debug" OnChange="(evt => { Debug=evt; StateHasChanged(); })"></CheckBox>
+        </div>
+        @foreach (var kv in Errors)
+        {
+            @foreach (var error in kv.Value)
+            {
+                <div align="left" class="text text-danger">@kv.Key : @error</div>
+            }
+        }
+        @if (Debug)
+        {
+            <div align="left" class="text-black-50 text-success">@Json</div>
+        }
+        <div class="text-black-50 text-danger" align="left">@Form.Error</div>
+        <div>
+            <div>
+                @foreach (var field in Form.FormFields)
+                {
+                    <div style="padding: 3px;">
+                        <FormControl Model="@field" AfterInput="@OnPropertyChanged" />
+                    </div>
+                }
+
+            </div>
+        </div>
+
+        <div style="padding: 5px;" align="right"> @ChildContent </div>
+        <div style="padding: 5px;" align="right">
+            @Body
+        </div>
+        <div style="padding: 5px;" align="right">
+            <button class="btn btn-sm btn-primary" @onclick="(evt => OnReady.InvokeAsync(Form.Item))">ок</button>
+            <button class="btn btn-sm btn-danger">отмена</button>
+        </div>
+    </div>
+}
+@functions
+{
+    [Parameter]
+    public EventCallback<object> OnReady { get; set; }
+
+    public string Json { get; set; }
+
+
+    public Dictionary<string, List<string>> ValidateOnInput(object model, InputEvent evt)
+    {
+        TextDataSetter.SetValue(model, evt.Property, evt.Value);
+        this.Form.FormFields.First(f => f.Name == evt.Property).Value = evt.Value;
+        return model.Validate();
+    }
+    public async Task OnPropertyChanged(InputEvent evt)
+    {
+        this.Info("OnPropertyChanged()");
+        try
+        {
+            Dictionary<string, List<string>> message = ValidateOnInput(Form.Item, evt);
+            SetErrors(Form, message);
+            Form.FormFields.ForEach(item =>
+            {
+                item.State = message.ContainsKey(item.Name) && message[item.Name].Count() > 0 ? "invalid" : "valid";
+            });
+            this.Info(message.ToJson());
+            if (Form.IsValid)
+            {
+                await OnValidated.InvokeAsync();
+            }
+           
+            StateHasChanged();
+
+            await OnChangedCallback.InvokeAsync(this.Form.Item);
+
+        }
+        catch (Exception ex)
+        {
+            Form.Error = ex.Message;
+        }
+
+        Json = Form.Item.ToJsonOnScreen();
+    }
+} 
+

@@ -5,13 +5,14 @@ public class InputTcpIp4AddressAttribute: BaseInputAttribute
     public InputTcpIp4AddressAttribute(string mask = "255.255.255.0"):base(InputTypes.Text)
     {
     }
-    public override bool IsValidValue(object value)
-    {
-        return true;
-    }
+    
 
     public override string OnValidate(object model, string property, object value)
     {
+        if(value is null)
+        {
+            return null;
+        }
         string message = GetMessage(model, property, value);
         string text = value.ToString();
         if (text.CountOfChar('.') != 3)
@@ -27,7 +28,7 @@ public class InputTcpIp4AddressAttribute: BaseInputAttribute
                     $"Сегмент №{ctn}: не является числом";
             }
             int number = word.ToInt();
-            if (number < 1)
+            if (number < 0)
             {
                 return $"{message}." +
                     $"Сегмент №{ctn}: содержит число ниже разрешенного диапазона";

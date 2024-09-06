@@ -278,7 +278,7 @@ public class InputFormModel
     public InputFormField CreateFormField( Type type, string PropertyName)
     {
         InputFormField field = null;
-       
+        this.Info(PropertyName);
         var property = type.GetProperty(PropertyName);
         if (property == null)
         {
@@ -286,7 +286,15 @@ public class InputFormModel
             );
         }
         var propertyType = Typing.ParsePropertyType(property.PropertyType);
+        if(propertyType is null)
+        {
+            propertyType = property.PropertyType.GetTypeName();
+        }
         var Attributes = Attrs.ForProperty(type, property.Name);
+        if(Attributes.ContainsKey(nameof(NotInputAttribute)))
+        {
+            throw new Exception();
+        }
 
         field = new InputFormField();
         field.Target = Item;
@@ -305,20 +313,20 @@ public class InputFormModel
            
         if (Attributes.ContainsKey(nameof(NotInputAttribute)))
         {
-            throw new Exception();
+            return field;
         }
         if (ReflectionService.IsPrimitive(propertyType) == false)
         {
             if (Typing.IsCollectionType(property.PropertyType))
             {
-                if(property.PropertyType == null)
+                if (property.PropertyType == null)
                     throw new Exception("property.PropertyType == null");
                 field.IsCollection = true;
                 var itemType = property.PropertyType.GetGenericArguments()[0].GetTypeName();
                 field.IsPrimitive = Typing.IsPrimitive(itemType);                                                                           //var table = ForCollectionProperty(Item, property.Name);
                 field.Type = "custom";
                 field.Value = Item.GetValue(PropertyName);
-                if (field.Value is null && property.PropertyType.GetConstructors().Any(c => c.GetParameters().Count()==0))
+                if (field.Value is null && property.PropertyType.GetConstructors().Any(c => c.GetParameters().Count() == 0))
                     field.Value = property.PropertyType.New();
                 field.ValueType = property.PropertyType.GetGenericArguments()[0].GetTypeName();// Typing.ParseCollectionType(property.PropertyType);
             }
@@ -347,10 +355,14 @@ public class InputFormModel
         {
             bool isInput = Attrs.IsInput(type, property.Name);
 
-               
+
             field.Type = Attrs.GetControlType(type, property.Name);
             if (field.Type != null)
             {
+                if (field.Type.ToLower().Contains("collect"))
+                {
+                    field.ValueType = Typing.ParseCollectionType(property.PropertyType);
+                }
                 string input =
                     Attributes.ContainsKey(field.Type) ? Attributes[field.Type] :
                     Attributes.ContainsKey(field.Type.Replace("Attribute", "")) ? Attributes[field.Type.Replace("Attribute", "")] :
@@ -373,6 +385,7 @@ public class InputFormModel
                         }
                 }
             }
+           
             else
             {
                 field.Type = GetInputType(type, property.Name);
@@ -397,17 +410,23 @@ public class InputFormModel
         foreach (var propertyName in propertyNames)
         {
 
-            var field = CreateFormField(type, propertyName);
-            if (target != null)
+            try
             {
-                var val = GetValue(target, propertyName);
-                if (val is not null)
+                var field = CreateFormField(type, propertyName);
+                if (target != null)
                 {
-                    field.Value = val;
-                }
+                    var val = GetValue(target, propertyName);
+                    if (val is not null)
+                    {
+                        field.Value = val;
+                    }
 
+                }
+                fields.Add(field);
+            }catch(Exception ex)
+            {
+                this.Error(ex);
             }
-            fields.Add(field);
         }
         return fields;
     }

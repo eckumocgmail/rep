@@ -28,13 +28,16 @@ public class OdbcDatasourceDescription
 
 }
 
- 
 
+
+[Label("Управление ODBC источниками")]
 public class OdbcDriverManager: MyValidatableObject
 {
 
-
+    [Label("Получение списка источников ODBC")]
     public string[] GetOdbcDatasourcesNames() => GetOdbcDatasources().Select(d => d.Name).ToArray();
+
+    [Label("Получение сведения по источникам ODBC")]
     public OdbcDatasourceDescription[] GetOdbcDatasources()
     {
         bool next = true;
@@ -64,7 +67,7 @@ public class OdbcDriverManager: MyValidatableObject
         return dss.ToArray();
     }
 
-
+    [Label("Получение ODBC драйверов")]
     public OdbcDriver[] GetOdbcDrivers()
     {
         bool next = true;
@@ -95,6 +98,24 @@ public class OdbcDriverManager: MyValidatableObject
     }
 
 
+
+    [Label("Регистрация ODBC драйвера")]
+    public void RegOdbcDriver(string name, string file)
+    {
+        //TODO:
+        throw new NotImplementedException();
+    }
+
+    [Label("Регистрация ODBC источника данных")]
+    public void RegOdbcDataSource(string name, string connectionstring, string driver)
+    {
+        throw new NotImplementedException();
+    }
+
+
+    /// <summary>
+    /// Выполнение комманды PS
+    /// </summary>
     private string Execute(string command)
     {
         this.Info("Выполнение команды: "+command);

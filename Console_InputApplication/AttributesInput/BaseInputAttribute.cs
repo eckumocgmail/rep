@@ -91,7 +91,7 @@ public class BaseInputAttribute : DataTypeAttribute, MyValidation
         if(INPUT_TYPES == null)
         {
             INPUT_TYPES = new List<string>();
-            typeof(BaseInputAttribute).Assembly.GetTypes().Where(t=>IsExtendedFrom(t,typeof(BaseInputAttribute).Name)).ToList().ForEach((Type t) => {
+            typeof(BaseInputAttribute).Assembly.GetTypes().Where(t=>IsExtendedFrom(t,typeof(BaseInputAttribute).Name) && IsExtendedFrom(t, typeof(InputStructureCollectionAttribute).Name)==false && false == IsExtendedFrom(t, typeof(InputPrimitiveCollectionAttribute).Name)).ToList().ForEach((Type t) => {
                 INPUT_TYPES.Add(t.Name);
             });
         }        

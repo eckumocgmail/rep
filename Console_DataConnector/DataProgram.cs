@@ -33,21 +33,7 @@ namespace Console_DataConnector
         public Dictionary<string, string> TypeMetaData { get; set; }
         private Dictionary<string, Dictionary<string, string>> PropertiesMetaData { get; set; }
 
-
-        public override IDictionary<string, string> GetTypeAttributes()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override IDictionary<string, string> GetPropertiesAttributes()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override IDictionary<string, string> GetMethodAttributes()
-        {
-            throw new NotImplementedException();
-        }
+         
 
 
 

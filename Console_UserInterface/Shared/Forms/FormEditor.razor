@@ -119,14 +119,27 @@ else
         </div>
 
         <div style="padding: 5px;" align="right"> @ChildContent </div>
-        <div style="padding: 5px;" align="right"> @Body </div>
+        <div style="padding: 5px;" align="right"> 
+            @Body 
+        </div>
+        <div style="padding: 5px;" align="right">
+            <button class="btn btn-sm btn-primary" @onclick="(evt => OnReady.InvokeAsync(Model))">ок</button>
+            <button class="btn btn-sm btn-danger">отмена</button>
+        </div>
     </div>
 }
 @functions
 {
+    [Parameter]
+    public EventCallback<object> OnReady { get; set; }
+
+    public string Json { get; set; }
+
+
     public Dictionary<string, List<string>> ValidateOnInput(object model, InputEvent evt)
     {       
         TextDataSetter.SetValue(model, evt.Property, evt.Value);
+        this.Form.FormFields.First(f => f.Name == evt.Property).Value = evt.Value;
         return model.Validate();
     }
     public async Task OnPropertyChanged(InputEvent evt)
@@ -158,5 +171,4 @@ else
 
         Json = Form.Item.ToJsonOnScreen();
     }
-    public string Json { get; set; }
 }
