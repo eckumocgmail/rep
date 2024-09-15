@@ -173,6 +173,12 @@ public sealed class SigninUser : BaseSignin<UserContext, UserAccount, UserPerson
         return String.IsNullOrEmpty(token)? null: this._users.Take(token);
     }
 
+
+    public UserContext GetUserByToken(string token)
+    {
+        return String.IsNullOrEmpty(token) ? null : this._users.Take(token);
+    }
+
     public List<string> GetNotifications()
     {
         if (IsSignin() == false)

@@ -23,12 +23,6 @@ using Blazor_UserInterface.AppUnits.DeliveryModel;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Console_UserInterface.AppUnits.DeliveryModel;
 
-public interface IKeywordsParserService
-{
-    public IDictionary<string, int> ParseKeywords(string Resource);
-}
-
-
 
 
 
@@ -97,45 +91,7 @@ namespace Console_BlazorApp.AppUnits.DeliveryServices
         }
 
     }
-    public class StupidKeywordsParserService : IKeywordsParserService
-    {
-
-
-        private IDictionary<string, int> keywords = new Dictionary<string, int>();
-
-        public StupidKeywordsParserService()
-        {
-        }
-
-        public IDictionary<string, int> ParseKeywords(string Resource)
-        {
-
-            var statisticsForThisRecord = new Dictionary<string, int>();
-
-            foreach (string text in Resource.SplitWords())
-            {
-                string word = text.ToUpper();
-                if (keywords.ContainsKey(word))
-                {
-                    keywords[word]++;
-                }
-                else
-                {
-                    keywords[word] = 1;
-                }
-
-                if (statisticsForThisRecord.ContainsKey(word))
-                {
-                    statisticsForThisRecord[word]++;
-                }
-                else
-                {
-                    statisticsForThisRecord[word] = 1;
-                }
-            }
-            return statisticsForThisRecord;
-        }
-    }
+    
 }
 
 namespace pickpoint_delivery_service
@@ -305,13 +261,13 @@ namespace pickpoint_delivery_service
 
             services.AddDbContext<DeliveryDbContext>(options =>
                 options.UseInMemoryDatabase(nameof(DeliveryDbContext)));
-            services.AddSingleton(typeof(IEntityFasade<Holder>), sp => new EntityFasade<Holder>(sp.GetService<DeliveryDbContext>()));
-            services.AddSingleton(typeof(IEntityFasade<Product>), sp => new EntityFasade<Product>(sp.GetService<DeliveryDbContext>()));
-            services.AddSingleton(typeof(IEntityFasade<ProductImage>), sp => new EntityFasade<ProductImage>(sp.GetService<DeliveryDbContext>()));
-            services.AddSingleton(typeof(IEntityFasade<ProductsInStock>), sp => new EntityFasade<ProductsInStock>(sp.GetService<DeliveryDbContext>()));
-            services.AddSingleton(typeof(IEntityFasade<Order>), sp => new EntityFasade<Order>(sp.GetService<DeliveryDbContext>()));
-            services.AddSingleton(typeof(IEntityFasade<OrderItem>), sp => new EntityFasade<OrderItem>(sp.GetService<DeliveryDbContext>()));
-            services.AddSingleton(typeof(IEntityFasade<CustomerContext>), sp => new EntityFasade<CustomerContext>(sp.GetService<DeliveryDbContext>()));
+            services.AddSingleton(typeof(IEntityFasade<Holder>), sp => new EfEntityFasade<Holder>(sp.GetService<DeliveryDbContext>()));
+            services.AddSingleton(typeof(IEntityFasade<Product>), sp => new EfEntityFasade<Product>(sp.GetService<DeliveryDbContext>()));
+            services.AddSingleton(typeof(IEntityFasade<ProductImage>), sp => new EfEntityFasade<ProductImage>(sp.GetService<DeliveryDbContext>()));
+            services.AddSingleton(typeof(IEntityFasade<ProductsInStock>), sp => new EfEntityFasade<ProductsInStock>(sp.GetService<DeliveryDbContext>()));
+            services.AddSingleton(typeof(IEntityFasade<Order>), sp => new EfEntityFasade<Order>(sp.GetService<DeliveryDbContext>()));
+            services.AddSingleton(typeof(IEntityFasade<OrderItem>), sp => new EfEntityFasade<OrderItem>(sp.GetService<DeliveryDbContext>()));
+            services.AddSingleton(typeof(IEntityFasade<CustomerContext>), sp => new EfEntityFasade<CustomerContext>(sp.GetService<DeliveryDbContext>()));
 
             services.AddSingleton<IKeywordsParserService, StupidKeywordsParserService>();
             services.AddSingleton<IdeliveryDbContextInitiallizer, DeliveryDbContextInitiallizer>();
@@ -322,18 +278,16 @@ namespace pickpoint_delivery_service
         }
         public static void CreateDeliveryData(IServiceCollection services, ConfigurationManager configuration)
         {
-            //Task.Run(() => {
-                using (var db = new DeliveryDbContext())
-                {
-                    db.Database.EnsureDeleted();
-                    db.Database.EnsureCreated();
-                    db.Info("Создание минимального набора данных");
-                    db.Info
-                    (
-                        $"Создание минимального набора данных \n {db.InitPrimaryData(@"D:\System-Config\MyExpirience\Console_BlazorAPp\Console_UserInterface\Resources").ToJsonOnScreen()}"
-                    );
-                }
-            //});
+            using (var db = new DeliveryDbContext())
+            {
+                db.Database.EnsureDeleted();
+                db.Database.EnsureCreated();
+                db.Info("Создание минимального набора данных");
+                db.Info
+                (
+                    $"Создание минимального набора данных \n {db.InitPrimaryData(@"D:\System-Config\MyExpirience\Console_BlazorAPp\Console_UserInterface\Resources").ToJsonOnScreen()}"
+                );
+            }
         }
         public static void ConfigureDeliveryServices(IServiceCollection services, IConfiguration config)
         {
@@ -343,14 +297,14 @@ namespace pickpoint_delivery_service
 
             services.AddScoped<IKeywordsParserService, StupidKeywordsParserService>();
 
-            services.AddScoped(typeof(IEntityFasade<CustomerContext>), sp => new EntityFasade<Order>(sp.GetService<DeliveryDbContext>()));
-            services.AddScoped(typeof(IEntityFasade<Holder>), sp => new EntityFasade<Holder>(sp.GetService<DeliveryDbContext>()));
-            services.AddScoped(typeof(IEntityFasade<Product>), sp => new EntityFasade<Product>(sp.GetService<DeliveryDbContext>()));
-            services.AddScoped(typeof(IEntityFasade<ProductImage>), sp => new EntityFasade<ProductImage>(sp.GetService<DeliveryDbContext>()));
-            services.AddScoped(typeof(IEntityFasade<ProductsInStock>), sp => new EntityFasade<ProductsInStock>(sp.GetService<DeliveryDbContext>()));
-            services.AddScoped(typeof(IEntityFasade<Order>), sp => new EntityFasade<Order>(sp.GetService<DeliveryDbContext>()));
-            services.AddScoped(typeof(IEntityFasade<OrderItem>), sp => new EntityFasade<OrderItem>(sp.GetService<DeliveryDbContext>()));
-            services.AddScoped(typeof(IEntityFasade<CustomerContext>), sp => new EntityFasade<CustomerContext>(sp.GetService<DeliveryDbContext>()));
+            services.AddScoped(typeof(IEntityFasade<CustomerContext>), sp => new EfEntityFasade<Order>(sp.GetService<DeliveryDbContext>()));
+            services.AddScoped(typeof(IEntityFasade<Holder>), sp => new EfEntityFasade<Holder>(sp.GetService<DeliveryDbContext>()));
+            services.AddScoped(typeof(IEntityFasade<Product>), sp => new EfEntityFasade<Product>(sp.GetService<DeliveryDbContext>()));
+            services.AddScoped(typeof(IEntityFasade<ProductImage>), sp => new EfEntityFasade<ProductImage>(sp.GetService<DeliveryDbContext>()));
+            services.AddScoped(typeof(IEntityFasade<ProductsInStock>), sp => new EfEntityFasade<ProductsInStock>(sp.GetService<DeliveryDbContext>()));
+            services.AddScoped(typeof(IEntityFasade<Order>), sp => new EfEntityFasade<Order>(sp.GetService<DeliveryDbContext>()));
+            services.AddScoped(typeof(IEntityFasade<OrderItem>), sp => new EfEntityFasade<OrderItem>(sp.GetService<DeliveryDbContext>()));
+            services.AddScoped(typeof(IEntityFasade<CustomerContext>), sp => new EfEntityFasade<CustomerContext>(sp.GetService<DeliveryDbContext>()));
             services.AddScoped<IOrdersService, OrdersService>();
             //services.AddScoped<UnitOfWork>();
             services.AddScoped<IdeliveryDbContextInitiallizer, DeliveryDbContextInitiallizer>();
@@ -1049,75 +1003,6 @@ namespace pickpoint_delivery_service
 
 
 
-    public static class ObjectQueringExtrensions
-    {
-        public static string GetTypeName(this Type propertyType)
-        {
-            string name = propertyType.Name;
-            if (name.Contains("`"))
-            {
-                string text = propertyType.AssemblyQualifiedName;
-                text = text.Substring(text.IndexOf("[[") + 2);
-                text = text.Substring(0, text.IndexOf(","));
-                name = name.Substring(0, name.IndexOf("`")) + "<" + text + ">";
-            }
-            return name;
-        }
-
-        public static IDictionary<string, int> GetCountOf(this string text, params string[] terms)
-        {
-            var result = new Dictionary<string, int>();
-            foreach (var term in terms)
-            {
-                int count = 0;
-                int startIndex = -term.Length;
-                var ltext = text.ToLower();
-                int subIndex = ltext.Substring(startIndex + term.Length).IndexOf(term);
-                while (startIndex < text.Length)
-                {
-                    if (subIndex != -1)
-                    {
-                        count++;
-                        startIndex += subIndex;
-                    }
-                    else
-                    {
-                        break;
-                    }
-
-                }
-                result[term] = count;
-            }
-            return result;
-        }
-        public static IDictionary<string, int> GetContentStatistics
-            (this object target, params string[] words)
-        {
-
-            var stat = new Dictionary<string, int>();
-
-            target.GetType().GetProperties().ToList().ForEach(p =>
-                stat[p.Name] = p.GetValue(target) == null ? 0 :
-                    p.GetValue(target).ToString().ToLower().GetCountOf(words).Values.Sum()
-            );
-            return stat;
-        }
-        public static IDictionary<string, object> ToDictionary(this object target)
-        {
-            var result = new Dictionary<string, object>();
-            target.GetType().GetProperties().ToList().ForEach(p =>
-                result[p.Name] = p.GetValue(target)
-            );
-            return result;
-        }
-        public static IDictionary<string, object> SelectProperties(this object target, params string[] properties)
-        {
-            var result = new Dictionary<string, object>();
-            properties.ToList().ForEach(p =>
-                result[p] = target.GetType().GetProperty(p).GetValue(target)
-            );
-            return result;
-        }
-    }
+    
 
 }

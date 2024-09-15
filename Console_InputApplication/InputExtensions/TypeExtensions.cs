@@ -55,10 +55,9 @@ public static class StringExtensions
     }
     public static List<string> GetOwnPropertyNames(this Type type)
     {
-        if (type is Type)
-            return (from p in new List<PropertyInfo>(((Type)type).GetProperties()) where p.DeclaringType == ((Type)type) select p.Name).ToList();
-        else
-            return (from p in new List<PropertyInfo>(type.GetType().GetProperties()) where p.DeclaringType == type.GetType() select p.Name).ToList();
+        var properties = type.GetType().GetProperties();
+        var own = properties.Where(p => p.DeclaringType.GetTypeName() == type.GetTypeName()).Select(p=>p.Name).ToList();
+        return own;
     }
 
 
@@ -374,7 +373,13 @@ public static class TypeExtensions2
         if (type is Type)
             return (from p in new List<PropertyInfo>(((Type)type).GetProperties()) where p.DeclaringType == ((Type)type) select p.Name).ToList();
         else
-            return (from p in new List<PropertyInfo>(type.GetType().GetProperties()) where p.DeclaringType == type.GetType() select p.Name).ToList();
+        {
+            var ptype = type.GetType();
+            type.Info(ptype.Name);
+            var properties = ptype.GetProperties().Select(p => p.Name).ToList();//.Where( prop => type.GetType().BaseType.GetProperties().Select(p => p.Name).Contains(prop.Name) == false).Select(p => p.Name).ToList();
+            return properties;
+            //return (from p in new List<PropertyInfo>(properties) where p.DeclaringType == type.GetType() select p.Name).ToList();
+        }
     }
     public static List<string> GetOwnMethodNames(this Type type)
     {
@@ -435,7 +440,7 @@ public static class TypeExtensions2
         return (from p in new List<FieldInfo>(type.GetFields()) select p.Name).ToList();
     }
 }
-public class ReflectionService3
+public static class ReflectionService3
 {
     private static HashSet<string> PrimitiveTypeNames = Typing.PRIMITIVE_TYPES;
     public static ConcurrentDictionary<string, Type> SHORT_NAME_TYPE_DICTIONARY = new ConcurrentDictionary<string, Type>();
@@ -472,7 +477,7 @@ public class ReflectionService3
     }
 
 
-    public static bool IsPrimitive(Type type)
+    public static bool IsPrimitive(this Type type)
     {
         return IsPrimitive(Typing.ParsePropertyType(type));
     }

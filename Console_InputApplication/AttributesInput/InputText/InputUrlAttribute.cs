@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,9 +11,7 @@ public class InputUrlAttribute : BaseInputAttribute
     {
         return true;
     }
-
    
-
     public InputUrlAttribute() : base(InputTypes.Url) { }
     public InputUrlAttribute( string ErrorMessage) : base(InputTypes.Url)
     {

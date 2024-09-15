@@ -16,19 +16,19 @@ using static System.Net.WebRequestMethods;
 [Description("Использует динамически созданные объекты в качестве контроллеров приложения")]
 public class AppRouterMiddleware: TypeNode<AppRouterMiddleware>, IMiddleware
 {
+
     /// <summary>
-    /// Параметры маршрутизации (маршрут, тип, действие).    
+    /// Параметры маршрутизации 
     /// </summary>
     private ConcurrentDictionary<string, string> routing { get; set; } = new()
     {
-         
+         //"/api/test", "TestController.DoTests()"
     };
 
+   
     public AppRouterMiddleware()
     {
-        this.AddRoute($"/app/{GetType().GetTypeName()}/{nameof(GetRoutes)}",
-            GetType().GetTypeName(),
-            nameof(GetRoutes));
+        this.AddController(nameof(AppRouterMiddleware));    
     }
 
 
@@ -37,22 +37,28 @@ public class AppRouterMiddleware: TypeNode<AppRouterMiddleware>, IMiddleware
     /// </summary>    
     public void AddRoute(string route, string controller, string action)
     {
-        this.Commit(() => 
-        {
-            var ctrl = controller.ToType();
-            var method = controller.ToType().GetMethod(action);
-            routing[route] = $"{controller}.{action}";
-            return 1;
-        }, new Dictionary<string, object>() 
-        {
-            { "route", route },
-            { "controller", controller },
-            { "action", action },
-        });        
+        var ctrl = controller.ToType();
+        var method = controller.ToType().GetMethod(action);
+        routing[route] = $"{controller}.{action}";
     }
 
-    public ConcurrentDictionary<string, string> GetRoutes() => 
-        new ConcurrentDictionary<string, string>(routing.Select(kv => new KeyValuePair<string, string>(kv.Key, $"{kv.Value}")));
+    public void AddControllerAction( string controller, string action)
+    {
+        var route = $"/api/{controller}/{action}";
+        var ctrl = controller.ToType();
+        var method = controller.ToType().GetMethod(action);
+        routing[route] = $"{controller}.{action}";
+    }
+
+    public void AddController(string controller)
+    {
+        var ctrl = controller.ToType();
+        foreach (var actionName in ctrl.GetOwnMethodNames())
+        {
+            AddControllerAction(controller, actionName);
+        }
+    }
+
 
     /// <summary>
     /// 
@@ -65,31 +71,87 @@ public class AppRouterMiddleware: TypeNode<AppRouterMiddleware>, IMiddleware
 
         try
         {
+            bool matched = false;
             var query = http.Request.Path.ToString();
             foreach(var keyValue in routing)
             {
                 var route = keyValue.Key;
-                if( IsMatches(http, route) )
+                if( IsMatches(query, route) )
                 {
-                    var controller = keyValue.Value.Split(".")[0];
-                    var action = keyValue.Value.Split(".")[1];
+                    matched = true;
+
+                    if (keyValue.Value.IndexOf(".")==-1)
+                        throw new Exception($"Маршрут настроен неверно {keyValue.Key} {keyValue.Value}");
+                    var controllerTypeName = keyValue.Value.Split(".")[0];
+                    var actionName = keyValue.Value.Split(".")[1];
 
                     Clear();
-                    var arguments = http.GetArgumentsForAction(keyValue.Key, controller.ToType().GetMethod(action));
-                    MethodBase.GetCurrentMethod().EnsureIsValid(arguments);
-                } 
+                    
+
+                    var controllerType = controllerTypeName.ToType();
+                    if (controllerType is null)
+                        throw new ArgumentNullException("controllerType", $"Не найден с тип с именем {controllerTypeName}");
+                    var controller = http.RequestServices.GetService(controllerType);
+                    if (controller is null)
+                        throw new ArgumentNullException("controller", $"Не найден объект в контейнере с типом {controllerType}");
+                    var action = controllerType.GetMethods().FirstOrDefault(method => method.Name == actionName);
+                    if (action is null)
+                        throw new ArgumentNullException("action", $"Не найден метод действия {keyValue.Value}");
+                    switch(http.Request.Method.ToUpper())
+                    {
+                        case "GET":
+                            {
+                                var form = controllerType.GetInputForm(actionName);
+                                http.ResponseJson(200, form);
+                            }
+                            break;
+                        case "POST":
+                            {
+                                var argumentsMap = http.GetArgumentsForAction(action);
+                                if (argumentsMap is null)
+                                    throw new ArgumentNullException("argumentsMap", $"Не получены аргументы вызова {keyValue.Value}");
+                                try
+                                {
+                                    action.EnsureIsValid(argumentsMap);
+                                }
+                                catch (Exception ex)
+                                {
+                                    this.Error($"Валидация завершена с ошибкой: {ex}");
+                                }
+                                object result = null;
+                                var arguments = argumentsMap.Values.ToArray();
+                                try
+                                {
+                                    result = action.Invoke(controller, arguments);
+                                }
+                                catch (Exception ex)
+                                {
+                                    this.Error($"Ошибка при выполнении метода {controllerTypeName}.{actionName}({arguments.ToJson()}) => {ex.Message}");
+                                }
+                                http.ResponseJson(200, result);
+                            }
+                            break;
+                        default: throw new NotSupportedException();
+                    }
+
+                    break;
+                    
+                }
+                
             }
+            if (!matched)
+                await todo.Invoke(http);
         }
         catch (Exception ex)
         {
             this.Error($"Ошибка при обработки запроса {http.Request.GetDisplayUrl()} : {ex.Message}\n {ex.StackTrace}");
+            await todo.Invoke(http);
         }
-        await todo.Invoke(http);
+        
     }
 
-    private bool IsMatches(HttpContext http, string route)
-    {
-        var query = http.Request.GetDisplayUrl();
+    private bool IsMatches(string query, string route)
+    {        
         while(route is not null && route.IndexOf("{")!=-1)
         {
             int i1 = route.IndexOf("{");
@@ -111,7 +173,7 @@ public class AppRouterMiddleware: TypeNode<AppRouterMiddleware>, IMiddleware
                 query = query.Substring(i1 + 1 + query.Substring(i1 + 1).IndexOf("/"));
             }
         }
-        return true;
+        return query == route;
     }
 }
 

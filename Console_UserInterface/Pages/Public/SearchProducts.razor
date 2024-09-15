@@ -110,7 +110,7 @@
             db.SaveChanges();
         }
         IsReady = true;
-        var fasade = new EntityFasade<Product>(db);
+        var fasade = new EfEntityFasade<Product>(db);
         SearchOptions = fasade.GetOptions(SearchQuery).ToList();
         OnSearch();
 
@@ -124,14 +124,14 @@
         try
         {
 
-            EntityFasade<Product> fasade = null;
+            EfEntityFasade<Product> fasade = null;
             if (this.UseExternalServices)
             {
                 //TODO
             }
             else
             {
-                fasade = new EntityFasade<Product>(db);
+                fasade = new EfEntityFasade<Product>(db);
             }
             var Catalogs = Root.GetSelected();
             var SearchedProducts = db.Products.ToList();

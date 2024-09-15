@@ -45,9 +45,13 @@ public static class DbContextExtensions
         {
             if (info.Name.StartsWith("get_") == true && info.ReturnType.Name.IndexOf("DbSet")!=-1)
             {
+
+                
                 if (info.Name.IndexOf("MigrationHistory") == -1)
                 {
-                    entities.Add(info.ReturnType);
+                    string typeName = info.ReturnType.GenericTypeArguments[0].GetTypeName();
+                    var ptype = typeName.ToType();
+                    entities.Add(ptype);
                 }
             }
         }

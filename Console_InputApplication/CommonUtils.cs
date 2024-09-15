@@ -400,8 +400,8 @@ public static List<MyMessageProperty> ParseActions(Type type)
     }
 
     public static bool ReferenceIsDictionary(object properties)
-    {
-        return properties.GetType().Name.Contains("Dictionary");
+    {        
+        return properties.GetType().IsExtends(typeof(Dictionary<,>));
     }
 }
 /// <summary>

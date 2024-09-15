@@ -22,7 +22,17 @@ public static class TextFactoryExtensions
     {                      
         if(text == null)
             throw new ArgumentNullException("text");
-        return text.Contains(".")? ReflectionService.TypeForName(text): ReflectionService.TypeForShortName(text);
+        
+        Type ptype = text.Contains(".")? ReflectionService.TypeForName(text): ReflectionService.TypeForShortName(text);
+        if(ptype == null)
+        {
+            ptype = text.Contains(".") ? ServiceFactory.Get().TypeForName(text) : ServiceFactory.Get().TypeForShortName(text);  
+        }
+        if(ptype is null)
+        {
+            throw new ArgumentException($"Не удалось найти тип: {text} исп. ReflectionService/");
+        }
+        return ptype;
     }
     /// <summary>
     /// Поиск типа по имени
@@ -42,7 +52,8 @@ public static class TextFactoryExtensions
         {
             if (text == null)
                 throw new ArgumentNullException("text");
-            return ReflectionService.CreateWithDefaultConstructor<object>(text.ToType());
+            var ptype = text.ToType();
+            return ReflectionService.CreateWithDefaultConstructor<object>(ptype);
         }
         catch(Exception ex) 
         {

@@ -7,10 +7,14 @@ public interface APIActiveCollection<T>: APICollection<T> where T : ActiveObject
     void DoCheck();
     ConcurrentDictionary<string, object> GetSession(string key);
     ConcurrentDictionary<string, T> GetMemory();
+    UserContext Take(string token);
+    T Remove(string key);
+    string Put(T user);
+    bool Has(string key);
 }
 
 
-public interface APICollection<T>
+public interface F<T>
 {
     bool Has(string key);
     T Take(string key);

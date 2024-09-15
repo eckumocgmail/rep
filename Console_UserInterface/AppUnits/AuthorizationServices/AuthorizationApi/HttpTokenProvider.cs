@@ -5,6 +5,8 @@ using Microsoft.JSInterop;
 
 using Newtonsoft.Json.Linq;
 
+using Parlot.Fluent;
+
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
@@ -12,7 +14,7 @@ using System.Threading.Tasks;
 
 public class LocalStorage : ILocalStorage
 {
-
+    private static string KEY = "PublicKey";
 
     private readonly IJSRuntime _jsr;
     private readonly IJSInvoke _jss;
@@ -39,7 +41,15 @@ public class LocalStorage : ILocalStorage
         return await _jss.EvalAsync<List<string>>("return Object.getOwnPropertyNames(localStorage);");
     }
 
+    public Task SetToken(string token)
+    {
+        return this.SetItem(KEY, token);
+    }
 
+    public Task<string> GetToken()
+    {
+        return this.GetItem(KEY);
+    }
 }
 
 

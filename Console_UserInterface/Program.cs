@@ -6,45 +6,69 @@ using Newtonsoft.Json;
 using pickpoint_delivery_service;
 using Console_UserInterface.AppUnits.AuthorizationBlazor;
 using Microsoft.AspNetCore.Http.Extensions;
-using Console_BlazorApp;
 using Blazored.Modal.Services;
 using System.Reflection;
 using Console_DataConnector.DataModule.DataADO.ADOWebApiService;
-using static System.Net.Mime.MediaTypeNames;
+using Console_UserInterface.AppUnits;
+using Console_UserInterface.Services;
+using Console_UserInterface.Location;
+using Console_UserInterface.Shared;
 
 namespace Console_UserInterface
 {
     public class Program
     {
+        public static class Test
+        {
+            public static void SessionTest() =>
+                new SessionUnit(AppProviderService.GetInstance()).DoTest(false).ToDocument().WriteToConsole();
+            public static void TestApp()            
+                => new DeliveryServicesUnit().DoTest(true).ToDocument().WriteToConsole();
+            
+            public static void TestInputField()
+            {
+                var model = new InputFormModel();
+                model.Item = new AttributesInputTest.CollectionModel();
+                var field = model.CreateFormField(model.Item.GetType(), nameof(AttributesInputTest.CollectionModel.ListDateModel));
+                field.ToJsonOnScreen().WriteToConsole();
+            }
+        }
+
         public static void Main(string[] args)
         {
-
-            ServiceFactory.Get().AddTypes(typeof(Program).Assembly);
-            ServiceFactory.Get().AddTypes(typeof(Program).Assembly.Modules.Select(mod => mod.Assembly));
-
-            //TestApp();
+            RegTypes();            
             UpdateDatabases();
             var builder = WebApplication.CreateBuilder(args);
             ConfigureServices(builder);
             Configure(builder);
         }
 
+        private static void RegTypes()
+        {
+            ServiceFactory.Get().AddTypes(typeof(JsonPropertyAttribute).Assembly);
+            ServiceFactory.Get().AddTypes(typeof(Newtonsoft.Json.JsonArrayAttribute).Assembly);
+            ServiceFactory.Get().AddTypes(typeof(System.Data.SqlClient.SqlClientPermission).Assembly);
+            ServiceFactory.Get().AddTypes(Assembly.GetExecutingAssembly());
+            ServiceFactory.Get().AddTypes(Assembly.GetCallingAssembly());
+            ServiceFactory.Get().AddTypes(Assembly.GetEntryAssembly());
+            ServiceFactory.Get().AddTypes(Assembly.GetExecutingAssembly().Modules.Select(mod => mod.Assembly));
+            ServiceFactory.Get().AddTypes(Assembly.GetCallingAssembly().Modules.Select(mod => mod.Assembly));
+            ServiceFactory.Get().AddTypes(Assembly.GetEntryAssembly().Modules.Select(mod => mod.Assembly));
+            ServiceFactory.Get().AddTypes(typeof(Program).Assembly);
+            ServiceFactory.Get().AddTypes(typeof(Program).Assembly);
+            ServiceFactory.Get().AddTypes(typeof(Program).Assembly.Modules.Select(mod => mod.Assembly));
+        }
+
         public static void Configure(WebApplicationBuilder builder)
         {
             var app = builder.Build();
-            if (!app.Environment.IsDevelopment())
-            {
-                app.UseExceptionHandler("/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
-            }
+            app.UseSession();
+            app.UseDeveloperExceptionPage();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-         
+            app.UseMiddleware<AppRouterMiddleware>();
             app.UseRouting();
             app.MapControllers();
-
-            app.UseMiddleware<AppRouterMiddleware>();
             //UseOdbc(app);
             //UseApi(app);
             app.MapBlazorHub();
@@ -54,16 +78,17 @@ namespace Console_UserInterface
 
         public static void ConfigureServices(WebApplicationBuilder builder)
         {
-
-            builder.Services.AddHttpContextAccessor();
+            builder.Services.AddBlazorContextMenu();        
             builder.Services.AddBlazorBootstrap();
-
+            
             // Add services to the container.
-            builder.Services.AddHttpContextAccessor();
             builder.Services.AddRazorPages();
             builder.Services.AddControllers();
             builder.Services.AddServerSideBlazor();
+            builder.Services.AddHttpContextAccessor();
             
+            builder.Services.AddTransient<IconsProvider>();
+            builder.Services.AddTransient<GeoLocationService>();
             builder.Services.AddSingleton<AppRouterMiddleware>();
             builder.Services.AddScoped<SqlServerWebApi>();
             builder.Services.AddScoped<UserService>();
@@ -73,6 +98,9 @@ namespace Console_UserInterface
             {
                 //todo configure authorization
             });
+
+            LocationModule.AddLocationService(builder.Services);
+            SesionModule.AddSessionService(builder.Services);
             RecaptchaModule.ConfigureServices(builder.Configuration, builder.Services);
             AuthorizationDbContext.ConfigureServices(builder.Services);
             AuthorizationModule.ConfigureServices(builder.Services);
@@ -83,18 +111,6 @@ namespace Console_UserInterface
             DbContextUserInitializer.CreateUserData(builder.Services, builder.Configuration);
         }
 
-        public static void TestApp()
-        {
-            new DeliveryServicesUnit().DoTest(true).ToDocument().WriteToConsole();
-        }
-
-        public static void TestInputField()
-        {
-            var model = new InputFormModel();
-            model.Item = new AttributesInputTest.CollectionModel();
-            var field = model.CreateFormField(model.Item.GetType(), nameof(AttributesInputTest.CollectionModel.ListDateModel));
-            field.ToJsonOnScreen().WriteToConsole();
-        }
 
         [Label("Создание структуры баз данных")]
         public static void UpdateDatabases()
@@ -116,7 +132,6 @@ namespace Console_UserInterface
                 db.ServiceContexts.ToList().ToJsonOnScreen().WriteToConsole();
             }
         }
-
 
         public static void UseApi(WebApplication app)
         {
@@ -201,25 +216,6 @@ namespace Console_UserInterface
 
                 }
             }
-        }
-
-        public static void Main2(string[] args)
-        {
-
-            var builder = WebApplication.CreateBuilder(args);
-            builder.Services.AddSingleton<AppRouterMiddleware>();
-
-            builder.Services.AddTransient<MailRuService2>();
-            //builder.Services.AddTransient<InputModalService>();
-            builder.Services.AddTransient<IModalService, ModalService>();
-
-
-            //builder.Services.AddInputModal();
-
-            builder.Services.AddControllers();
-            builder.Services.AddRazorPages();
-            builder.Services.AddServerSideBlazor();                       
-        }
-        
+        }             
     }
 }

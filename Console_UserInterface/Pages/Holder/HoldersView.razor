@@ -14,7 +14,7 @@
         OnSearch();
     }
 
-    EntityFasade<Holder> fasade = null;
+    EfEntityFasade<Holder> fasade = null;
 
     public int PageNumber { get; set; } = 1;
     public string SearchQuery { get; set; } = "";
@@ -27,7 +27,7 @@
         try
         {
             db.Products.ToList();
-            fasade = new EntityFasade<Holder>(db);
+            fasade = new EfEntityFasade<Holder>(db);
             var SearchedProducts = fasade.Search(SearchQuery);
             SearchOptions = fasade.GetOptions(SearchQuery).ToList();
             PagesCount = (SearchedProducts.Count() + SearchedProducts.Count() % 10) / 10;

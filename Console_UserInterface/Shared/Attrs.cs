@@ -12,7 +12,7 @@ using System.Linq;
 using System.Reflection;
 using UserAuthorization.DataAttributes.AttributeDisplay;
 
-public class Attrs: Utils
+public partial class Attrs: Utils
 {
 
      
@@ -380,8 +380,7 @@ public class Attrs: Utils
 
 
 
-    private static List<string> CONTROL_TYPES =
-        null;// 
+    private static List<string> CONTROL_TYPES = null;// 
 
 
     public static List<string> GetInputTypes() => BaseInputAttribute.GetInputTypes();
@@ -389,7 +388,7 @@ public class Attrs: Utils
     {
         if(CONTROL_TYPES == null)
         {
-            CONTROL_TYPES = Assembly.GetExecutingAssembly().GetTypes().Where(t => Typing.IsExtendedFrom(t, nameof(ControlAttribute))).ToList().Select(t=>t.Name).ToList();
+            CONTROL_TYPES = typeof(ControlAttribute).Assembly.GetTypes().Where(t => Typing.IsExtendedFrom(t, nameof(ControlAttribute))).ToList().Select(t=>t.Name).ToList();
         }
         return CONTROL_TYPES;
     }

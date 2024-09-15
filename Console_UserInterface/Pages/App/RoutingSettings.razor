@@ -1,2 +1,22 @@
-﻿@inject AppRouterMiddleware router
-<DataTable DataItems="@(router.GetRoutes().Select(r => r.Key).ToList())" DataType="String"></DataTable> 
+﻿@page "/app/routing"
+@inject AppRouterMiddleware router
+<CardContainer>
+    <CardHeader>
+        <h3>Зарегистрированные маршруты</h3>
+    </CardHeader>
+    <CardBody>
+        <ul class="list-group">
+            @foreach (var kv in router.GetRoutes())
+            {
+                <li class="list-group-item">
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="@kv.Key">
+                            <span class="oi oi-account-login" aria-hidden="true"></span> @kv.Value
+                        </NavLink>
+                    </div>
+                </li>
+            }
+        </ul>
+    </CardBody>
+    <CardFooter></CardFooter>
+</CardContainer>

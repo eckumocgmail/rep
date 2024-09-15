@@ -1,0 +1,27 @@
+﻿@inject ILocalStorage localStorage
+@inject SigninUser signin
+@inject ITokenProvider _tokenProvider
+@inject NavigationManager nav
+@inject UserAuthStateProvider provider
+@code 
+{
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            var token = await localStorage.GetToken();
+            if (signin.Validate(token))
+            {
+                await _tokenProvider.Set(token);
+                await provider.LoginAsync(token);
+                nav.NavigateTo(nav.Uri);
+            }
+            else
+            {
+                await localStorage.SetToken("");
+            }
+        }
+    }
+}

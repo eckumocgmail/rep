@@ -60,7 +60,10 @@ public class UserAccount: BaseEntity
     public string RFId { get; set; } = "";
 
 
-    public UserAccount() :base(){ }
+    public UserAccount() :base()
+    {
+        this.Info("Новый ЭКЗЕМПЛЯР");
+    }
     public UserAccount(string email, string password):base(   )
     {
             

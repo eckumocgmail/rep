@@ -84,7 +84,7 @@ public class BaseInputAttribute : DataTypeAttribute, MyValidation
 
   
     private static List<string> INPUT_TYPES = null;
-    private string _InputType;
+    public string _InputType;
 
     public static List<string> GetInputTypes()
     {

@@ -1,0 +1,63 @@
+﻿@using static Console_UserInterface.Location.LocationDbContext;
+@code 
+{
+    [Parameter]
+    public AppPage Model { get; set; }
+}
+<CardContainer>
+    <CardHeader>@Model.ToJson()</CardHeader>
+    <CardBody>
+        @if(Model is not null)
+        {
+            <div>
+                @foreach(var component in Model.PageComponents)
+                {
+                    <ComponentView Model="component" OnInput="((evt) => OnInputValue(component.Name, evt))"></ComponentView>
+                    @if (Model.ValidationErrors.ContainsKey(component.Name) == false)
+                    {
+                        Model.ValidationErrors[component.Name] = new();
+                    }
+                    foreach (var error in Model.ValidationErrors[component.Name])
+                    {
+                        <div class="text text-danger">@error</div>
+                    }
+                }
+            </div>
+        }
+    </CardBody>
+    <CardFooter></CardFooter>
+</CardContainer>
+@functions 
+{
+    public void OnInputValue(string name, object? value)
+    {
+        try
+        {
+            if (Model.ModelInstance is null)
+            {                
+                Model.ModelInstance = Model.ModelType.ToType().New();
+            }
+            if(value is ChangeEventArgs )
+            {
+                Model.ModelInstance.SetValue(name, ((ChangeEventArgs)value).Value);
+            }
+            else
+            {
+                Model.ModelInstance.SetValue(name, value);
+            }
+
+
+            Model.ValidationErrors = Model.ModelInstance.Validate();
+            foreach(var comp in Model.PageComponents)
+            {
+                comp.State = Model.ValidationErrors.ContainsKey(comp.Name) && Model.ValidationErrors[comp.Name].Count() > 0 ? "invalid" : "valid";
+            }
+            StateHasChanged();
+        }
+        catch(Exception ex)
+        {
+            this.Error(ex);
+        }
+        StateHasChanged();
+    }
+}

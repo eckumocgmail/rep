@@ -161,9 +161,13 @@ public sealed class SignupUser : BaseSignup<UserContext, UserAccount, UserPerson
                     URL = httpContextAccessor.HttpContext.Request.GetDisplayUrl()
                 };
                 _model.Add(context.Wallet = new( ) { });
+                _model.SaveChanges();
                 _model.Add(context.Account = new(Email, Password) { });
+                _model.SaveChanges();
                 _model.Add(context.Person = new() { FirstName = FirstName, LastName = LastName, SurName = SurName, Birthday = Birthday, Tel = Tel });
+                _model.SaveChanges();
                 _model.Add(context.Settings = new UserSettings());
+                _model.SaveChanges();
                 _model.Add(context);
                 _model.SaveChanges();
 

@@ -86,18 +86,19 @@ public static class AttributesInfoExtensions
     }
 
 
-    public static IDictionary<string, string> GetArgumentAttributes(
+    public static Dictionary<string, string> GetArgumentAttributes(
         this Type ptype, string method, string parameter)
     {
         var methodInfo = ptype.GetMethods().First(p => p.Name == method);
         if (methodInfo == null)
             throw new ArgumentException(nameof(method));
         var parInfo = methodInfo.GetParameters().FirstOrDefault(p => p.Name == parameter);
-        var res = new Dictionary<string, string>(parInfo.ParameterType.GetCustomAttributesData().Select(data => new KeyValuePair<string, string>(
-
-            TypeExtensions2.GetTypeName(data.AttributeType),
-            data.ConstructorArguments.First().Value.ToString()
-        )));
+        var res = new Dictionary<string, string>();
+        foreach (var kv in parInfo.ParameterType.GetCustomAttributesData())
+        {
+            res[TypeExtensions2.GetTypeName(kv.AttributeType)] = kv.ConstructorArguments.Count() > 0 ? kv.ConstructorArguments.First().ToString() : "";
+        }
+         
 
         return res;
     }

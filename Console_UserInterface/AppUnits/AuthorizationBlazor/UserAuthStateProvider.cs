@@ -100,6 +100,33 @@ public class UserAuthStateProvider : AuthenticationStateProvider, IDisposable
         NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(principal)));
     }
 
+    public async Task LoginAsync(string token)
+    {
+        var principal = new ClaimsPrincipal();
+        var context = this._signin.GetUserByToken(token);
+        var user = new User()
+        {
+            UserId = context.Account.Email,
+            Username = context.Person.GetFullName(),
+            Password = context.Account.Hash,
+            Roles = context.Roles.Select(r => r.Code).ToList()
+        };
+        var headers = _httpContextAccessor.HttpContext.Request.Headers;
+        headers["X-Auth-UserId"] = user == null ?
+            new Microsoft.Extensions.Primitives.StringValues() :
+            new Microsoft.Extensions.Primitives.StringValues(user.UserId);
+        headers["X-Auth-Roles"] = user == null ?
+            new Microsoft.Extensions.Primitives.StringValues() :
+            new Microsoft.Extensions.Primitives.StringValues(user.Roles.ToArray());
+        CurrentUser = user;
+
+        if (user is not null)
+        {
+            principal = user.ToClaimsPrincipal();
+        }
+
+        NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(principal)));
+    }
     public async Task LoginAsync(string username, string password)
     {
         var principal = new ClaimsPrincipal();

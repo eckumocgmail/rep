@@ -1,0 +1,34 @@
+﻿@page "/ui/checklist/{ListItemsStr}/{CheckedItemsStr}"
+<ul class="list-group">
+    @foreach (var item in ListItems)
+    {
+        <li class="list-group-item">
+            <CheckBox Checked="@CheckedItems.Contains(item)"
+                OnChange="(evt => { if(CheckedItems.Contains(item)){ CheckedItems.Remove(item); } else {CheckedItems.Add(item);}    StateHasChanged(); })" 
+                Label="@item" />
+        </li>
+    }
+    
+</ul>
+@code 
+{
+    [Parameter]
+    public string ListItemsStr 
+    { 
+        set
+        {
+            ListItems = value.Split(",").ToList();
+        } 
+    }
+    public List<string> ListItems { get; set; }
+
+    [Parameter]
+    public string CheckedItemsStr
+    {
+        set
+        {
+            CheckedItems = value.Split(",").ToList();
+        }
+    }
+    public List<string> CheckedItems { get; set; } = new();  
+}

@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using pickpoint_delivery_service;
 
+using System.ComponentModel.DataAnnotations;
+
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Console_BlazorApp.AppUnits.DeliveryControllers
 {
@@ -10,11 +13,12 @@ namespace Console_BlazorApp.AppUnits.DeliveryControllers
     /// <summary>
     /// Процесс оформления заказа
     /// </summary>
+    /// /api/Checkout/SessionImage?key=
     [ApiController]
     [Microsoft.AspNetCore.Mvc.Route("/api/[controller]/[action]")]
     public class CheckoutController : Controller
 
-
+         
     {
         private readonly SigninUser signin;
 
@@ -87,9 +91,17 @@ namespace Console_BlazorApp.AppUnits.DeliveryControllers
             image = image == null ? db.ProductImages.First() : image;
             Response.ContentType = image.ContentType;
             byte[] data = image.ImageData;
+            Response.ContentType = "image/json";
             await Response.Body.WriteAsync(data, 0, data.Length);
         }
 
+        [HttpGet]
+        public async Task SessionImage([FromServices] Console_UserInterface.Services.ISessionService sessionServices, [FromQuery]string id)
+        {
+            
+            byte[] value = sessionServices.GetValue<byte[]>(id);
+            await Response.Body.WriteAsync(value, 0, value.Length);
+        }
         public SearchModel<Product> GetModel()
         {
             return signin.GetFromSession<SearchModel<Product>>(GetType().GetTypeName());            
@@ -97,7 +109,7 @@ namespace Console_BlazorApp.AppUnits.DeliveryControllers
 
         public IEnumerable<string> GetOptions([FromServices] DeliveryDbContext _deliveryDbContext, string Query)
         {
-            var fasade = new EntityFasade<Product>(_deliveryDbContext);
+            var fasade = new EfEntityFasade<Product>(_deliveryDbContext);
             return fasade.GetOptions(Query);            
         }
     }

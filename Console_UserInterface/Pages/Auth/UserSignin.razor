@@ -5,6 +5,8 @@
 @inject IHttpContextAccessor accessor
 @inject NavigationManager nav
 @inject UserAuthStateProvider provider
+@inject ILocalStorage localStorage
+
 <PageTitle>ЕвроАвто/Авторизация</PageTitle>
 <div align="center">
     <h3>Авторизация пользователя</h3>
@@ -42,9 +44,10 @@
                 bool isSignin = signin.IsSignin();
                 if (signinResult.Succeeded)
                 {
-                 
+
+                    await localStorage.SetToken(signinResult.Result.SecretKey);
                     await provider.LoginAsync(username,password);
-                    AuthenticationState state = await provider.GetAuthenticationStateAsync();
+                    //AuthenticationState state = await provider.GetAuthenticationStateAsync();
                     
                     nav.NavigateTo("/public/search-products");
                 }

@@ -1,0 +1,103 @@
+﻿@page "/forms"
+@using Console_UserInterface.Shared.Forms;
+@using Microsoft.EntityFrameworkCore;
+
+<PageTitle>Index</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+@code
+{
+    public List<object> Items { get; set; } = new();
+    public List<string> Types { get; set; } = global::Attrs.GetInputTypes();
+
+    private IEnumerable<string> GetEntities()
+    {
+        return GetEntitiesTypes().ToList().Select(pt => pt.GetTypeName());
+    }
+    private List<Type> GetEntitiesTypes()
+    {
+        List<Type> entityTypes = new();
+        foreach (var dbct in typeof(Console_UserInterface.Program).Assembly.GetTypes())
+        {
+            if (dbct.IsExtendsFrom(typeof(DbContext)))
+            {
+                entityTypes.AddRange(dbct.New().GetEntitiesTypes());
+            }
+
+        }
+        return entityTypes.ToList();
+    }
+    bool Visible = false;
+    public InputFormModel FormModel = new InputFormModel(new UserPerson());
+    public FormEditor Form = new FormEditor();
+}
+
+<button @onclick="evt => {Visible = !Visible; StateHasChanged();}">visible</button>
+<SurveyPrompt Title="How is Blazor working for you?" />
+<ContextMenu Id="myMenu">
+    <Item OnClick="@OnClick">Item 1</Item>
+    <Item OnClick="@OnClick">Item 2</Item>
+    <Item OnClick="@OnClick" Enabled="false">Item 3 (disabled)</Item>
+    <Seperator />
+    <Item>
+        Submenu
+        <SubMenu>
+            <Item OnClick="@OnClick">Submenu Item 1</Item>
+            <Item OnClick="@OnClick">Submenu Item 2</Item>
+        </SubMenu>
+    </Item>
+</ContextMenu>
+
+<ContextMenuTrigger MenuId="myMenu">
+    <p>Right-click on me to show the context menu !!</p>
+</ContextMenuTrigger>
+@code
+{
+    void OnClick(ItemClickEventArgs e)
+    {
+        Console.WriteLine($"Item Clicked => Menu: {e.ContextMenuId}, MenuTarget: {e.ContextMenuTargetId}, IsCanceled: {e.IsCanceled}, MenuItem: {e.MenuItemElement}, MouseEvent: {e.MouseEvent}");
+    }
+    public List<string> SelectOptions { get; set; } = (typeof(Console_UserInterface.Program).Assembly.GetTypes().Where(p => p.IsExtendsFrom("BaseEntity")).Select(p => p.Name).ToList());
+    public async Task OnTypeChanged( string evt)
+    {
+        try
+        {            
+            var ptype = evt.ToType();
+            object p = ptype.New();
+            this.Items.Clear();
+            this.Items.Add(p);
+
+        }
+        catch(Exception ex)
+        {
+            this.Error(ex.ToString());
+        }
+        finally
+        {
+            StateHasChanged();
+            await Task.CompletedTask;
+        }
+    }
+}
+
+<Console_UserInterface.Shared.CardContainer >
+    <CardHeader>
+        <Console_UserInterface.Shared.SelectBox Value="@null" 
+            Label="Тип" 
+            Options="@SelectOptions"                                                
+            OnChange="@OnTypeChanged">
+        </Console_UserInterface.Shared.SelectBox>
+
+    </CardHeader>
+    <CardFooter>
+        @foreach(object Item in Items)
+        {
+            <p>@Item</p>
+            <Console_UserInterface.Shared.Forms.FormEditor Model="@Item"></Console_UserInterface.Shared.Forms.FormEditor>
+        }
+    </CardFooter>
+    <CardBody></CardBody>
+</Console_UserInterface.Shared.CardContainer>
+ 

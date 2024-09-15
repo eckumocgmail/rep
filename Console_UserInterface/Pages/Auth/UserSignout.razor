@@ -1,0 +1,17 @@
+﻿@page "/user/signout"
+@inject ILocalStorage localStorage
+@inject SigninUser signin
+@inject NavigationManager nav
+@code 
+{
+    protected override async Task OnAfterRenderAsync(bool first)
+    {
+        await base.OnAfterRenderAsync(first);
+        if (first)
+        {
+            signin.Signout();
+            await localStorage.SetToken("");            
+        }
+        nav.NavigateTo("/user/signin");
+    }
+}

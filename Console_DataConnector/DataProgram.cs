@@ -14,11 +14,8 @@ using Console_DataConnector.DataModule.DataADO.ADODbMetadataServices;
 using Console_DataConnector.DataModule.DataADO.ADODbMigBuilderService;
 using Console_DataConnector.DataModule.DataADO;
 using Console_DataConnector.DataModule.DataCommon.Metadata;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Data.SqlClient;
 using System.Data;
-using Google.Protobuf.WellKnownTypes;
-using System.Drawing;
  
 namespace Console_DataConnector
 {

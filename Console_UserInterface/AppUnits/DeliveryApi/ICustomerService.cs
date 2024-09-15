@@ -14,6 +14,11 @@ namespace Console_BlazorApp.AppUnits.DeliveryApi
         CustomerContext GetCustomerByPhone(string phoneNumber);*/
 
    
+        /// <summary>
+        /// Добавление товара в корзину заказа
+        /// </summary>
+        /// <param name="first"></param>
+        /// <param name="orderId"></param>
         void AddItemToOrder(Product first, int orderId);
         int CreateCustomer(string firstName, string lastName, string phoneNumber);
         Order CreateOrder(int customerId);

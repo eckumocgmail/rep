@@ -15,7 +15,8 @@
     {
         await Task.CompletedTask;
         if( first )
-        {
+        {            
+            //js.InvokeAsync<int>($"startUpdateGeoPosition", DotNetObjectReference.Create(this));
             js.InvokeAsync<int>($"startupNotification", DotNetObjectReference.Create(this));
         }
 

@@ -1,0 +1,380 @@
+﻿@using System.Reflection;
+@using Console_UserInterface.Services;
+@using static Console_UserInterface.Location.LocationDbContext;
+@inherits BaseComponent
+@code
+{
+    [Parameter]
+    [NotNullNotEmpty]
+    public PageComponent Model { get; set; }
+    [Parameter]
+    public EventCallback<object> OnInput { get; set; }
+}
+@functions
+{
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        this.Validate();
+        if(Model is not null)
+        {
+            Model.Validate();
+        }
+    }
+    private List<dynamic> items;
+    public List<dynamic> GetCollectionItems()
+    {
+        items = items is null ? new() : items;
+        items.Clear();
+        if (Model is not null && Model.Value is not null)
+        {
+            foreach (var item in (dynamic)Model.Value)
+            {
+                items.Add(item);
+            }
+        }
+        return items;
+    }
+    public Type GetCollectionItemType()
+    {
+        this.EnsureIsValide();
+        this.Model.EnsureIsValide();
+        return Model.Type.ToType();
+    }
+
+    public string GetHtmlInputValue()
+    {
+
+        switch (Model.Type.ToLower())
+        {
+            case "date":
+                string year = "XXXX";
+                string month = "XX";
+                string day = "XX";
+                if (Model.Value != null)
+                {
+                    System.DateTime? dateNullable = null;
+                    if (Model.Value is System.DateTime)
+                    {
+                        dateNullable = (System.DateTime)Model.Value;
+                    }
+                    else
+                    {
+                        try
+                        {
+                            var str = Model.Value.ToString();
+                            dateNullable = str.ToDate();
+                        }
+                        catch (Exception)
+                        {
+                        }
+                    }
+                    if (dateNullable == null)
+                    {
+                        //throw new Exception("Значение DateTime не получено в итоге");
+                        return "";
+                    }
+                    System.DateTime date = (System.DateTime)dateNullable;
+                    year = date.Year.ToString();
+                    month = (date.Month >= 10) ? date.Month.ToString() : ("0" + date.Month.ToString());
+                    day = (date.Day >= 10) ? date.Day.ToString() : ("0" + date.Day.ToString());
+                }
+                return $"{year}-{month}-{day}";
+            default: return Model.Value != null ? Model.Value.ToString() : "";
+
+
+        }
+
+    }
+    public void OnInputHandle(object evt)
+    {       
+        this.OnInput.InvokeAsync(this.Model.Value = evt is ChangeEventArgs ? ((ChangeEventArgs)evt).Value: evt);
+        //this.Model.Errors = this.Model.Validate();
+        StateHasChanged();
+    }
+
+    public void OnItemAdded(object evt)
+    {
+        this.Info($"OnItemAdded({evt})");
+        /*if (Model.Value is null)
+            {
+            Model.Value = Model.CollectionSetup.ItemType.ToType().New();
+        }*/
+        if(Model.Value is null)
+        {
+            var type = typeof(List<>).MakeGenericType(new Type[] { typeof(string) });
+            var p = type.GetConstructors().First().Invoke(new object[0]);
+            Model.Value = p;
+
+        }
+        //GetCollectionItems().Add(evt);
+        var add = Model.Value.GetType().GetMethod("Add");
+        add.Invoke(Model.Value, new object[] { evt });
+    }
+    public void OnItemRemoved(object evt)
+    {
+        if (Model.Value is null)
+        {
+            var type = typeof(List<>).MakeGenericType(new Type[] { typeof(string) });
+            var p = type.GetConstructors().First().Invoke(new object[0]);
+            Model.Value = p;
+
+        }
+        foreach (var item in (dynamic)evt) 
+            Model.Value.GetType().GetMethod("Remove").Invoke(Model.Value, new object[] { item });
+
+    }
+}
+<div>
+    <label class="@(Model.State == "invalid"? "text text-danger": "text")">@Model.Label</label>
+    <p>@Model.Value</p>
+    <div class="@(Model.Size == "small"? "input-group-sm": Model.Size == "big"? "input-group-lg": "input-group" ) mb-3">
+        <div class="input-group-prepend">
+            <span class="input-group-text" id="basic-addon1">
+                
+            </span>
+        </div>
+        @if (Model is not null && Model.Visible)
+        {
+            @if (Model.IsCollection)
+            {
+                if (Model.CollectionSetup is null)
+                {
+                    <p>Model.CollectionSetup</p>
+                }
+
+                <p>Model.CollectionSetup</p>
+                @if (Model.IsPrimitive)
+                {
+                    <ListPrimitiveEditor Label="@Model.Label" Attributes="Model.Attributes" OnRemove="OnItemRemoved" OnAdd="OnItemAdded" Items="GetCollectionItems()" ItemType="Model.CollectionSetup.ItemType.ToType()"></ListPrimitiveEditor>
+                     
+                }
+                else
+                {
+                    @* <ListEditor ItemType="GetCollectionItemType()" Items="GetCollectionItems()"></ListEditor>*@
+
+                }
+            }
+            else
+            {
+                @if (Model.IsPrimitive)
+                {
+                    @if (Model.Control is not null)
+                    {
+
+                        @switch (Model.Control.GetType().GetTypeName())
+                        {
+                            case nameof(InputSelectAttribute):
+                                InputSelectAttribute inputSelect = (InputSelectAttribute)Model.Control;
+                                <SelectBox Options="inputSelect.Options" Value="@Model.Value.ToString()" OnChange="((string evt) => OnInputHandle(evt))"></SelectBox>
+                                break;
+                            case nameof(InputDictionaryAttribute):
+                                InputDictionaryAttribute inputDictionary = (InputDictionaryAttribute)Model.Control;
+                                <SelectBox Options="inputDictionary.Options" Value="@Model.Value.ToString()" OnChange="((string evt) => OnInputHandle(evt))"></SelectBox>
+                                break;
+                            case nameof(InputComboboxAttribute):
+                                InputComboboxAttribute inputCombobox = (InputComboboxAttribute)Model.Control;
+                                <ComboBox Value="@Model.Value.ToString()" OnInput="((string evt) => OnInputHandle(evt))" Label="@Model.Label"></ComboBox>
+                                break;
+                            default:
+                                <div>Тип control @Model.Control.GetType() не поддерживается</div>
+                                break;
+                        }
+                    }
+                    else
+                    {                       
+                        @switch (Model.Type)
+                        {                            
+                            case InputTypes.Percent:
+                                <input type="number" oninput="if(this.value>100) this.value = 100; if(this.value < 0)this.value = 0; console.log(this.value)" @onchange="(evt => { var intValue = evt.Value.ToString().ToInt(); if( intValue >= 0  && intValue <=100 ) OnInput.InvokeAsync(new ChangeEventArgs(){ Value=evt }).Wait(); StateHasChanged();})" class="form-control @(Model.State)" value="@Model.Value" name="@Model.Name" />
+                                break;
+                            case InputTypes.Number:
+                                <input type="number" @oninput="((evt) => OnInputHandle(evt ))" class="form-control is-@(Model.State) @Model.State)" value="@GetHtmlInputValue()" name="@Model.Name"  />
+                                break;
+                            case InputTypes.Custom:
+                                <input type="number" @oninput="((evt) => OnInputHandle(evt ))" class="form-control is-@(Model.State) @Model.State)" value="@GetHtmlInputValue()" name="@Model.Name"  />
+                                break;
+                            case InputTypes.Date:
+                                <input type="date" @oninput="((evt) => OnInputHandle(evt ))"class="form-control is-@(Model.State) @Model.State)" value="@GetHtmlInputValue()" name="@Model.Name"  />
+                                break;
+                            case InputTypes.DateTime:
+                                <input type="datetime" @oninput="((evt) => OnInputHandle(evt ))" class="form-control is-@(Model.State) @Model.State)" value="@GetHtmlInputValue()" name="@Model.Name"  />
+                                break;
+                            case InputTypes.Time:
+                                <input type="time" @oninput="((evt) => OnInputHandle(evt ))" class="form-control is-@(Model.State) @Model.State)" value="@GetHtmlInputValue()" name="@Model.Name"  />
+                                break;
+                            case InputTypes.Duration:
+                                <input type="number" @oninput="((evt) => OnInputHandle(evt ))" class="form-control is-@(Model.State) @Model.State)" value="@GetHtmlInputValue()" name="@Model.Name" />
+                                break;
+                            case InputTypes.Xml:
+                                <div>
+                                    <span>add</span>
+                                                                                          
+                                </div>
+
+                                
+                                break;
+                            case InputTypes.Image:
+                                <img id="img_from_file_@GetHashCode()" src="" style="width: 100%; height: 100%; min-height: 320px; min-width: 320px; max-height: 640px; max-width: 640px; margin: 0px; padding: 0px;" class="btn" />
+                                <input type="hidden" value="@Model.Value" id="data_input_@GetHashCode()" @onchange="(evt => { this.OnInput.InvokeAsync( Model.Value = evt.Value ).Wait(); StateHasChanged(); })" name="@Model.Name" />
+                                <input type="file" id="file_input" onchange="
+                                        for(let i=0; i<this.files.length; i++)
+                                        {
+                                            let file= this.files[i];
+                                            let reader = new FileReader();
+                                            reader.onload = function() {                                                     
+                                                 document.getElementById('img_from_file_@GetHashCode()').src=reader.result;
+                                                 document.getElementById('data_input_@GetHashCode()').value=reader.result;
+                                            };
+                                            reader.readAsDataURL(file);
+                                        }
+                                    " />
+
+
+
+                                /*@inject ISessionService signin
+                                @inject NavigationManager nav
+                                @inject IJSRuntime js
+                                @code
+                                {
+                                    int ctn = 0;
+                                    string ImageSource { get; set; }
+                                    public async Task OnImageClicked()
+                                    {
+                                        this.Info($@"document.querySelector('input[id='{Model.Name}']')");
+                                        await js.InvokeAsync<string>("eval", $"document.querySelector('[id={Model.Name}]').click();");
+                                    }
+                                }
+                                <img src="@ImageSource"  @onclick="OnImageClicked" style="padding: 0px; margin: 0px; width: 320px; height: 320px;" class="btn btn-primary" />
+                                @ImageSource
+                                <div style="display: block;">
+                                    <FileUpload FileExts=".png,.jpg,.icon" Single="true"
+                                                Id="@Model.Name"
+                                                OnChanged='(evt => {
+                                                    if( evt is not null && evt.Count() > 0 )
+                                                    {
+                                                        var file = evt.First();                                                        
+
+                                                        Model.Value = file.FileData;
+                                                        
+                                                        ////ImageSource = "data:image/gif;base64,"+Convert.ToBase64String((byte[])Model.Value);
+                                                        signin.SetValue($"{Model.Name}{ctn}", Model.Value);
+                                                        var val = signin.GetValue($"{Model.Name}{ctn}");
+                                                        ImageSource="https://localhost:7166/api/Checkout/SessionImage?id="+Model.Name+ctn;
+                                                        ctn++;
+                                                        //Model.Value = "data:image/json;base64,"+Convert.ToBase64String((byte[])Model.Value);
+                                                        //OnInputValue(Model.Name)(new ChangeEventArgs(){ Value = Model.Value });
+                                                        StateHasChanged();
+                                                    }
+                                        })'></FileUpload>
+                                </div>*/
+                                break;
+                            //почтовый индекс 197371
+                            case InputTypes.PostalCode:
+                                <input type="text" @oninput="((evt) => OnInputHandle(evt ))" class="form-control is-@(Model.State) @Model.State)" value="@GetHtmlInputValue()" name="@Model.Name"  />
+                                break;
+
+                            //номер карты 2202-8080-9090-1010
+                            case InputTypes.CreditCard:
+                                <span class="btn" style="width: 25px; height: 25px;"></span>
+                                <span class="btn" style="width: 25px; height: 25px;"></span>
+                                <span class="btn" style="width: 25px; height: 25px;"></span>
+                                <span class="btn" style="width: 25px; height: 25px;"></span>
+                                <span class="btn" style="width: 25px; height: 25px;"></span>
+                                <span class="btn" style="width: 25px; height: 25px;"></span>
+                                <span class="btn" style="width: 25px; height: 25px;"></span>
+                                <span class="btn" style="width: 25px; height: 25px;"></span>
+                                <span class="btn" style="width: 25px; height: 25px;"></span>
+                                <span class="btn" style="width: 25px; height: 25px;"></span>
+                                <span class="btn" style="width: 25px; height: 25px;"></span>
+                                <span class="btn" style="width: 25px; height: 25px;"></span>
+                                break;
+
+                            //баланс
+                            case InputTypes.Currency:
+                                <input type="text" @oninput="((evt) => OnInputHandle(evt ))" class="form-control is-@(Model.State) @Model.State)" value="@GetHtmlInputValue()" name="@Model.Name"  />
+                                break;
+                            case InputTypes.Icon:
+                                <select class="form-control is-@(Model.State) @Model.State)" value="@GetHtmlInputValue()" name="@Model.Name">
+                                    @inject IconsProvider icons
+                                    @foreach (var option in icons.GetValues())
+                                    {
+                                        <option value="@option">@option</option>    
+                                    }
+                                    
+                                </select>
+                                break;                            
+                            case InputTypes.Color:
+                                <input type="color" @oninput="((evt) => OnInputHandle(evt ))" class="form-control is-@(Model.State) @Model.State)" value="@GetHtmlInputValue()" name="@Model.Name" />
+                                break;
+                            case InputTypes.Email:
+                                <input type="email" @oninput="((evt) => OnInputHandle(evt ))" class="form-control is-@(Model.State) @Model.State)" value="@GetHtmlInputValue()" name="@Model.Name"  />
+                                break;
+                            case InputTypes.File:
+                                <FileUpload FileExts="*.*" OnChanged="((evt) => OnInputHandle(evt ))" Single="true"></FileUpload>
+                                break;
+                            case InputTypes.Month:
+                                <input type="month" @oninput="((evt) => OnInputHandle(evt ))" class="form-control is-@(Model.State) @Model.State)" value="@GetHtmlInputValue()" name="@Model.Name"  />
+                                break;
+                            case InputTypes.Password:
+                                <input type="password" @oninput="((evt) => OnInputHandle(evt ))" class="form-control is-@(Model.State) @Model.State)" value="@GetHtmlInputValue()" name="@Model.Name"  />
+                                break;
+                            case InputTypes.Phone:
+                                <input type="text" oninput="var evt = window.event;
+                                        try {
+                                            console.log(evt);
+
+                                            var s = '';
+                                            var v = evt.target.value;
+                                            for (let i = 0; i < v.length; i++) {
+                                                if ('0123456789-'.indexOf(v[i]) != -1) {
+                                                    s += v[i];
+                                                    if (s.length > 13) {
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                            if (s.length > 1 && s[1] != '-') s = s.substring(0, 1) + '-' + s.substring(1);
+                                            if (s.length > 4 && s[5] != '-') s = s.substring(0, 5) + '-' + s.substring(5);
+                                            if (s.length > 8 && s[9] != '-') s = s.substring(0, 9) + '-' + s.substring(9);
+                                            v = s;
+                                            if (v.endsWith('-')) v = v.substring(0, v.length - 1);
+                                            this.value = v;
+
+                                        } catch (e) {
+                                            console.error(e);
+                                        };" class="form-control is-@(Model.State) @Model.State)" value="@GetHtmlInputValue()" name="@Model.Name" />
+                                break;
+                            case InputTypes.Url:
+                                <input type="url" @oninput="((evt) => OnInputHandle(evt ))" class="form-control is-@(Model.State) @Model.State)" value="@GetHtmlInputValue()" name="@Model.Name"  />
+                                break;
+                            case InputTypes.Week:
+                                <input type="week" @oninput="((evt) => OnInputHandle(evt ))" class="form-control is-@(Model.State) @Model.State)" value="@GetHtmlInputValue()" name="@Model.Name"  />
+                                break;
+                            case InputTypes.Year:
+                                <input type="year" @oninput="((evt) => OnInputHandle(evt ))" class="form-control is-@(Model.State) @Model.State)" value="@GetHtmlInputValue()" name="@Model.Name"  />
+                                break;
+                            case InputTypes.Text:
+                                <input type="text" @oninput="((evt) => OnInputHandle(evt ))" class="form-control is-@(Model.State) @Model.State)" value="@GetHtmlInputValue()" name="@Model.Name"  />
+                                break;
+                            case InputTypes.MultilineText:
+                                <textarea class="form-control is-@(Model.State) @Model.State)" name="@Model.Name" @onchange="(async evt => { await OnInput.InvokeAsync(evt); StateHasChanged(); })">@Model.Value</textarea>
+                                break;
+                            default:
+                                <div class="alert alert-danger">
+                                    Тип @Model.Type не поддерживается в @GetType().GetTypeName()
+                                </div>
+                                break;
+                        }
+
+                    }
+                }
+                else
+                {
+                    <PageView Model="@this.Model.AsPage()"></PageView>
+                }
+            }
+        }
+        
+    </div>
+</div>

@@ -96,6 +96,18 @@ public class ServiceFactory
 
     public IEnumerable<string> GetNames() => this.ByShortNames.Keys.ToList();
 
+    /// <summary>
+    /// Получение типов абстрации для классов сущностей, 
+    /// Наследуется от BaseEntity
+    /// </summary>
+    /// <returns></returns>
+    public IEnumerable<string> GetEntityTypes() => 
+        this.ByShortNames.Values.Where(val => 
+        val != typeof(BaseEntity) && 
+        val.IsAbstract == true && 
+        val.IsExtends(typeof(BaseEntity))
+    ).Select(P => P.Name);
+
 
     /// <summary>
     /// 
@@ -148,6 +160,7 @@ public class ServiceFactory
     }
     public void AddTypes(Assembly assembly)
     {
+        
         if (Assemblies.Contains(assembly) == true)
         {
             return;

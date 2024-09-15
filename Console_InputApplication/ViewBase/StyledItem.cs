@@ -77,6 +77,7 @@ public class StyledItem : ViewBuilder
         BorderColor = "#ffffff";         
         Width = 100;
         Height = 100;
+        TextAlign = "left";
         Cursor = "inherit";
         Changed = false;
     }

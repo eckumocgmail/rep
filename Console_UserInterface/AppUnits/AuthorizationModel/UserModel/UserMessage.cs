@@ -28,6 +28,7 @@ public class UserMessage : BaseEntity
     [Label("Источник")]
     [NotNullNotEmpty("Свойство " + nameof(FromUserId) + " дожно иметь действительное значение" )]
     //[NotInput("Свойство " + nameof(FromUserId) + " не вводится пользователем, оно устанавливается системой перед созданием сообщения на эл. почту пользорвателя с инструкциями по активации")]    
+    [InputDictionary($"{nameof(UserContext)},{nameof(UserContext.AccountId)}")]
     public int? FromUserId { get; set; }
 
     [Label("Источник")]        

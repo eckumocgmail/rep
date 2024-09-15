@@ -1,0 +1,23 @@
+﻿@inject IJSRuntime js
+@inject SigninUser signin
+@code 
+{
+    protected override async Task OnAfterRenderAsync(bool first)
+    {
+        await base.OnAfterRenderAsync(first);
+        if (first)
+        {
+            await js.InvokeAsync<int>($"startUpdateGeoPosition", DotNetObjectReference.Create(this));            
+        }
+    }
+
+    [JSInvokable]
+    public async Task OnGeoPositionChanged(object latitude, object longitude)
+    {
+        await Task.CompletedTask;
+        if (signin.IsSignin())
+        {
+            this.Info($"{signin.Verify().Person.GetFullName()} [{latitude},{longitude}]");
+        }
+    }
+}

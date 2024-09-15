@@ -1,6 +1,7 @@
-﻿@code
+﻿@using Console_UserInterface.AppUnits;
+@code
 {
     [Parameter]
     public int HolderId { get; set; }
 }
-<NavModel Model="@((new AppBuilder()).GetNavModel(GetType().Namespace, new Dictionary<string, string>(){ {"HolderId", HolderId.ToString() }} ))"></NavModel>
+<NavModel Model="@(AppBuilder.CreateNavMenu( GetType().Namespace, new Dictionary<string, string>(){ {"HolderId", HolderId.ToString() }} ))"></NavModel>

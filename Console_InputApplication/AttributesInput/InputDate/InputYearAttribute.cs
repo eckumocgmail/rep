@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 [Label("Год")]
 public class InputYearAttribute : BaseInputAttribute
 {
-    public InputYearAttribute() : base(InputTypes.Year)
+    public InputYearAttribute() : base(
+        InputTypes.Year)
     {
     }
     public override bool IsValidValue(object value)

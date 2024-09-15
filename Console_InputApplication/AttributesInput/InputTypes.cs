@@ -4,45 +4,61 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-public class InputTypes: HashSet<string>
+public class InputTypes
 {
+    public static List<string> GetAll() => new List<string>() 
+    {
+        InputTypes.Color,
+        InputTypes.PrimitiveCollection,
+        InputTypes.Email,
+        InputTypes.File,
+        InputTypes.Month,
+        InputTypes.Password,
+        InputTypes.Phone,
+        InputTypes.Week,
+        InputTypes.Url,
+        InputTypes.StructureCollection,
+        InputTypes.Percent,
+        InputTypes.Number,
+        InputTypes.Custom,
+        InputTypes.Image,
+        InputTypes.Xml,
+        InputTypes.Time,
+        InputTypes.DateTime,
+        InputTypes.Date,
+        InputTypes.PostalCode,
+        InputTypes.CreditCard,
+        InputTypes.Icon,
+        InputTypes.Currency,
+        InputTypes.Year,
+        InputTypes.Text,
+        InputTypes.MultilineText
+    };
+    public const string Color = "Color";
+    public const string PrimitiveCollection = "PrimitiveCollection";
+    public const string Email = "Email";
+    public const string File = "File";
+    public const string Month = "Month";
+    public const string Password = "Password";
+    public const string Phone = "Phone";
+    public const string Week = "Week";
+    public const string Url = "Url";
+    public const string StructureCollection = "StructureCollection";
+    public const string Percent = "Percent";
+    public const string Number = "Number";
+    public const string Custom = "Custom";
+    public const string Date = "Date";
+    public const string DateTime = "DateTime";
+    public const string Time = "Time";
+    public const string Duration = "Duration";
+    public const string Xml = "Xml";
+    public const string Image = "Image";
+    public const string PostalCode = "PostalCode";
+    public const string CreditCard = "CreditCard";
+    public const string Currency = "Currency";
+    public const string Icon = "Icon";
     
-    public static string PrimitiveCollection = "PrimitiveCollection";
-    public static string StructureCollection = "StructureCollection";
-    public static string Percent = "Percent";
-    public static string Number = "Number";
-    public static string Custom = "Custom";
-    public static string Date = "Date";
-    public static string DateTime = "DateTime";
-    public static string Time = "Time";
-    public static string Duration = "Duration";
-    public static string Xml = "Xml";
-    public static string Image = "Image";
-    public static string PostalCode = "PostalCode";
-    public static string CreditCard = "CreditCard";
-    public static string Currency = "Currency";
-    public static string Icon = "Icon";
-    public static string Color = "Color";
-    public static string Email = "Email";
-    public static string File = "File";
-    public static string Month = "Month";
-    public static string Password = "Password";    
-    public static string Phone = "Phone";
-    public static string Url = "Url";
-    public static string Week = "Week";
-    public static string Year = "Year";
-    public static string Text = "Text";
-    public static string MultilineText = "MultilineText";
-
-
-    public IEnumerable<string> GetAll()
-        => new List<string>()
-        {
-            Text,MultilineText,Year,Week,Month,Url,Phone,Password,File,Email,Color,Icon,Currency,
-            PostalCode,Image,Xml,Duration,Time,DateTime,Custom,Number,Percent, StructureCollection,PrimitiveCollection
-        };
-
-
-
-
+    public const string Year = "Year";
+    public const string Text = "Text";
+    public const string MultilineText = "MultilineText";
 }

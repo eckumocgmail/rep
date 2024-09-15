@@ -12,9 +12,6 @@ using AngleSharp.Dom;
 
 
 using Microsoft.AspNetCore.Mvc;
-
-using MySqlX.XDevAPI.Common;
-
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 

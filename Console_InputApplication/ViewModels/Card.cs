@@ -33,7 +33,7 @@ public class Card : ViewItem
     {
         ActivePropertyName = Name;
         Changed = true;
-        IsCollection = Attrs.IsCollection(Item.GetType(), Name);        
+        IsCollection = AttrsUtil.IsCollection(Item.GetType(), Name);        
         return true;
     }
       
@@ -49,7 +49,7 @@ public class Card : ViewItem
     {
         
         Item = item;
-        Navigation = Attrs.GetNavigation(Item.GetType());
+        Navigation = AttrsUtil.GetNavigation(Item.GetType());
         ActivePropertyName = Navigation.First().Name;
         Changed = false;
     }

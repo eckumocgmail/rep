@@ -30,4 +30,9 @@ public class ActiveObject : NamedObject, IActiveObject
 
     [InputTcpIp4Address]
     public string Ip4 { get; set; }
+
+
+    public DateTime GeoUpdated { get; set; } = DateTime.Now;
+    public string Latitude { get; set; } = "60.000000";
+    public string Longitude { get; set; } = "30.000000";
 } 

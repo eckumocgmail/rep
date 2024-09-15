@@ -168,12 +168,13 @@
     //[Parameter] public string InputType { get; set; }
     [Parameter] public bool IsInput { get; set; }
 
-    [Parameter]
-    public PropertyInfo PropertyModel { get; set; }
+    /*[Parameter]
+    [NotNullNotEmpty]
+    public MemberInfo PropertyModel { get; set; }*/
 
     [Parameter]
     public Dictionary<string,string> Attributes { get; set; }
-
+    Type ValueType { get; set; }
     public void OnAddButtonClicked()
     {
         if (ItemType is not null)
@@ -181,12 +182,9 @@
 
             InputFormField field = null;
 
-            var property = PropertyModel;
-            if (property == null)
-            {
-                throw new Exception("Ошибка при создании поля " + ItemModel.Name);
-            }
-            var propertyType = Typing.ParsePropertyType(property.PropertyType);
+            this.ValueType = typeof(List<>).MakeGenericType(this.ItemType);
+
+            var propertyType = ValueType.GetTypeName();
 
 
             field = new InputFormField();
@@ -363,13 +361,23 @@
     {
         if (this.Attributes is null)
             throw new ArgumentException("Attributes");
-        PagesCount = Items.Count() % PageSize == 0 ? ((int)(Items.Count() / PageSize)) : ((int)(Items.Count() / PageSize) + 1);        
+        PagesCount = Items is null? 1: Items.Count() % PageSize == 0 ? ((int)(Items.Count() / PageSize)) : ((int)(Items.Count() / PageSize) + 1);
         Update();
     }
     [Parameter]
     public string SearchQuery { get; set; }
     public void Update()
     {
+        if (Items is null)
+        {
+            Items = new List<dynamic>();
+        }
+        var valitionMessages = this.Validate();
+        if (valitionMessages.Where(kv => kv.Value.Count() > 0).Count() > 0)
+        {
+            this.Error(valitionMessages.ToJsonOnScreen());
+            throw new Exception(valitionMessages.ToJsonOnScreen());
+        }
         if (SelectedItems is null)
             SelectedItems = new();
         SelectedItems.Clear();

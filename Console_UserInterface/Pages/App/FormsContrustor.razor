@@ -1,14 +1,31 @@
 ﻿@page "/app/form-constructor"
-<h3>FormsContrustor</h3>
 
-@code 
+<CardContainer>
+    <CardHeader>
+        <h3>Конструктор форм</h3>
+        <SelectBox Label="Тип поля ввода" Options="Attrs.GetInputTypes()"></SelectBox>
+        <SelectBox Label="Тип элемента управления" Options="Attrs.GetControlTypes()"></SelectBox>
+    </CardHeader>
+    <CardBody>
+        
+        <CheckList ListItems="@(typeof(InputFormModel).GetInputProperties())" OnChanged="(evt => { SelectedFields = evt; StateHasChanged(); })"></CheckList>
+        <FormEditor Model="(new InputFormModel(new UserAccount()))" Properties="@(SelectedFields)"></FormEditor>
+        @*<TreeNode Name="Приложение"></TreeNode>
+        <FormModel Form="@Model"></FormModel>
+        *@
+
+    </CardBody>
+    <CardFooter>
+        <Button>ok</Button>
+    </CardFooter>
+</CardContainer>
+
+@code
 {
-    public InputFormModel Model { get; set; } = new InputFormModel(new InputFormField());
+    public List<string> SelectedFields { get; set; } = new List<string>() { "Title", "Description" };
+    public InputFormField Field { get; set; } = new InputFormField(typeof(UserPerson), nameof(UserPerson.Tel));
+    //public InputFormModel Model { get; set; } = new InputFormModel(new InputFormField());
 
 }
 
-<FormEditor Model="Model"></FormEditor>
 
-<SelectBox Label="Тип поля ввода" Options="Attrs.GetInputTypes()"></SelectBox>
-<SelectBox Label="Тип элемента управления" Options="Attrs.GetControlTypes()"></SelectBox>
-<FormModel Form="@Model"></FormModel>

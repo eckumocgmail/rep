@@ -17,9 +17,7 @@ namespace ApplicationDb.Entities
 
         [NotNull]
         [Label("Тип файла")]
-        [InputSelect(1, Options = new string[] { 
-            "text/html"
-        })]
+        [InputSelect("text/html")]
         [NotNullNotEmpty("Необходимо ввести задать тип ресурса (MimeType)")]
         public string Mime { get; set; }
  

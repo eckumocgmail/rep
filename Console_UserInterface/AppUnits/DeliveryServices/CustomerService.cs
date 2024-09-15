@@ -66,7 +66,7 @@ namespace Console_BlazorApp.AppUnits.DeliveryServices
 
         public IEnumerable<Product> SearchProducts(string query, double maxPrice)
         {
-            var fasade = new EntityFasade<Product>(_deliveryUnit);
+            var fasade = new EfEntityFasade<Product>(_deliveryUnit);
             var products = fasade.Search(query);
             return products.Where(product => product.ProductCost <= maxPrice).ToList();
         }
@@ -75,7 +75,7 @@ namespace Console_BlazorApp.AppUnits.DeliveryServices
         {
 
             //TODO
-            var fasade = new EntityFasade<Product>(_deliveryUnit);
+            var fasade = new EfEntityFasade<Product>(_deliveryUnit);
             var products = fasade.Search(query);
 
             return products;
@@ -83,13 +83,13 @@ namespace Console_BlazorApp.AppUnits.DeliveryServices
 
         public IEnumerable<Product> SearchProducts(string query)
         {
-            var fasade = new EntityFasade<Product>(_deliveryUnit);
+            var fasade = new EfEntityFasade<Product>(_deliveryUnit);
             return fasade.Search(query);
         }
 
         public IEnumerable<Product> SearchProducts(string query, List<string> categories)
         {
-            var fasade = new EntityFasade<Product>(_deliveryUnit);
+            var fasade = new EfEntityFasade<Product>(_deliveryUnit);
             return fasade.Search(query);
         }
 

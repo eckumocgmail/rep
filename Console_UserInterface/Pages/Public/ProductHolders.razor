@@ -23,7 +23,7 @@
         try
         {
             db.Products.ToList();
-            var fasade = new EntityFasade<Holder>(db);
+            var fasade = new EfEntityFasade<Holder>(db);
             var SearchedProducts = fasade.Search(SearchQuery);
             SearchOptions = fasade.GetOptions(SearchQuery).ToList();
             PagesCount = (SearchedProducts.Count() + SearchedProducts.Count() % 10) / 10;

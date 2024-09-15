@@ -137,7 +137,7 @@ public class Utils
         return attrs;
     }
 
-    internal static Dictionary<string, Dictionary<string, string>> GetAttributesByMemberForType(Type type)
+    public static Dictionary<string, Dictionary<string, string>> GetAttributesByMemberForType(Type type)
     {
         type.GetProperties().ToList().Select(p => p.Name).ToList().ForEach((name) => {
             ForProperty(type, name).ToJsonOnScreen().WriteToConsole();
@@ -145,7 +145,7 @@ public class Utils
         return AttrsByMembers[type.Name];
     }
 
-    internal static IEnumerable<string> GetRefTypPropertiesNames(Type type)
+    public static IEnumerable<string> GetRefTypPropertiesNames(Type type)
     {
         return type.GetProperties().ToList().Where(p => Typing.IsPrimitive(p.PropertyType) == false).Select(p => p.Name);
     }

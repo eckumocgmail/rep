@@ -282,7 +282,7 @@ public abstract class AuthorizationCollection<T>: APIActiveCollection<T> where T
         return this._memory.ContainsKey(key);
     }
     
-    IEnumerable<T> APICollection<T>.GetAll()      => this._memory.Values.ToList();
+    //IEnumerable<T>  GetAll()      => this._memory.Values.ToList();
 
     public IEnumerable<string> GetNotActive(long ms)
     {
@@ -297,6 +297,17 @@ public abstract class AuthorizationCollection<T>: APIActiveCollection<T> where T
             result.Add(Remove(key));
         }
         return result;
+    }
+
+    UserContext APIActiveCollection<T>.Take(string token)
+    {
+        throw new NotImplementedException();
+    }
+
+  
+    public string Put(UserContext user)
+    {
+        throw new NotImplementedException();
     }
 }
 

@@ -232,6 +232,44 @@ public static class ObjectValidationExtensions
     /// Валидация модели по правилам определённым через атрибуты
     /// </summary>
     /// <returns></returns>
+    /// GetInputProperties(ptype)
+    public static Dictionary<string, List<string>> Validate(this object p, IEnumerable<string> properties)
+    {
+        //p.Info("Приступаю к валидации: " + p.GetType().GetProperties().Select(p => p.Name).ToJsonOnScreen());
+        object target = p;
+
+        Dictionary<string, List<string>> result = new Dictionary<string, List<string>>();
+        foreach (var property in properties.Select( name => p.GetType().GetProperty(name)))
+        {
+            string key = property.Name;
+
+            //p.Info($"Валидация свойства: {key}");
+            if (IsPrimitive(property.PropertyType))
+            {
+                List<string> errors = p.Validate(key);
+                if (errors.Count > 0)
+                {
+                    result[key] = errors;
+                }
+
+            }
+        }
+        var optional = target.ValidateOptional();
+        foreach (var pkv in optional)
+        {
+            if (result.ContainsKey(pkv.Key))
+            {
+                result[pkv.Key].AddRange(optional[pkv.Key]);
+            }
+            else
+            {
+                result[pkv.Key] = optional[pkv.Key];
+            }
+        }
+
+
+        return result;
+    }
     public static Dictionary<string, List<string>> Validate(this object p)
     {
         //p.Info("Приступаю к валидации: " + p.GetType().GetProperties().Select(p => p.Name).ToJsonOnScreen());

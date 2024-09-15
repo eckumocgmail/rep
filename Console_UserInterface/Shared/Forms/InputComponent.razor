@@ -1,0 +1,26 @@
+﻿@inherits InputBase
+<div>
+    @switch (ComponentType)
+    {
+        case ComponentTypes.Input:
+            break;
+        case ComponentTypes.Text:
+            break;
+        case ComponentTypes.Control:
+            break;
+        case ComponentTypes.Collection:
+            break;
+        case ComponentTypes.Custom:
+            break;
+        default:
+            <TextComponent></TextComponent>
+            break;
+    }
+</div>
+@code 
+{
+    protected override Task OnInitializedAsync()
+    {
+        return base.OnInitializedAsync();
+    }
+}

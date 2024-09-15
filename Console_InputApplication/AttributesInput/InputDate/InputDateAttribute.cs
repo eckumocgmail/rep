@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 [Label("Дата")]
 public class InputDateAttribute : BaseInputAttribute
 {
-    public InputDateAttribute( ) : base(InputTypes.Date)
+    public InputDateAttribute( ) : base(
+        InputTypes.Date)
     {
         
     }

@@ -1,5 +1,5 @@
 ﻿@using Microsoft.EntityFrameworkCore;  
-@typeparam DataType
+@typeparam DataType 
 @inject IServiceProvider serviceProvider
 <CardContainer>
     <CardHeader>
@@ -36,7 +36,7 @@
     public bool ShowLeft { get; set; } = false;
 
     private DbContext DbContext { get; set; }
-    private IEntityFasade<DataType> Fasade { get; set; }
+    private EfEntityFasade<DataType> Fasade { get; set; }
     public IEnumerable<DataType> AllItems { get; set; } = new List<DataType>();
     public IEnumerable<DataType> DataItems { get; set; } = new List<DataType>();
 
@@ -85,7 +85,7 @@
             var dataTypeName = typeof(DataType).GetTypeName();
             return etypes.Contains(dataTypeName);
         });
-        this.Fasade = new EntityFasade<DataType>(this.DbContext);
+        this.Fasade = new EfEntityFasade<DataType>(this.DbContext);
         DoSearch();
     }
 }

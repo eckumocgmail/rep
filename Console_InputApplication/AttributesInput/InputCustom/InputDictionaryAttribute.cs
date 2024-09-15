@@ -7,7 +7,7 @@ using System.Collections.Generic;
     "Приложение использует его в процессе выполнения валидации модели для проверки значений переменной. ")]
 public class InputDictionaryAttribute : ControlAttribute
 {
-    public object Options { get; private set; }
+    public List<string> Options { get; private set; }
 
     public InputDictionaryAttribute() : base()
     {

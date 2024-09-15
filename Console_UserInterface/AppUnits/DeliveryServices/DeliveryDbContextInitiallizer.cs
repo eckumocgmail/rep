@@ -1,36 +1,17 @@
-﻿ 
-using System.ComponentModel.DataAnnotations;
-using static System.Console;
+﻿using static System.Console;
 using static Newtonsoft.Json.JsonConvert;
-using Newtonsoft.Json.Linq;
-using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Collections.Concurrent;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Configuration;
-using System.Collections.Generic;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
-using System.Threading;
-using Console_AuthModel;
-using Microsoft.Extensions.Options;
-using Microsoft.AspNetCore.Builder;
 using Console_BlazorApp.AppUnits.DeliveryModel;
 using Console_BlazorApp.AppUnits.DeliveryApi;
 using Mvc_Apteka.Entities;
-using WebApiDetaliusBotTests;
 using Newtonsoft.Json.Serialization;
-using Console_AuthModel.AuthorizationModel.UserModel;
+using Parlot;
 
 namespace pickpoint_delivery_service
 {
     public class DeliveryDbContextInitiallizer : IdeliveryDbContextInitiallizer
     {
-
-        
-
         public IDictionary<string, int> Init(DeliveryDbContext context, string contentPath)
         {
             
@@ -1462,17 +1443,17 @@ namespace pickpoint_delivery_service
                 throw new Exception("Не удалось загрузить сведения о продукции, т.к. не корректно указан путь к директории: " + ResourceDir);
             
             var http = new HttpClient();
-            var client = new WebApiDetaliusBotTests.Client("https://sps.euroauto.ru/", http);
-            var spare = new WebApiDetaliusBotTests.SpareClient("https://sps.euroauto.ru/", http);
-            var token = client.TokenAsync(new()
+            var client = new WebApiDetaliusBotTestsClient("https://sps.euroauto.ru/", http);
+            var spare = new WebApiDetaliusBotTestsSpareClient("https://sps.euroauto.ru/", http);
+            /*TokenResult token = client.GetTokenAsync(new
             {
                 Username = "detalius",
                 Password = "4F83F55B-A201-4B5D-9B34-FFBF9098D8AC"
             }).Result;
-            client.SetToken(token.access_token);
+            client.SetToken(token);*/
 
         
-            PostSparePartsOfferResponse offer = new PostSparePartsOfferResponse()
+            /*PostSparePartsOfferResponse offer = new PostSparePartsOfferResponse()
             {
                 Offer_lines =Newtonsoft.Json.JsonConvert.DeserializeObject<List<PostSparePartsOfferResponseItem>>(@" [
                     {
@@ -1519,7 +1500,7 @@ namespace pickpoint_delivery_service
                 {
                     foreach (var image in item.Images)
                     {
-                        var response = http.GetAsync(image).Result;
+                        var response = http.GetAsync($"/api/checkout/image?id={image.Id}").Result;
                         var sr = response.Content.ReadAsStreamAsync().Result;
                         byte[] Data = new byte[sr.Length];
                            
@@ -1537,7 +1518,7 @@ namespace pickpoint_delivery_service
                         context.SaveChanges();
                     }
                 }
-            }
+            }*/
 
             int catalogId = -1;
             if (context.ProductCatalogs.ToList().Any(p => p.ProductCatalogName == "Мобильные телефоны") == false)

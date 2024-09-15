@@ -1,0 +1,67 @@
+﻿@page "/data-editor"
+@inject IServiceProvider provider
+@code
+{
+    bool Debug = false;
+    public List<string> InputTypes { get; set; } = new();
+    public List<string> DbContextTypes { get; set; } = new();
+    public Dictionary<string, object> TargetObjects = new();
+}
+<ContextMenu Id="myMenu">
+    <Item OnClick="@OnClick">Item 1</Item>
+    <Item OnClick="@OnClick">Item 2</Item>
+    <Item OnClick="@OnClick" Enabled="false">Item 3 (disabled)</Item>
+    <Seperator />
+    <Item>
+        Submenu
+        <SubMenu>
+            <Item OnClick="@OnClick">Submenu Item 1</Item>
+            <Item OnClick="@OnClick">Submenu Item 2</Item>
+        </SubMenu>
+    </Item>
+</ContextMenu>
+@code{
+    void OnClick(ItemClickEventArgs e)
+    {
+        Console.WriteLine($"Item Clicked => Menu: {e.ContextMenuId}, MenuTarget: {e.ContextMenuTargetId}, IsCanceled: {e.IsCanceled}, MenuItem: {e.MenuItemElement}, MouseEvent: {e.MouseEvent}");
+    }
+}
+
+<ContextMenuTrigger MenuId="myMenu">
+    <p>Right-click on me to show the context menu !!</p>
+</ContextMenuTrigger>
+<PageTitle>Главная страница</PageTitle>
+<CardContainer>
+    <CardHeader>Выберите контекст данных</CardHeader>
+    <CardBody>
+        <CheckList ListItems="@(GetType().Assembly.GetTypes<DbContext>().Select(t => t.GetTypeName()).ToList())" OnChanged="(evt => { DbContextTypes=evt; StateHasChanged(); })"></CheckList>               
+    </CardBody>
+</CardContainer>
+
+@foreach (var db in DbContextTypes.Select(type => type.New()))
+{
+    <CardContainer>
+        <CardHeader>Контекст @db.GetTypeName()</CardHeader>
+        <CardBody>
+            <CheckList ListItems="@db.GetEntitiesTypes().Select(p => p.GetTypeName().Replace("DbSet<","").Replace(">","")).Select(p => p.LastIndexOf(".")!=-1? p.Substring(p.LastIndexOf(".")+1): p).ToList()" OnChanged="(evt => InputTypes = evt)"></CheckList>
+        </CardBody>
+    </CardContainer>    
+}
+
+@foreach (var type in InputTypes)
+{
+    <CardContainer>
+        <CardHeader>Сущность @type</CardHeader>
+        <CardBody>
+            <ListEditor ItemType="@(type.ToType())" OnAdd="(evt => { var db = DataService.GetDbContext(type.ToType()); db.Add(evt); db.SaveChanges(); db.Dispose(); StateHasChanged(); })"></ListEditor>      
+        </CardBody>
+    </CardContainer>
+
+}
+@code
+{
+    public void OnAdd(object evt)
+    {
+        //var dbc = DataService.GetDbContext(type.ToType()); dbc.Add(evt); dbc.SaveChanges(); StateHasChanged();
+    }
+}

@@ -96,12 +96,12 @@
     <CardBody>
         @if (ItemForm is not null)
         {           
-            <FormEditor Model="@ItemForm">
+            <FormModel Form="@ItemForm">
                 <span class="btn btn-sm btn-primary @(ItemForm.Item.Validate().Count()==0?"":"disabled")"
                     @onclick="(evt => { AddItem(ItemForm.Item);  } )">
                     сохранить
                 </span>
-            </FormEditor>
+            </FormModel>
         }
         else
         {
@@ -144,7 +144,7 @@
         {
             Items = GetDataSet();
         }
-        PagesCount = Items.Count() % PageSize == 0 ? ((int)(Items.Count() / PageSize)) : ((int)(Items.Count() / PageSize) + 1);
+        PagesCount = Items is null? 1:  Items.Count() % PageSize == 0 ? ((int)(Items.Count() / PageSize)) : ((int)(Items.Count() / PageSize) + 1);
         Update();
     }
     public void Update()

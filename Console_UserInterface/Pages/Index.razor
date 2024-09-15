@@ -1,45 +1,83 @@
 ﻿@page "/"
+@using Console_UserInterface.Location;
+@using static Console_UserInterface.Location.LocationDbContext;
 @inject IServiceProvider provider
+@inject SigninUser signin
+@inject RouteService route
+@inject PageService page
+@inject LocationService location
 @code
 {
-    bool Debug = false;
-    public List<string> InputTypes { get; set; } = new();
-    public List<string> DbContextTypes { get; set; } = new();
-    public Dictionary<string, object> TargetObjects = new();
-}
- 
-<PageTitle>Главная страница</PageTitle>
-<CardContainer>
-    <CardHeader>Выберите контекст данных</CardHeader>
-    <CardBody>
-        <CheckList ListItems="@(GetType().Assembly.GetTypes<DbContext>().Select(t => t.GetTypeName()).ToList())" OnChanged="(evt => { DbContextTypes=evt; StateHasChanged(); })"></CheckList>               
-    </CardBody>
-</CardContainer>
-
-@foreach (var db in DbContextTypes.Select(type => type.New()))
-{
-    <CardContainer>
-        <CardHeader>Контекст @db.GetTypeName()</CardHeader>
-        <CardBody>
-            <CheckList ListItems="@db.GetEntitiesTypes().Select(p => p.GetTypeName().Replace("DbSet<","").Replace(">","")).Select(p => p.LastIndexOf(".")!=-1? p.Substring(p.LastIndexOf(".")+1): p).ToList()" OnChanged="(evt => InputTypes = evt)"></CheckList>
-        </CardBody>
-    </CardContainer>    
-}
-
-@foreach (var type in InputTypes)
-{
-    <CardContainer>
-        <CardHeader>Сущность @type</CardHeader>
-        <CardBody>
-            <ListEditor ItemType="@(type.ToType())" OnAdd="(evt => { var db = DataService.GetDbContext(type.ToType()); db.Add(evt); db.SaveChanges(); db.Dispose(); StateHasChanged(); })"></ListEditor>      
-        </CardBody>
-    </CardContainer>
-
-}
-@code
-{
-    public void OnAdd(object evt)
+    public List<object> Routes { get; set; }
+    protected override async Task OnInitializedAsync()
     {
-        //var dbc = DataService.GetDbContext(type.ToType()); dbc.Add(evt); dbc.SaveChanges(); StateHasChanged();
+        await base.OnInitializedAsync();
+        this.Routes = new LocationDbContext().AppRoutes.ToList().Select(r => r.Uri).ToList().Select(p => (object)p).ToList();
+        var builder = new MainMenuBuilder.MenuBuilder();
+        var fileMenu = builder.CreateMenu("File", new List<string>() { "Create", "Open", "Close" }.Select(text => builder.CreateButtonMenu(text)).ToArray());
+        MainMenuModel.Add(fileMenu);
+        InitPage();
     }
+
+    void InitPage()
+    {
+        this.Page = new AppPage();
+        foreach (var type in InputTypes.GetAll())
+        {
+            Page.PageComponents.Add(new PageComponent()
+            {
+                    Type = type,
+                    Name = type,
+                    Label = type,
+                    Icon = "home",
+                    Attributes = new Dictionary<string, string>(),
+                    Help = "help",
+                    Description = type,
+                    Edited = true,
+                    IsPrimitive = true,//type != InputTypes.StructureCollection && type != InputTypes.Custom,
+                    IsCollection = type == InputTypes.PrimitiveCollection || type == InputTypes.StructureCollection,
+                    CollectionSetup = type == InputTypes.PrimitiveCollection || type == InputTypes.StructureCollection ? new PageComponent.CollectionSettings()
+                    {
+                        ItemType = "DateTime"
+                    }: null 
+            });
+        }
+    }
+    public List<MainMenuBuilder.MenuItemModel> MainMenuModel { get; set; } = new();
+    public object ToolsBarModel { get; set; }
+    public TabsContainer Tabs { get; set; }
+    public AppPage Page { get; set; }
 }
+
+<CardContainer Width="512px" Height="512px">
+    <CardHeader>
+        <MenuBar Model="MainMenuModel"></MenuBar>
+        <ToolsBar Model="ToolsBarModel"></ToolsBar>
+        <SearchPane OnSearchSubmit="((SearchPane evt) => { 
+            this.Page = location.Navigate(evt.SearchQuery);
+        })">
+        </SearchPane>
+    </CardHeader>
+    <CardBody>
+        @if (Page is not null)
+        {
+            <PageView Model="Page"></PageView>
+        }
+        <TabsContainer @ref="Tabs">
+            <ListPrimitiveEditor                                 
+                ItemType="@typeof(String)"
+                OnAdd="(evt => { route.AddRoute<AppPage>(evt.ToString()); StateHasChanged(); } )"
+                Attributes="new Dictionary<string, string>()" 
+                Items="@Routes" >
+            </ListPrimitiveEditor>
+        </TabsContainer>
+    </CardBody>
+    <CardFooter>
+        <StatusBar StatusName="@StatusName" IsActive="@IsActive" ></StatusBar>
+    </CardFooter>
+</CardContainer>
+ @code
+{
+    public bool IsActive { get; set; }
+    public string StatusName { get; set; } = "waiting";
+ }

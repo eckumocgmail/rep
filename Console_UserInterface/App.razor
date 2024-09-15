@@ -1,4 +1,20 @@
-﻿
+﻿@using Console_UserInterface.Location;
+@using static Console_UserInterface.Location.LocationDbContext;
+@inject NavigationManager nav
+@inject LocationService location
+@code
+{
+    public AppPage Page { get; set; } 
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        nav.LocationChanged += (sender, evt) =>
+        {
+            this.Info(nav.Uri);
+            Page = location.Navigate(nav.Uri);
+        };
+    }
+}
 <CascadingAuthenticationState>
     <Router AppAssembly="@typeof(App).Assembly">
         <Found Context="routeData">
@@ -16,6 +32,10 @@
             <FocusOnNavigate RouteData="@routeData" Selector="h1" />
         </Found>
         <NotFound>
+            @if (Page is not null)
+            {
+                <PageView Model="Page"></PageView>
+            }
             <PageTitle>Not found</PageTitle>
             <LayoutView Layout="@typeof(MainLayout)">
                 <p role="alert">Sorry, there's nothing at this address.</p>

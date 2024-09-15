@@ -1,26 +1,38 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+
+using Newtonsoft.Json;
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Reflection;
+
+
 /// <summary>
 /// Модель данных отображаемых в представлении
 /// формы ввода
 /// </summary>
+[Label("Модель формы ввода")]
 public class InputFormModel
 {
+
+    [Label("Заголовок формы")]
+    public string Title { get; set; }
+    [Label("Описани формы")]
+    public string Description { get; set; }
+    [NotInput]
+    [Label("Сообщение об ошибке")]
+    [InputRusWord]
+    public string Error { get; set; }
 
 
 
     [Label("Контейнер")]
     [InputSelect("h-group,v-group")]
     public string Container { get; set; }
-
-    /// <summary>
-    /// установливает размеры formcontrol
-    /// </summary>
+   
     [Label("Размер")]
     [InputSelect("small,normal,big")]
     public string Size { get; set; }
@@ -32,7 +44,7 @@ public class InputFormModel
 
     [Label("Поля ввода")]
     [InputStructureCollection(nameof(InputFormField))]
-    [JsonIgnore]
+    //[JsonIgnore]
     [NotMapped]
     public List<InputFormField> FormFields { get; set; } = new List<InputFormField>();
 
@@ -58,11 +70,7 @@ public class InputFormModel
     [InputSelect("valid,invalid")]
     public bool IsValid { get; set; }
 
-    [NotInput]
-    [Label("Сообщение об ошибке")]
-    [InputRusWord]
 
-    public string Error { get; set; }
 
     public InputFormModel() : base()
     {
@@ -73,17 +81,24 @@ public class InputFormModel
         Container = "group";
         Size = "normal";
     }
-    public string Title { get; set; }
-    public string Description { get; set; }
     public InputFormModel(object item) : this()
     {
         if (item == null)
             throw new Exception("Аргумент item на задан");
-        IsValid = false;
-        Item = item;
-        Title = item.GetType().GetLabel();
-        Description = item.GetType().GetDescription();
-        Update(item.GetType().GetOwnPropertyNames().ToArray());
+        try
+        {
+            IsValid = false;
+            Item = item;
+            Title = item.GetType().GetLabel();
+            Description = item.GetType().GetDescription();
+            var ptype = item.GetType();            
+            var properties = ptype.GetInputProperties();            
+            Update(properties.ToArray());
+        }
+        catch(Exception ex)
+        {
+            this.Error($"Ошибка при инициаллизации {GetType().GetTypeName()}: {ex}");
+        }
     }
 
     public InputFormModel(object item, params string[] propertyNames) : this()
@@ -130,8 +145,8 @@ public class InputFormModel
             throw new Exception("Установите свойство Item для модели " + GetType().Name);
         }
         form.Item = item;
-        form.Title = form.Title == null ? Attrs.LabelFor(item) : form.Title;
-        form.Description = Attrs.DescriptionFor(item);
+        form.Title = form.Title == null ? AttrsUtil.LabelFor(item) : form.Title;
+        form.Description = AttrsUtil.DescriptionFor(item);
         if (Typing.ReferenceIsDictionary(item) == false)
         {
             form.FormFields = CreateFormFields(item.GetType(), propertyNames, item);
@@ -221,7 +236,7 @@ public class InputFormModel
             return ForPrimitiveCollection(
                         target.GetType().GetProperty(property).GetValue(target),
                         ReflectionService.TypeForName(typeName),
-                        Attrs.DescriptionFor(target.GetType(), property));
+                        AttrsUtil.DescriptionFor(target.GetType(), property));
         }
         else
         {
@@ -274,23 +289,187 @@ public class InputFormModel
         }
         return table;
     }
+    public InputFormField CreateFormField(MyParameterDeclarationModel paramModel)
+    {
+        InputFormField field = null;
+       
+        var propertyType = paramModel.Type;
+        
+        var Attributes = paramModel.Attributes;
+        if (Attributes.ContainsKey(nameof(NotInputAttribute)))
+        {
+            throw new Exception();
+        }
+
+        field = new InputFormField();
+        field.Target = Item;
+        //field.Property = paramModel.Name;
+        field.Attributes = Attributes;
+
+        field.Order = Attributes.ContainsKey(nameof(InputOrderAttribute)) ?
+            Attributes[nameof(InputOrderAttribute)].ToInt() : 0;
+        var attrs = Attributes;
+        field.Name = paramModel.Name;
+        field.Label = 
+            attrs.ContainsKey(nameof(LabelAttribute)) ? attrs[nameof(LabelAttribute)] :
+            attrs.ContainsKey(nameof(DisplayAttribute)) ? attrs[nameof(DisplayAttribute)] : paramModel.Name;
+        field.Description = attrs.ContainsKey(nameof(DescriptionAttribute)) ? attrs[nameof(DescriptionAttribute)] :
+                attrs.ContainsKey(nameof(DescriptionAttribute)) ? attrs[nameof(DescriptionAttribute)] : "";
+        field.Icon = attrs.ContainsKey(nameof(IconAttribute)) ? attrs[nameof(IconAttribute)] :
+            attrs.ContainsKey(nameof(InputIconAttribute)) ? attrs[nameof(InputIconAttribute)]: "home";
+        field.Help = attrs.ContainsKey(nameof(HelpMessageAttribute)) ? attrs[nameof(HelpMessageAttribute)] : "";
+        field.IsPrimitive = ReflectionService.IsPrimitive(propertyType);
+
+        if (Attributes.ContainsKey(nameof(NotInputAttribute)))
+        {
+            return field;
+        }
+        if (ReflectionService.IsPrimitive(propertyType) == false)
+        {
+            if (Typing.IsCollectionType(paramModel.Type.ToType()))
+            {
+               
+                field.IsCollection = true;
+                var itemType = paramModel.Type.ToType().GetGenericArguments()[0].GetTypeName();
+                field.IsPrimitive = Typing.IsPrimitive(itemType);                                                                           //var table = ForCollectionProperty(Item, property.Name);
+                field.Type = "custom";
+              
+                if (field.Value is null && paramModel.Type.ToType().GetConstructors().Any(c => c.GetParameters().Count() == 0))
+                    field.Value = paramModel.Type.ToType().New();
+                field.ValueType = paramModel.Type.ToType().GetGenericArguments()[0].GetTypeName();// Typing.ParseCollectionType(property.PropertyType);
+            }
+            else
+            {
+
+                /*var p = property.GetValue(Item);
+                if (p != null)
+                {
+                    var table = ForDictionary(p);
+                    field.Type = "custom";
+                    field.Control = table;
+                    field.Value = property.PropertyType.New();
+                }
+                else
+                {
+                    field.Value = propertyType.New();
+                    field.Type = "custom";
+                    field.Value = property.PropertyType.New();
+                }*/
+
+
+            }
+        }
+        else
+        {
+            bool isInput = AttrsUtil.IsInput(Attributes);
+
+
+            field.Type = AttrsUtil.GetControlType(Attributes);
+            if (field.Type != null)
+            {
+                if (field.Type.ToLower().Contains("collect"))
+                {
+                    field.ValueType = Typing.ParseCollectionType(paramModel.Type.ToType());
+                }
+                string input =
+                    Attributes.ContainsKey(field.Type) ? Attributes[field.Type] :
+                    Attributes.ContainsKey(field.Type.Replace("Attribute", "")) ? Attributes[field.Type.Replace("Attribute", "")] :
+                    Attributes.ContainsKey(field.Type + "Attribute") ? Attributes[field.Type + "Attribute"] :
+                    throw new Exception("Не найден атрибут соответвующий типу элемента управления " + field.Type);
+                Type fieldType = ReflectionService.TypeForShortName(field.Type);
+                ControlAttribute attribute = ReflectionService.Create<ControlAttribute>(fieldType, new object[] { input });
+
+                //field.Control = attribute.CreateControl(field);
+                field.Type = field.Type.Replace("Attribute", "");
+                field.TextValue = input;
+                switch (field.Type)
+                {
+                    case nameof(InputDictionaryAttribute):
+                        {
+                            string entity = input.Split(",")[0];
+                            string display = input.Split(",")[1];
+
+                            break;
+                        }
+                }
+            }
+
+            else
+            {
+                field.Type = GetInputType(paramModel.Type.ToType(), Attributes);
+                if(field.Type is null)
+                {
+                    field.Type = "text";
+                }
+                else
+                {
+                    field.Type = field.Type.ToLower();
+                }                 
+            }
+        }
+
+        this.Warn(field.Validate().ToJsonOnScreen());
+        return field;
+    }
+
+    private string? GetInputType(Type type, Dictionary<string, string> attrs)
+    {
+        if (attrs.ContainsKey("Key") || attrs.ContainsKey("KeyAttribute"))
+        {
+            return "hidden";
+        }
+        string result = null;
+        string key = null;
+        List<string> keys = new List<string>(attrs.Keys);
+        BaseInputAttribute.GetInputTypes().ForEach((string name) =>
+        {
+            if (keys.Contains(name))
+            {
+                key = name;
+            }
+        });
+        if (key != null)
+        {
+            result = key.Replace("Attribute", "").Replace("Input", "");
+        }
+        else
+        {
+
+            result = null;
+        }
+             
+        if (type.IsDateTime())
+        {
+            return "date";
+        }
+        else if (type.IsBoolean())
+        {
+            return "checkbox";
+        }
+        else if (type.IsNumber())
+        {
+            return "number";
+        }
+        else
+        {
+            return "text";
+        } 
+    }
 
     public InputFormField CreateFormField( Type type, string PropertyName)
     {
         InputFormField field = null;
-        this.Info(PropertyName);
         var property = type.GetProperty(PropertyName);
         if (property == null)
         {
-            throw new Exception("Ошибка при создании поля " + PropertyName
-            );
+            throw new Exception("Ошибка при создании поля " + PropertyName            );
         }
         var propertyType = Typing.ParsePropertyType(property.PropertyType);
         if(propertyType is null)
         {
             propertyType = property.PropertyType.GetTypeName();
         }
-        var Attributes = Attrs.ForProperty(type, property.Name);
+        var Attributes = AttrsUtil.ForProperty(type, property.Name);
         if(Attributes.ContainsKey(nameof(NotInputAttribute)))
         {
             throw new Exception();
@@ -305,10 +484,10 @@ public class InputFormModel
             Attributes[nameof(InputOrderAttribute)].ToInt() : 0;
 
         field.Name = property.Name;
-        field.Label = Attrs.LabelFor(type, property.Name);
-        field.Description = Attrs.DescriptionFor(type, property.Name);
-        field.Icon = Attrs.IconFor(type, property.Name);
-        field.Help = Attrs.HelpFor(type, property.Name);
+        field.Label = AttrsUtil.LabelFor(type, property.Name);
+        field.Description = AttrsUtil.DescriptionFor(type, property.Name);
+        field.Icon = AttrsUtil.IconFor(type, property.Name);
+        field.Help = AttrsUtil.HelpFor(type, property.Name);
         field.IsPrimitive = ReflectionService.IsPrimitive(propertyType);
            
         if (Attributes.ContainsKey(nameof(NotInputAttribute)))
@@ -353,10 +532,10 @@ public class InputFormModel
         }
         else
         {
-            bool isInput = Attrs.IsInput(type, property.Name);
+            bool isInput = AttrsUtil.IsInput(type, property.Name);
 
 
-            field.Type = Attrs.GetControlType(type, property.Name);
+            field.Type = AttrsUtil.GetControlType(type, property.Name);
             if (field.Type != null)
             {
                 if (field.Type.ToLower().Contains("collect"))
@@ -392,10 +571,8 @@ public class InputFormModel
                 field.Type = field.Type.ToLower();
             }
         }
-            
 
-        
-        field.EnsureIsValide();
+        this.Warn(field.Validate().ToJsonOnScreen());
         return field;
     }
 
@@ -423,9 +600,10 @@ public class InputFormModel
 
                 }
                 fields.Add(field);
-            }catch(Exception ex)
+            }
+            catch(Exception ex)
             {
-                this.Error(ex);
+                this.Error($"Ошибка при создании поля ввода для свойства: {propertyName} {ex.Message}");
             }
         }
         return fields;
@@ -440,7 +618,7 @@ public class InputFormModel
 
     public string GetInputType(Type type, string property)
     {
-        string result = Attrs.GetInputType(type, property);
+        string result = AttrsUtil.GetInputType(type, property);
         if (result != null) return result;
         var propertyInfo = type.GetProperty(property);
         string propertyType = Typing.ParsePropertyType(propertyInfo.PropertyType);
@@ -558,7 +736,5 @@ public class InputFormModel
         return (InputFormField)(from p in FormFields where ReflectionService.GetValueFor(p, "Name").ToString() == propertyName select p).SingleOrDefault();
     }
 
-
-
-
+    
 }

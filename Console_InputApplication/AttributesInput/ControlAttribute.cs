@@ -25,25 +25,48 @@ public class ControlAttribute : BaseInputAttribute
 public class InputFormField
 {
     [JsonIgnore]
+    [NotInput()]
+    public MemberInfo Property { get; set; }
+
+    [JsonIgnore()]
+    [NotInput()]
+    [Label("Ссылка на объект")]
     public object Target { get; set; }
-    public bool Visible { get; set; }
-
-    [JsonIgnore]
-    public PropertyInfo Property { get; set; }
-    public int Order { get; set; }
-
-    [InputHidden]
-    public int InputFormModelId { get; set; }
 
     [NotInput]
     [NotMapped]
     [JsonIgnore]
     public virtual InputFormModel InputFormModel { get; set; }
 
+    [InputHidden]
+    [InputNumber]
+    public int InputFormModelId { get; set; }
+
+    
+
+
+    [NotMapped()]
+    [JsonIgnore]
+    public ViewItem Control { get; set; }
+
+    [InputPositiveInt()]
+    [NotNullNotEmpty()]
+    [Label("Приоритет вывода")]
+    public int Order { get; set; }
+
+    [Label("Видно на экране")]
+    public bool Visible { get; set; } = true;
+
+
+
     [Label("Наименование")]
+    [NotNullNotEmpty]
+    [InputEngWord]
     public string Name { get; set; } = "Undefined";
 
     [Label("Иконка")]
+    [InputIcon]
+    [NotNullNotEmpty]
     public string Icon { get; set; } = "home";
     public string TextValue { get; set; }
 
@@ -52,7 +75,7 @@ public class InputFormField
     [Label("Описание")]
     public string Description { get; set; } = "Нет подробного описания";
 
-    [InputSelect("{{GetInputTypes()}}")]
+
     public string Type { get; set; } = "Text";
     public string ValueType { get; set; }
 
@@ -79,11 +102,6 @@ public class InputFormField
     [Label("Состояние")]
     [InputSelect("valid,invalid,undefined")]
     public string State { get; set; } = "undefined";
-
-
-    [NotMapped()]
-    [JsonIgnore]
-    public ViewItem Control { get; set; }
 
     [NotMapped]
     [Label("Подсказка")]

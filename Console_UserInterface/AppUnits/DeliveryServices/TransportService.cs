@@ -1,9 +1,6 @@
 ﻿using Console_BlazorApp.AppUnits.DeliveryApi;
 using Console_BlazorApp.AppUnits.DeliveryModel;
-using Google.Protobuf;
-
 using Microsoft.EntityFrameworkCore;
-
 using pickpoint_delivery_service;
 
 namespace Console_BlazorApp.AppUnits.DeliveryServices

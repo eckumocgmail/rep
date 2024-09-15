@@ -32,7 +32,7 @@ public static class HttpContextExtensions
     /// <summary>
     /// Считывание аргументов выполнения метода API из http контекста
     /// </summary>
-    public static Dictionary<string, object> GetArgumentsForAction(this HttpContext http, string route, MethodInfo action)
+    public static Dictionary<string, object> GetArgumentsForAction(this HttpContext http, MethodInfo action)
     {
         var result = new Dictionary<string, object>();
         foreach (var par in action.GetParameters())
@@ -120,7 +120,7 @@ public static class HttpContextExtensions
     {
         using (var streamWriter = new StreamWriter(context.Response.Body, System.Text.Encoding.UTF8))
         {
-            context.Response.ContentType = "text/html";
+            context.Response.ContentType = "text/json";
             context.Response.StatusCode = status;
 
             byte[] data = System.Text.Encoding.UTF8.GetBytes(target.ToJsonOnScreen());

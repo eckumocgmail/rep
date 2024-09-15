@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 [Label("Дата/Время")]
 public class InputDateTimeAttribute : BaseInputAttribute
 {
-    public InputDateTimeAttribute( ) : base(InputTypes.DateTime)
+    public InputDateTimeAttribute( ) : base(
+        InputTypes.DateTime)
     {
     }
     public override bool IsValidValue(object value)

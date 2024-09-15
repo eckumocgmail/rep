@@ -6,7 +6,7 @@ using pickpoint_delivery_service;
 
 namespace Console_BlazorApp.AppUnits.DeliveryServices
 {
-    public class HolderProductsFasade : EntityFasade<Product>
+    public class HolderProductsFasade : EfEntityFasade<Product>
     {
         private readonly Holder _holder;
 

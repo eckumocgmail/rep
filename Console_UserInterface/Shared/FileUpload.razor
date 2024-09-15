@@ -1,12 +1,13 @@
 ﻿ 
-<InputFile OnChange="OnFilesLoaded" AdditionalAttributes='new Dictionary<string, object>(){
+@*<InputFile OnChange="OnFilesLoaded" AdditionalAttributes='new Dictionary<string, object>(){
     { "multiple", Single ? "false": "true" },
     { "accept", FileExts },
     { "id", (Id is null? (Id=$"{GetType()}_{GetHashCode()}"): Id)}
-}'></InputFile>
+}'></InputFile>*@
+
 
 @code 
-{    
+{
     [Parameter]
     public string FileExts { get; set; } = "*.*";
 
@@ -20,31 +21,49 @@
     public EventCallback<IEnumerable<FileItem>> OnChanged { get; set; }
     public List<FileItem> Files { get; set; } = new();
     public bool IsLoading { get; set; } = false;
-
+    public bool CompareData(byte[] data1, byte[] data2)
+    {
+        if (data1.Length != data2.Length)
+            return false;
+        for (int i = 0; i < data2.Length; i++)
+        {
+            if(data1[i]!=data2[i])
+            {
+                return false;
+            }
+        }
+        return true;
+    }
     public async Task OnFilesLoaded(InputFileChangeEventArgs evt)
     {
         IsLoading = true;
         StateHasChanged();
         Files.Clear();
-        foreach (var file in evt.GetMultipleFiles(3))
+        foreach (IBrowserFile file in evt.GetMultipleFiles())
         {
             try
-            {
-                using (var ms = new MemoryStream())
-                {
-                    using (var stream = file.OpenReadStream())
+            {                                    
+                using (var stream = file.OpenReadStream(512000))
+                {                                                
+                    var data = new byte[stream.Length];
+                    await stream.ReadAsync(data, 0, (int)stream.Length);
+
+                    string image_dir = "C:\\Users\\123\\Pictures";
+                    string path = @$"{image_dir}\{file.Name}";
+                    var data2 = System.IO.File.ReadAllBytes(path);
+                    if(CompareData(data, data2)==false)
                     {
-                        var data = new byte[stream.Length];
-                        await stream.ReadAsync(data);
-                        Files.Add(new FileItem()
-                        {
-                            ContentType = file.ContentType,
-                            FileData = data,
-                            FileName = file.Name
-                        });
+                        throw new Exception("Данные отличаются");
                     }
 
-                }                
+                    FileItem item = null;
+                    Files.Add(item = new FileItem()
+                    {
+                        ContentType = file.ContentType,
+                        FileData = data,
+                        FileName = file.Name
+                    });
+                }                             
             }
             catch (Exception ex)
             {

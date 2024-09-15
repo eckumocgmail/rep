@@ -9,6 +9,9 @@
     public InputFormModel Form { get; set; }
 
     [Parameter]
+    public List<string> Properties { get; set; }
+
+    [Parameter]
     public RenderFragment ChildContent { get; set; }
 
     [Parameter]
@@ -23,17 +26,37 @@
     bool Debug = true;
 }
 @code{
+    public void Update(object item)
+    {
+        this.Model = item;
+        this.OnInitializedAsync().Wait();
+        StateHasChanged();
+    }
+    protected override async Task OnParametersSetAsync()
+    {     
+        this.Info("OnParametersSetAsync()");
+        await base.OnParametersSetAsync();
+        await this.OnInitializedAsync();
+    }
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
         try
         {
-            if (Model is InputFormModel)
-                Model = ((InputFormModel)Model).Item;
+            //if (Model is InputFormModel){}
+            //    Model = ((InputFormModel)Model).Item;
             if (Model is null)
                 throw new ArgumentNullException("Model");
             this.Info($"Model: {Model.ToJsonOnScreen()}");
-            Form = new InputFormModel(Model);
+            if(Properties is null)
+            {
+                Form = new InputFormModel(Model);
+            }
+            
+            else
+            {
+                Form = new InputFormModel(Model, Properties.ToArray());
+            }
         }
         catch(Exception ex)
         {
@@ -52,7 +75,15 @@
         }
         foreach(var kv in errors)
         {
-            Form.FormFields.First(field => field.Name == kv.Key).Errors = kv.Value;
+            var field = Form.FormFields.FirstOrDefault(field => field.Name == kv.Key);
+            if(field is not null)
+            {
+                field.Errors = kv.Value;
+            }
+            else
+            {
+                this.Warn($"Не найдлено поле ввода формы с именем {kv.Key}");
+            }
         }
         StateHasChanged();
     }
@@ -103,11 +134,18 @@ else
         }
         @if(Debug)
         {
-            <div align="left" class="text-black-50 text-success">@Json</div>
+            <div align="left" class="text-black-50 text-success">
+                @Json
+            </div>
+            <div align="left" class="text-black-50 text-success">
+                @Form.ToJsonOnScreen()
+            </div>
         }
         <div class="text-black-50 text-danger" align="left">@Form.Error</div>
         <div>
-            <div>
+            <p>@Model.GetType().GetTypeName()</p>
+            <p>@Form.FormFields.Select(f => f.Name).ToJsonOnScreen()</p>
+            <div align="left">
                 @foreach (var field in Form.FormFields)
                 {
                     <div style="padding: 3px;">
