@@ -128,22 +128,17 @@
 <div>
     <label class="@(Model.State == "invalid"? "text text-danger": "text")">@Model.Label</label>
     <p>@Model.Value</p>
-    <div class="@(Model.Size == "small"? "input-group-sm": Model.Size == "big"? "input-group-lg": "input-group" ) mb-3">
+    <div class="d-flex flex-row flex-nowrap @(Model.Size == "small"? "input-group-sm": Model.Size == "big"? "input-group-lg": "input-group" ) mb-3">
         <div class="input-group-prepend">
             <span class="input-group-text" id="basic-addon1">
-                
+                @@
             </span>
         </div>
         @if (Model is not null && Model.Visible)
         {
             @if (Model.IsCollection)
-            {
-                if (Model.CollectionSetup is null)
-                {
-                    <p>Model.CollectionSetup</p>
-                }
-
-                <p>Model.CollectionSetup</p>
+            {               
+                
                 @if (Model.IsPrimitive)
                 {
                     <ListPrimitiveEditor Label="@Model.Label" Attributes="Model.Attributes" OnRemove="OnItemRemoved" OnAdd="OnItemAdded" Items="GetCollectionItems()" ItemType="Model.CollectionSetup.ItemType.ToType()"></ListPrimitiveEditor>
@@ -151,7 +146,7 @@
                 }
                 else
                 {
-                    @* <ListEditor ItemType="GetCollectionItemType()" Items="GetCollectionItems()"></ListEditor>*@
+                    <ListEditor ItemType="@Model.CollectionSetup.ItemType.ToType()" Items="GetCollectionItems()"></ListEditor>
 
                 }
             }
@@ -276,11 +271,11 @@
 
                             //номер карты 2202-8080-9090-1010
                             case InputTypes.CreditCard:
-                                <span class="btn" style="width: 25px; height: 25px;"></span>
-                                <span class="btn" style="width: 25px; height: 25px;"></span>
-                                <span class="btn" style="width: 25px; height: 25px;"></span>
-                                <span class="btn" style="width: 25px; height: 25px;"></span>
-                                <span class="btn" style="width: 25px; height: 25px;"></span>
+                                <textarea class="btn" onkeypress="this.innerHTML=event.char;" style="width: 25px; height: 25px;"></textarea>
+                                <textarea class="btn" onkeypress="this.innerHTML=event.char;" style="width: 25px; height: 25px;"></textarea>
+                                <textarea class="btn" onkeypress="this.innerHTML=event.char;" style="width: 25px; height: 25px;"></textarea>
+                                <span class="btn" onkeypress="this.innerHTML=event.char;" style="width: 25px; height: 25px;"></span>
+                                <span class="btn" onkeypress="this.innerHTML=event.char;" style="width: 25px; height: 25px;"></span>
                                 <span class="btn" style="width: 25px; height: 25px;"></span>
                                 <span class="btn" style="width: 25px; height: 25px;"></span>
                                 <span class="btn" style="width: 25px; height: 25px;"></span>

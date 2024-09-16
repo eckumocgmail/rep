@@ -9,8 +9,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-
-
+using System.Diagnostics.CodeAnalysis;
 
 [Label("Группа пользователей")]
 public class UserGroup: DictionaryTable 
@@ -46,6 +45,12 @@ public class UserGroup: DictionaryTable
     [NotInput]
     [JsonIgnore()]
     public virtual List<UserPerson> People { get; set; }
+
+
+    [InputImage()]
+    [Label("Аватар")]
+    [AllowNull]
+    public string Avatar { get; set; } = "data:image/json";
 
     /*[NotMapped]
     [JsonIgnore()]

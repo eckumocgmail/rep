@@ -299,15 +299,27 @@ public abstract class AuthorizationCollection<T>: APIActiveCollection<T> where T
         return result;
     }
 
-    UserContext APIActiveCollection<T>.Take(string token)
+
+    public bool ContainsKey(string key)
     {
-        throw new NotImplementedException();
+        return _sessions.ContainsKey(key);
     }
 
-  
-    public string Put(UserContext user)
+    T APIActiveCollection<T>.Take(string key)
     {
-        throw new NotImplementedException();
+        this.Info($"Take({key})");
+        
+
+        if (this._memory.ContainsKey(key))
+        {
+            T target = this._memory[key];
+            target.LastActive = GetTimestamp();
+            return target;
+        }
+        else
+        {
+            return null;
+        }
     }
 }
 

@@ -33,6 +33,7 @@
     {
         try
         {
+            this.Info($"input: {name}={value}");
             if (Model.ModelInstance is null)
             {                
                 Model.ModelInstance = Model.ModelType.ToType().New();

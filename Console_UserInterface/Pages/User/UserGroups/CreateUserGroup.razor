@@ -1,0 +1,16 @@
+﻿@page "/user/group/create"
+@inject NavigationManager nav
+@inject DbContextUser db
+<EditForm Model="@GroupModel">
+    <button @onclick="OnSaveButtonClicked" class="btn btn-sm">создать</button>
+</EditForm>
+@code 
+{
+    public UserGroup GroupModel = new();
+    public void OnSaveButtonClicked()
+    {
+        db.Add(GroupModel);
+        db.SaveChanges();
+        nav.NavigateTo("/user/groups");
+    }
+}

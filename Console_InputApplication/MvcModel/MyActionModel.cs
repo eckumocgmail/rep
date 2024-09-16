@@ -49,7 +49,7 @@ public class MyActionModel
     public string Name { get; set; } = InputConsole.GetProcessName();
 
     [Label("Маршрут")]
-    [InputEngWord("Использщуйте идентьфикаторы написанные латиницей")]
+    [InputText("Использщуйте идентьфикаторы написанные латиницей")]
     public string Path { get; set; } = InputConsole.GetWrk();
 
     [Label("Http метод")]

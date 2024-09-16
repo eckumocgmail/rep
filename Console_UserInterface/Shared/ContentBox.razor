@@ -1,0 +1,53 @@
+﻿@inject IUserModelsService models
+@inject ComponentRegistry registry
+@inherits BaseComponent
+@code{
+    [Parameter]
+    public object Model { get; set; }
+
+    [Parameter]
+    public bool FullSize { get; set; } = false;
+}
+
+@if (Model != null)
+{
+    @try
+    {
+        if(Model != null)
+        {
+            
+            <SharedComponent Model="@((ViewItem)Model)" Type="@Model.GetType().Name"></SharedComponent>
+        }
+        
+    }
+    catch (Exception ex)
+    {
+        <div class="alert alert-danger">
+            <h2> Исключение при формировании представления: @Model.GetType().Name @((ViewItem)Model).GetContentPath() </h2>
+            <p> @ex.Source </p>
+            <p> @ex.Message </p>
+            @if (ex.HelpLink != null)
+            {
+                <a href="@ex.HelpLink"> справочная инфомация </a>
+            }
+
+            @if (ex.Data != null)
+            {
+                <table>
+                    @foreach (var key in ex.Data.Keys)
+                    {
+                        <tr>
+                            <td>@key</td>
+                            <td>@ex.Data[key]</td>
+                        </tr>
+                    }
+                </table>
+            }
+
+            <div>
+                @ex.StackTrace
+            </div>
+
+        </div>
+    }
+}

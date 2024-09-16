@@ -48,6 +48,9 @@
     [Parameter]
     public EventCallback<UserMessage> OnSend { get; set; }
 
+    [Parameter]
+    public EventCallback<UserMessage> OnComplete { get; set; }
+
     private UserMessage MessageModel { get; set; } = new() { };
      
     public async Task OnSendClicked()

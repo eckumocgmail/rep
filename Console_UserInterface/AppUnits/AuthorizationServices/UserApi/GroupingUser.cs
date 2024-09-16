@@ -14,8 +14,11 @@ public class GroupingUser : BaseGrouping<UserContext, UserGroup, UserGroups>
         this._model = model;
     }
 
-   
 
+    public int GetUsersCountInGroup(int groupId)
+    {
+        return _model.UserGroups_UserGroup.Where(p => p.GroupId == groupId).Count();
+    }
     public override MethodResult<UserGroups> AddToGroup(UserContext item, UserGroup parent)
     {
         try

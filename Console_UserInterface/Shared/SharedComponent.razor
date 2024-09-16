@@ -1,0 +1,35 @@
+﻿@inherits LayoutComponentBase
+@code {
+
+    [Parameter]
+    public string Type { get; set; }
+
+    [Parameter]
+    public object Model { get; set; }
+
+}
+<div>
+    SharedComponent
+    @if (Type == "InputForm")
+    {
+         
+    }
+    else if (Type == "Button")
+    {
+
+        <Button>Button</Button>
+    }
+    else if (Type == "Tree")
+    {
+   
+    }
+    else if (Type == "Pane")
+    {
+        <ContentPane Model="@Model"></ContentPane>
+    }
+    
+    else
+    {
+        <div class="alert alert-warning">Тип компонента @Type не зарегистрирован в SharedComponent</div>
+    }
+</div>

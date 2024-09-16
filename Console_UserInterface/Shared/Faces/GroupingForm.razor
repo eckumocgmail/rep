@@ -2,26 +2,60 @@
 @using static AuthorizationDbContext;
 @inject SigninUser signin
 @inject GroupingUser userGrouping
+@inject NavigationManager nav
 
 <div class="card">
     <label>Мои группы</label>
     <ul class="list-group">
-        @foreach (var option in userGrouping.GetSelectedOptions(signin.Verify()))
-        {
-            <li class="list-group-item" onmouseleave="this.classList.remove('active')" onmouseover="this.classList.add('active')">@option</li>
-        }
+        <div class="d-flex flex-row flex-wrap">        
+            @foreach (var option in userGrouping.GetSelectedOptions(signin.Verify()))
+            {
+                <li class="list-group-item card" style="margin: 10px; max-width: 280px;" @onclick='evt => { nav.NavigateTo($"/user/group/{option.Id}"); }' onmouseleave="this.classList.remove('active')" onmouseover="this.classList.add('active')">@option (@GetUsersCountInGroup(option) пользователей)</li>
+            }
+        </div>
     </ul>
 </div>
 
-
+@code
+{
+    public void OnCreateGroupButtonClicked()
+    {
+        nav.NavigateTo("/user/group/create");
+    }
+}
 <div class="card">
     <h2>Доступные группы</h2>
-    <ul class="list-group">
+    <div>
+        <span @onclick="OnCreateGroupButtonClicked"> создать </span>
+    </div>
+    <ul class="d-flex flex-row flex-wrap">
         @foreach (var option in userGrouping.GetAvailableOptions(signin.Verify()))
         {
-            <li class="list-group-item" onmouseleave="this.classList.remove('active')" onmouseover="this.classList.add('active')" @onclick="evt => {userGrouping.AddToGroup(signin.Verify(), option); StateHasChanged();}">@option</li>
+            <li class="list-group-item" style="margin: 10px; padding: 0px;" onmouseleave="this.classList.remove('active')" onmouseover="this.classList.add('active')" @onclick="evt => OnAddToGroupClicked(option)"
+                >
+
+                <div>@option (@GetUsersCountInGroup(option) пользователей)</div>
+                <button style="width: 320px; height: 320px; background-image: Url('@option.Avatar')"></button>
+            </li>
         }
     </ul>
 </div> 
+@code 
+{
+    public int GetUsersCountInGroup(UserGroup group)
+    {
+        using (var db = new DbContextUser())
+        {
+            var service = new GroupingUser(db);
+            return service.GetUsersCountInGroup(group.Id);
+        }
+        
+    }
+    public void OnAddToGroupClicked(UserGroup option)
+    {
+        userGrouping.AddToGroup(signin.Verify(), option); 
+        StateHasChanged();
+    }
+}
  
  

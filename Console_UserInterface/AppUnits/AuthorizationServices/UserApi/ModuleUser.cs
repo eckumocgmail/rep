@@ -18,7 +18,7 @@ public class ModuleUser
         if (services.Any(descr => descr.ServiceType == typeof(MailRuService2)) == false)
             services.AddTransient<MailRuService2>();
 
-        
+        services.AddScoped<UserGroupsService>();
         services.AddScoped<IJSInvoke, JSInvoke>();
         services.AddScoped<ILocalStorage, LocalStorage>();
         services.AddScoped<ITokenProvider, MemoryTokenProvider>();

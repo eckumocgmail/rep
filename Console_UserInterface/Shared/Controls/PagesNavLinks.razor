@@ -1,9 +1,5 @@
-﻿@*page "/developer/pages-nav-links"
+﻿@page "/developer/pages-nav-links"
 @inject INavMenuService navMenuService
-@code {
-
-}
-
 <div>
     @foreach (var navLink in navMenuService.GetPageLinks())
     {
@@ -14,6 +10,3 @@
     }
 </div>
 
-
-
-*@

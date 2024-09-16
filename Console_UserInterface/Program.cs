@@ -36,8 +36,8 @@ namespace Console_UserInterface
 
         public static void Main(string[] args)
         {
-            RegTypes();            
-            UpdateDatabases();
+            RegTypes();
+            //UpdateDatabases();
             var builder = WebApplication.CreateBuilder(args);
             ConfigureServices(builder);
             Configure(builder);

@@ -20,7 +20,7 @@ public class AppRouterMiddleware: TypeNode<AppRouterMiddleware>, IMiddleware
     /// <summary>
     /// Параметры маршрутизации 
     /// </summary>
-    private ConcurrentDictionary<string, string> routing { get; set; } = new()
+    public ConcurrentDictionary<string, string> routing { get; set; } = new()
     {
          //"/api/test", "TestController.DoTests()"
     };

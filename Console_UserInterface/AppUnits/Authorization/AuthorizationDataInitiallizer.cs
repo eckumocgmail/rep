@@ -250,9 +250,10 @@ public class AuthorizationDataInitiallizer
 
             db.UserGroups_.Add(new UserGroup() { 
                 Name = "Разработчик",
-                Description = "hi"
+                Description = "hi",
+                Avatar = "data:image/json;base64," + Convert.ToBase64String(System.IO.File.ReadAllBytes("C:\\Users\\123\\Pictures\\1.jfif"))
             });
-            db.SaveChanges();
+            db.SaveChanges();   
 
             db.UserGroups_UserGroup.Add(new UserGroups() { 
                 GroupId = db.UserGroups_.First().Id,

@@ -1,11 +1,23 @@
 ﻿@inherits LayoutComponentBase
+@inject SigninUser signin
+<style>
+    .dark a
+    {
+        background-color: black;          
+        color: white;
+    }
+</style>
 <div class="page">
     <div class="sidebar" style="overflow-y: auto;">
         <NavMenu></NavMenu>
     </div>
 
-    <main>
-
+    <main class="@( signin.IsSignin()? signin.Verify().Settings.ColorTheme: "dark" )">
+        @if(signin.IsSignin())
+        {
+            <p>@signin.Verify().Settings.ColorTheme</p>
+        }
+        
         <div style="position: fixed;" class="card">
             <GeoPositionUpdater></GeoPositionUpdater>
             <UserNotifications></UserNotifications>

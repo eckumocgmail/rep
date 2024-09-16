@@ -74,9 +74,9 @@ class GroupService: IGroupService
 }
 public class UserGroupsService 
 {
-    private readonly AuthorizationDbContext _context;
+    private readonly DbContextUser _context;
 
-    public UserGroupsService(AuthorizationDbContext context)
+    public UserGroupsService(DbContextUser context)
     {
         _context = context;
     }
