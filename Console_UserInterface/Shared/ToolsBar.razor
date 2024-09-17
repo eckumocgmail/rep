@@ -1,9 +1,14 @@
-﻿<div class="card w-100">
-    <span class="btn btn-sm btn-dark"></span>
+﻿@using static MainMenuBuilder;
+<div class="card w-100">
+    <MenuItemView Model="Model"></MenuItemView>
+    
 </div>
 
 @code
 {
     [Parameter]
-    public object Model { get; set; }
+    public List<MenuItemModel> Model { get; set; } = new();
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
 }

@@ -11,8 +11,8 @@
 
         @if(menu.Expanded)
         {
-            <MenuBar Model="@(menu.HierElements.Select( node => (MainMenuBuilder.MenuItemModel)node.Value ).ToList())">
-            </MenuBar>
+            <MenuItemView Model="@(menu.HierElements.Select( node => (MainMenuBuilder.MenuItemModel)node.Value ).ToList())">
+            </MenuItemView>
         }
     }
 </div>

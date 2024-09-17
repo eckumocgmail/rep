@@ -1,9 +1,9 @@
 ﻿ 
-@*<InputFile OnChange="OnFilesLoaded" AdditionalAttributes='new Dictionary<string, object>(){
+<InputFile OnChange="OnFilesLoaded" AdditionalAttributes='new Dictionary<string, object>(){
     { "multiple", Single ? "false": "true" },
     { "accept", FileExts },
     { "id", (Id is null? (Id=$"{GetType()}_{GetHashCode()}"): Id)}
-}'></InputFile>*@
+}'></InputFile>
 
 
 @code 

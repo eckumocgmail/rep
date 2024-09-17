@@ -20,7 +20,7 @@ namespace Console_UserInterface.Services
             });
 
             services.AddSingleton<AppSessionContext>();
-            services.AddSingleton<ISessionService, SessionService>();
+            services.AddScoped<ISessionService, SessionService>();
         }
     }
 
@@ -49,8 +49,8 @@ namespace Console_UserInterface.Services
             this.AssertService<ISessionService>(sessions => {
                 this.Info("Объекты сеанса:");
                 this.Info(sessions.GetKeys().ToJsonOnScreen());
-                sessions.SetValue<UserAccount>("account", new UserAccount("eckumoc@gmail.com","Gye*34FRtw"));
-                var founded = sessions.GetValue<UserAccount>("account");                
+                sessions.SetValue<object>("account", new { username="eckumoc@gmail.com", password="Gye*34FRtw" });
+                var founded = sessions.GetValue<object>("account");                
                 return founded is not null;
             },
             "Получение установка объектов сеанса работает", 

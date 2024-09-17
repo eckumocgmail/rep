@@ -49,6 +49,8 @@ public static class InputFormExtensions
             var field = formModel.CreateFormField(paramModel);
             formModel.FormFields.Add(field);
         }
+        formModel.Container = "v-group";
+        formModel.IsValid = false;
         formModel.EnsureIsValide();
         return formModel;
 

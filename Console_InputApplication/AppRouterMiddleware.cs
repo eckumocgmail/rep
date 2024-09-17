@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Console_UserInterface.Services;
+
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 
 using Newtonsoft.Json;
@@ -9,7 +11,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+
+using static System.Collections.Specialized.BitVector32;
 using static System.Net.WebRequestMethods;
 
 [Label("Маршрутизатор http-запросов")]
@@ -26,9 +31,9 @@ public class AppRouterMiddleware: TypeNode<AppRouterMiddleware>, IMiddleware
     };
 
    
-    public AppRouterMiddleware()
+    public AppRouterMiddleware(   )
     {
-        this.AddController(nameof(AppRouterMiddleware));    
+        this.AddController(nameof(AppRouterMiddleware));
     }
 
 
@@ -60,13 +65,29 @@ public class AppRouterMiddleware: TypeNode<AppRouterMiddleware>, IMiddleware
     }
 
 
+    public string CreateFormFile(InputFormModel model)
+    {
+
+        string dir = System.IO.Directory.GetCurrentDirectory();
+        for(int i=0; i<100; i++)
+        {
+            string filename = $"form_{i}.json";
+            if(System.IO.File.Exists(Path.Combine(dir,filename))==false) 
+            {
+                System.IO.File.WriteAllText(Path.Combine(dir, filename), model.ToJsonOnScreen());
+                return filename;
+            }
+        }
+        throw new Exception();
+    }
+
+
     /// <summary>
     /// 
     /// </summary>
     public async Task InvokeAsync(HttpContext http, RequestDelegate todo)
     {
         await Task.CompletedTask;
-
         this.Info($"{http.Request.GetDisplayUrl()}");
 
         try
@@ -102,7 +123,9 @@ public class AppRouterMiddleware: TypeNode<AppRouterMiddleware>, IMiddleware
                         case "GET":
                             {
                                 var form = controllerType.GetInputForm(actionName);
-                                http.ResponseJson(200, form);
+                                string filepath = CreateFormFile(form);
+                                
+                                http.Response.Redirect($"/forms/session/{filepath}");                                
                             }
                             break;
                         case "POST":

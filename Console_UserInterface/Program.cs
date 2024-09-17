@@ -87,7 +87,7 @@ namespace Console_UserInterface
             builder.Services.AddServerSideBlazor();
             builder.Services.AddHttpContextAccessor();
             
-            builder.Services.AddTransient<IconsProvider>();
+            
             builder.Services.AddTransient<GeoLocationService>();
             builder.Services.AddSingleton<AppRouterMiddleware>();
             builder.Services.AddScoped<SqlServerWebApi>();
@@ -99,7 +99,7 @@ namespace Console_UserInterface
                 //todo configure authorization
             });
 
-            LocationModule.AddLocationService(builder.Services);
+            UserInterfaceModule.AddUserInterfaceServices(builder.Services, builder.Configuration);
             SesionModule.AddSessionService(builder.Services);
             RecaptchaModule.ConfigureServices(builder.Configuration, builder.Services);
             AuthorizationDbContext.ConfigureServices(builder.Services);

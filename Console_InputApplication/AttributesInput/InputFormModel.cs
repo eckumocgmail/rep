@@ -31,7 +31,7 @@ public class InputFormModel
 
     [Label("Контейнер")]
     [InputSelect("h-group,v-group")]
-    public string Container { get; set; }
+    public string Container { get; set; } = "v-group";
    
     [Label("Размер")]
     [InputSelect("small,normal,big")]
@@ -66,9 +66,8 @@ public class InputFormModel
 
     [Label("Состояние")]
     [NotInput]
-    [UpdateWhenChanged(false)]
-    [InputSelect("valid,invalid")]
-    public bool IsValid { get; set; }
+    [UpdateWhenChanged(false)]    
+    public bool IsValid { get; set; } = false;
 
 
 

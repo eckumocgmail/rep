@@ -32,6 +32,7 @@
             <FocusOnNavigate RouteData="@routeData" Selector="h1" />
         </Found>
         <NotFound>
+            <MainMenu></MainMenu>
             @if (Page is not null)
             {
                 <PageView Model="Page"></PageView>

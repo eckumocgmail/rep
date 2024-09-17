@@ -1,5 +1,6 @@
 ﻿@using System.Reflection;
 @using Console_UserInterface.Services;
+@using Mvc_Apteka.Entities;
 @using static Console_UserInterface.Location.LocationDbContext;
 @inherits BaseComponent
 @code
@@ -201,29 +202,26 @@
                             case InputTypes.Duration:
                                 <input type="number" @oninput="((evt) => OnInputHandle(evt ))" class="form-control is-@(Model.State) @Model.State)" value="@GetHtmlInputValue()" name="@Model.Name" />
                                 break;
-                            case InputTypes.Xml:
-                                <div>
-                                    <span>add</span>
-                                                                                          
-                                </div>
-
-                                
+                            case InputTypes.Xml:                                                                
+                                <XmlEditorView ItemType="string" Data="@(new List<HierTable<string>>(){ new HierTable<string>( ){ Name = 1.ToString() }})"></XmlEditorView>                                
                                 break;
                             case InputTypes.Image:
-                                <img id="img_from_file_@GetHashCode()" src="" style="width: 100%; height: 100%; min-height: 320px; min-width: 320px; max-height: 640px; max-width: 640px; margin: 0px; padding: 0px;" class="btn" />
-                                <input type="hidden" value="@Model.Value" id="data_input_@GetHashCode()" @onchange="(evt => { this.OnInput.InvokeAsync( Model.Value = evt.Value ).Wait(); StateHasChanged(); })" name="@Model.Name" />
-                                <input type="file" id="file_input" onchange="
-                                        for(let i=0; i<this.files.length; i++)
-                                        {
-                                            let file= this.files[i];
-                                            let reader = new FileReader();
-                                            reader.onload = function() {                                                     
-                                                 document.getElementById('img_from_file_@GetHashCode()').src=reader.result;
-                                                 document.getElementById('data_input_@GetHashCode()').value=reader.result;
-                                            };
-                                            reader.readAsDataURL(file);
-                                        }
-                                    " />
+                                <div class="d-flex flex-column flex-nowrap">
+                                    <img id="img_from_file_@GetHashCode()" src="" style="width: 100%; height: 100%; min-height: 320px; min-width: 320px; max-height: 640px; max-width: 640px; margin: 0px; padding: 0px;" class="btn" />
+                                    <input type="hidden" value="@Model.Value" id="data_input_@GetHashCode()" @onchange="(evt => { this.OnInput.InvokeAsync( Model.Value = evt.Value ).Wait(); StateHasChanged(); })" name="@Model.Name" />
+                                    <input type="file" id="file_input" onchange="
+                                            for(let i=0; i<this.files.length; i++)
+                                            {
+                                                let file= this.files[i];
+                                                let reader = new FileReader();
+                                                reader.onload = function() {                                                     
+                                                     document.getElementById('img_from_file_@GetHashCode()').src=reader.result;
+                                                     document.getElementById('data_input_@GetHashCode()').value=reader.result;
+                                                };
+                                                reader.readAsDataURL(file);
+                                            }
+                                        " />
+                                </div>
 
 
 
@@ -266,7 +264,20 @@
                                 break;
                             //почтовый индекс 197371
                             case InputTypes.PostalCode:
-                                <input type="text" @oninput="((evt) => OnInputHandle(evt ))" class="form-control is-@(Model.State) @Model.State)" value="@GetHtmlInputValue()" name="@Model.Name"  />
+                                <input type="text" @onchange="((evt) => {OnInputHandle(evt );})" oninput="
+                                            var s = '';
+                                            var v = evt.target.value;
+                                            for (let i = 0; i < v.length; i++) {
+                                                if ('0123456789'.indexOf(v[i]) != -1) {
+                                                    s += v[i];
+                                                    if (s.length > 6) {
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                            v = s;
+                                            this.value=v;
+                                " class="form-control is-@(Model.State) @Model.State)" value="@GetHtmlInputValue()" name="@Model.Name" />
                                 break;
 
                             //номер карты 2202-8080-9090-1010
@@ -315,7 +326,10 @@
                                 <input type="password" @oninput="((evt) => OnInputHandle(evt ))" class="form-control is-@(Model.State) @Model.State)" value="@GetHtmlInputValue()" name="@Model.Name"  />
                                 break;
                             case InputTypes.Phone:
-                                <input type="text" oninput="var evt = window.event;
+                                <input type="text" 
+
+                                    @onchange="((evt) => OnInputHandle(evt ))"
+                                    oninput="var evt = window.event;
                                         try {
                                             console.log(evt);
 

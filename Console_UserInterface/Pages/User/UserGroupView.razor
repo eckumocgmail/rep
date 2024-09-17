@@ -10,7 +10,7 @@
         @this
     </Template>
     <CardFooter>
-        <CreateMessage OnComplete="(evt => OnGroupMessageCompleted((UserGroupMessage)evt))"></CreateMessage>
+        <CreateMessage OnComplete="(evt => OnGroupMessageCompleted((UserGroupMessage)(object)evt))"></CreateMessage>
     </CardFooter>
 </SearchListCard>
 

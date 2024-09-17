@@ -1,0 +1,24 @@
+﻿@page "/forms/session/{Key}.json"
+@using System.Text;
+
+@inject IHttpContextAccessor accessor
+<FormEditor Model="Model"></FormEditor>
+@code 
+{
+    [Parameter]
+    [NotNullNotEmpty]
+    public string Key { get; set; }
+    public InputFormModel Model { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        this.EnsureIsValide();
+
+        string json = System.Text.Encoding.UTF8.GetString(accessor.HttpContext.Session.Get("/forms/session/"));
+        this.Model = json.FromJson<InputFormModel>();
+
+        //this.Model = Key.FromJson<InputFormModel>();
+
+    }
+}

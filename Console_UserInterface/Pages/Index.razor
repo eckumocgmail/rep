@@ -15,16 +15,16 @@
         this.Routes = new LocationDbContext().AppRoutes.ToList().Select(r => r.Uri).ToList().Select(p => (object)p).ToList();
         var builder = new MainMenuBuilder.MenuBuilder();
         var fileMenu = builder.CreateMenu("File", new List<string>() { "Create", "Open", "Close" }.Select(text => builder.CreateButtonMenu(text)).ToArray());
-        MainMenuModel.Add(fileMenu);
+        MenuItems.Add(fileMenu);
         InitPage();
     }
 
     void InitPage()
     {
-        this.Page = new AppPage();
+        this.PageInstance = new AppPage();
         foreach (var type in InputTypes.GetAll())
         {
-            Page.PageComponents.Add(new PageComponent()
+            PageInstance.PageComponents.Add(new PageComponent()
             {
                     Type = type,
                     Name = type,
@@ -43,27 +43,27 @@
             });
         }
     }
-    public List<MainMenuBuilder.MenuItemModel> MainMenuModel { get; set; } = new();
-    public object ToolsBarModel { get; set; }
-    public TabsContainer Tabs { get; set; }
-    public AppPage Page { get; set; }
+    public List<MainMenuBuilder.MenuItemModel> MenuItems { get; set; } = new();
+    public List<MainMenuBuilder.MenuItemModel> ToolItems { get; set; } = new();
+    public TabsContainer TabPanes { get; set; }
+    public AppPage PageInstance { get; set; }
 }
 
 <CardContainer Width="512px" Height="512px">
     <CardHeader>
-        <MenuBar Model="MainMenuModel"></MenuBar>
-        <ToolsBar Model="ToolsBarModel"></ToolsBar>
+        <MenuItemView Model="MenuItems"></MenuItemView>
+        <ToolsBar Model="ToolItems"></ToolsBar>
         <SearchPane OnSearchSubmit="((SearchPane evt) => { 
-            this.Page = location.Navigate(evt.SearchQuery);
+            this.PageInstance = location.Navigate(evt.SearchQuery);
         })">
         </SearchPane>
     </CardHeader>
     <CardBody>
-        @if (Page is not null)
+        @if (PageInstance is not null)
         {
-            <PageView Model="Page"></PageView>
+            <PageView Model="PageInstance"></PageView>
         }
-        <TabsContainer @ref="Tabs">
+        <TabsContainer @ref="TabPanes">
             <ListPrimitiveEditor                                 
                 ItemType="@typeof(String)"
                 OnAdd="(evt => { route.AddRoute<AppPage>(evt.ToString()); StateHasChanged(); } )"

@@ -1,0 +1,67 @@
+﻿@typeparam ItemType 
+@code 
+{
+    public TreeNode Root { get; set; } = new();
+    public TreeNode Cursor { get; set; }
+}
+<CardContainer>
+    <CardHeader>
+        <ToolsBar>
+            <span class="btn btn-sm @(Cursor is null? "disabled": "")" @onclick="evt => { Cursor.Children.Add(new TreeNode()); StateHasChanged(); }">добавить</span>
+            <span class="btn btn-sm @(Cursor is null? "disabled": "")">удалить</span>
+            <span class="btn btn-sm @(Cursor is null? "disabled": "")">настроить</span>
+        </ToolsBar>
+    </CardHeader>
+    <CardBody>    
+        <TreeNode Name="Каталог" Children="@Root.Children" Checked="@(Root.Checked)" OnChanged="(evt => { Root.Checked = !Root.Checked; Cursor = Root; StateHasChanged(); })"></TreeNode>
+    </CardBody>
+    <CardFooter>
+        <span>@(Cursor is not null ? Cursor.Name : "Выбор")</span>
+    </CardFooter>
+</CardContainer>
+@code
+{
+
+    [NotNullNotEmpty]
+    [Parameter]
+    public IEnumerable<HierTable<ItemType>> Data { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        this.EnsureIsValide();
+        if (Data.Count(p => p.ParentId is null) > 1)
+        {
+            throw new ArgumentException("Набор данных включает несколько корневых узлов");
+        }
+        var RootItem = Data.FirstOrDefault(p => p.ParentId is null);
+        if (RootItem is null)
+        {
+            throw new ArgumentException("Нет ссылки на корневой узел");
+        }
+        Dictionary<int, TreeNode> nodes = new();
+        foreach(var item in Data)
+        {
+            nodes[item.Id] = new TreeNode()
+            {
+                Name = item.Name,
+                Checked = false,
+                Children = new()
+            };
+            if(item.ParentId is not null)
+            {
+                this.Root = nodes[item.Id];
+            }            
+        }
+        foreach(var item in Data.ToList())
+        {
+
+            if(item.ParentId is not null)
+            {
+                var pparent = nodes[(int)item.ParentId];
+                var pchild = nodes[(int)item.Id];
+                pparent.Children.Add(pchild);                
+            }            
+        }
+        
+    }
+}
