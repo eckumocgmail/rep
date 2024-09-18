@@ -1,8 +1,8 @@
-﻿@page "/forms/session/{Key}.json"
+﻿@page "/forms/session/{Key}"
 @using System.Text;
-
+@Key
 @inject IHttpContextAccessor accessor
-<FormEditor Model="Model"></FormEditor>
+<FormModel Form="Model"></FormModel>
 @code 
 {
     [Parameter]
@@ -14,11 +14,13 @@
     {
         await base.OnInitializedAsync();
         this.EnsureIsValide();
-
-        string json = System.Text.Encoding.UTF8.GetString(accessor.HttpContext.Session.Get("/forms/session/"));
+        var filePath = Path.Combine
+        (
+            System.IO.Directory.GetCurrentDirectory(),
+            Key
+        );
+        var json = System.IO.File.ReadAllText(filePath);
         this.Model = json.FromJson<InputFormModel>();
-
-        //this.Model = Key.FromJson<InputFormModel>();
-
+        this.Model.Item = this.Model.ItemType.New(); //this.Model.Json is not null ? this.Model.Json.FromJson<object>() : this.Model.ItemType.New();
     }
 }

@@ -1,9 +1,12 @@
 {
+  "Json": "{}",
   "Title": "AddController",
   "Description": "",
   "Error": "",
   "Container": "v-group",
   "Size": "normal",
+  "Item": {},
+  "ItemType": "Dictionary<String,Object>",
   "FormFields": [
     {
       "InputFormModelId": 0,

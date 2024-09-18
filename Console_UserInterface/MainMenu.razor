@@ -59,7 +59,7 @@
         await base.OnInitializedAsync();
         navigator.LocationChanged += (sender, changes) => UpdateNavLinks(changes);
         actionLinks = GetNavigationLinks(navigator.Uri);
-        var list = actionLinks.ToList();
+        var list = actionLinks is not null ? actionLinks.ToList(): new();
         list.Sort( );
         actionLinks = list.ToArray();
         StateHasChanged();
@@ -83,8 +83,8 @@
     {
         string uri = changes.Location;
         Console.WriteLine(uri);
-        actionLinks = GetNavigationLinks(uri);
-        var list = actionLinks.ToList();
+        var actionLinks = GetNavigationLinks(uri);
+        var list = actionLinks is null? new List<ActionLink>(): actionLinks.ToList();
         list.Sort( );
         actionLinks = list.ToArray();
         StateHasChanged();

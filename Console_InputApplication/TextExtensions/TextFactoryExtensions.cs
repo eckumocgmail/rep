@@ -22,8 +22,18 @@ public static class TextFactoryExtensions
     {                      
         if(text == null)
             throw new ArgumentNullException("text");
-        
+        if (text.IndexOf("<") != -1)
+        {
+            var genericArgs = text.Substring(text.IndexOf("<")+1, text.IndexOf(">")- text.IndexOf("<")-1).Split(",");
+            var genericTypes = genericArgs.Select(parg => parg.ToType()).ToArray();
+            var mainType = text.Substring(0, text.IndexOf("<"));
+
+            mainType += $"`{genericTypes.Count()}";
+            var result = mainType.ToType().MakeGenericType(genericTypes);
+            return result;
+        }
         Type ptype = text.Contains(".")? ReflectionService.TypeForName(text): ReflectionService.TypeForShortName(text);
+        
         if(ptype == null)
         {
             ptype = text.Contains(".") ? ServiceFactory.Get().TypeForName(text) : ServiceFactory.Get().TypeForShortName(text);  

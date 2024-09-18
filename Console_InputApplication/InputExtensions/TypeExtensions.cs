@@ -209,8 +209,17 @@ public static class TypeExtensions2
         string result = targetType.GetNameOfType();
         return result;
     }
-    
-    
+    public static string GetOwnTypeName(this object target)
+    {
+        Type targetType = target is Type ? ((Type)target) : target.GetType();
+        string result = targetType.GetNameOfType();
+        int? iend = Enumerable.Range(0, result.Length).FirstOrDefault(i => result[i].ToString().IsEng() == false);
+        iend = iend is null ? result.Length: iend;
+        result.Substring(0, (int)iend);
+        return result;
+    }
+
+
 
     public static IEnumerable<Type> @extended(this Type method)
         => Assembly.GetExecutingAssembly().GetTypes().Where(type=>type.IsClass).Where(t => t.IsExtendsFrom(method));

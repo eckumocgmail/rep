@@ -17,6 +17,7 @@ using System.Reflection;
 [Label("Модель формы ввода")]
 public class InputFormModel
 {
+    public string Json { get; set; }
 
     [Label("Заголовок формы")]
     public string Title { get; set; }
@@ -42,6 +43,9 @@ public class InputFormModel
     [NotInput]
     public object Item { get; set; }
 
+    [NotNullNotEmpty]
+    public string ItemType { get; set; }
+    
     [Label("Поля ввода")]
     [InputStructureCollection(nameof(InputFormField))]
     //[JsonIgnore]
@@ -88,11 +92,13 @@ public class InputFormModel
         {
             IsValid = false;
             Item = item;
+            ItemType = item.GetTypeName();
             Title = item.GetType().GetLabel();
             Description = item.GetType().GetDescription();
             var ptype = item.GetType();            
             var properties = ptype.GetInputProperties();            
             Update(properties.ToArray());
+            this.Json = this.Item.ToJsonOnScreen();
         }
         catch(Exception ex)
         {
@@ -105,6 +111,7 @@ public class InputFormModel
         if (item == null)
             throw new Exception("Аргумент item на задан");
         IsValid = false;
+        ItemType = item.GetTypeName();
         Title = item.GetType().GetLabel();
         Description = item.GetType().GetDescription();
         Item = item;

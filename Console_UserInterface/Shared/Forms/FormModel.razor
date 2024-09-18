@@ -27,9 +27,10 @@
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
+        Errors = new();
         try
         {
-             
+
             Form = Form is null ? new InputFormModel() : Form;
         }
         catch (Exception ex)
@@ -58,13 +59,21 @@
         await Task.CompletedTask;
         if (Form is null)
             return;
-        var message = Form.Item.Validate();
-        SetErrors(Form, message);
-        Form.FormFields.ForEach(item =>
+        if (Form.Item is null && Form.Json is not null)
         {
-            item.State = message.ContainsKey(item.Name) && message[item.Name].Count() > 0 ? "invalid" : "valid";
-        });
-        this.Info(message.ToJson());
+            Form.Item =  Form.Json.FromJson<object>();
+        }
+        if (Form.Item is not null)
+        {
+            var message = Form.Item.Validate();
+            SetErrors(Form, message);
+            Form.FormFields.ForEach(item =>
+            {
+                item.State = message.ContainsKey(item.Name) && message[item.Name].Count() > 0 ? "invalid" : "valid";
+            });
+            this.Info(message.ToJson());
+            
+        }
         if (Form.IsValid)
         {
             await OnValidated.InvokeAsync();

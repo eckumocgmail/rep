@@ -36,6 +36,8 @@ public static class InputFormExtensions
         formModel.Title = actionModel.Name;
         formModel.Description = controller.GetMethodDescription(action);
         formModel.FormFields = new();
+        formModel.Item = new Dictionary<string, object>();
+        formModel.ItemType = formModel.Item.GetTypeName();
         foreach (var param in controller.GetActionParameters(action))
         {            
             var paramModel = new MyParameterDeclarationModel();
@@ -49,6 +51,8 @@ public static class InputFormExtensions
             var field = formModel.CreateFormField(paramModel);
             formModel.FormFields.Add(field);
         }
+        formModel.Item = new Dictionary<string, object>();
+        formModel.Json = "{}";
         formModel.Container = "v-group";
         formModel.IsValid = false;
         formModel.EnsureIsValide();

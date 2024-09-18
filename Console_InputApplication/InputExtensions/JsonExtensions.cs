@@ -1,6 +1,8 @@
 ﻿
 using Console_InputApplication;
 
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -330,6 +332,9 @@ public static class JsonExtensions
     {
         try
         {
+            if(target is null)
+                throw new ArgumentNullException("target");
+            target.Info(target);
             return JsonConvert.DeserializeObject<TModel>(target);
         }
         catch (JsonException ex)

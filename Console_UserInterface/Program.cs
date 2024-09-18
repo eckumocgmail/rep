@@ -45,6 +45,10 @@ namespace Console_UserInterface
 
         private static void RegTypes()
         {
+
+
+            ServiceFactory.Get().AddType(typeof(Dictionary<,>));
+            ServiceFactory.Get().AddTypes(typeof(string).Assembly);
             ServiceFactory.Get().AddTypes(typeof(JsonPropertyAttribute).Assembly);
             ServiceFactory.Get().AddTypes(typeof(Newtonsoft.Json.JsonArrayAttribute).Assembly);
             ServiceFactory.Get().AddTypes(typeof(System.Data.SqlClient.SqlClientPermission).Assembly);
@@ -56,7 +60,10 @@ namespace Console_UserInterface
             ServiceFactory.Get().AddTypes(Assembly.GetEntryAssembly().Modules.Select(mod => mod.Assembly));
             ServiceFactory.Get().AddTypes(typeof(Program).Assembly);
             ServiceFactory.Get().AddTypes(typeof(Program).Assembly);
+            ServiceFactory.Get().AddTypes(typeof(System.Object).Assembly);
             ServiceFactory.Get().AddTypes(typeof(Program).Assembly.Modules.Select(mod => mod.Assembly));
+            ServiceFactory.Get().Info(typeof(Dictionary<,>).GetTypeName());
+            "Dictionary<String,Object>".ToType();
         }
 
         public static void Configure(WebApplicationBuilder builder)

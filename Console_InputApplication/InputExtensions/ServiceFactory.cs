@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.DependencyInjection;
 
 using System;
@@ -25,7 +26,8 @@ public class ServiceFactory
         {
             Instance = new ServiceFactory();
         }
-        
+
+        Instance.AddType(typeof(Dictionary<,>));
         Instance.AddTypes(typeof(ServiceFactory).Assembly);
         Instance.AddTypes(typeof(DataColumnCollection).Assembly);
         Instance.AddTypes(typeof(System.String).Assembly);
@@ -168,29 +170,48 @@ public class ServiceFactory
         Assemblies.Add(assembly);
         foreach (var ptype in assembly.GetTypes())
         {
-            if (ptype.Name.EndsWith("ViewComponent"))
-            {
-                ViewComponents[ptype.Name] = ptype;
-            }
-            if (ptype.Name.EndsWith("Controller") && ptype.IsAbstract==false)
-            {
-                Controllers[ptype.Name] = ptype;
-            }
-            if (ptype.Name.Contains("`") ==false)
-            {
-                ByShortNames[ptype.Name] = ptype;
-                ByFullNames[ptype.FullName] = ptype;
-            }
-            
-            else if(ptype.Name.StartsWith("<")==false) 
-            {
-                string typeName = ParsePropertyType(ptype);
-                 
-                ByShortNames[typeName] = ptype;
-                ByFullNames[ptype.Namespace+"."+ typeName] = ptype;
-            }
-            
+            AddType(ptype);
         }
+    }
+
+    public void AddType(Type ptype)
+    {
+        if (ptype.Name.EndsWith("ViewComponent"))
+        {
+            ViewComponents[ptype.Name] = ptype;
+        }
+        if (ptype.Name.EndsWith("Controller") && ptype.IsAbstract == false)
+        {
+            Controllers[ptype.Name] = ptype;
+        }
+        if (ptype.Name.Contains("`") == false)
+        {
+            ByShortNames[ptype.Name] = ptype;
+            ByFullNames[ptype.FullName] = ptype;
+        }
+
+        else if (ptype.Name.StartsWith("<") == false)
+        {
+            string typeName = ParsePropertyType(ptype);
+
+            ByShortNames[typeName] = ptype;
+            ByFullNames[ptype.Namespace + "." + typeName] = ptype;
+        }
+        this.Info(ptype.GetOwnTypeName());
+        this.Info(ptype.GetTypeName());
+        this.Info(ptype.Name);
+        this.Info(ptype.Namespace + "." + ptype.GetTypeName());
+        ByShortNames[ptype.GetOwnTypeName()] = ptype;
+        ByShortNames[ptype.GetTypeName()] = ptype;
+        ByShortNames[ptype.Name] = ptype;
+        ByFullNames[ptype.Namespace + "." + ptype.GetTypeName()] = ptype;
+        
+
+
+        /*if (ptype.GetTypeName().Contains("Dictionary"))
+        {
+            ptype.Info(ptype.GetTypeName());
+        }*/
     }
 
 

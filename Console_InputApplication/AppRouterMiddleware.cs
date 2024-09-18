@@ -67,11 +67,10 @@ public class AppRouterMiddleware: TypeNode<AppRouterMiddleware>, IMiddleware
 
     public string CreateFormFile(InputFormModel model)
     {
-
         string dir = System.IO.Directory.GetCurrentDirectory();
         for(int i=0; i<100; i++)
         {
-            string filename = $"form_{i}.json";
+            string filename = $"form_{i}";
             if(System.IO.File.Exists(Path.Combine(dir,filename))==false) 
             {
                 System.IO.File.WriteAllText(Path.Combine(dir, filename), model.ToJsonOnScreen());
