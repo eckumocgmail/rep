@@ -7,11 +7,13 @@
 @code
 {
     public bool IsReady { get; set; } = false;
-    public TestingReport Report { get; set; }  
+    public TestingUnit Unit { get; set; }
+    public TestingReport Report { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
+        this.Unit = new UserInterfaceUnit(provider);
         //await RunTestsAsync();
         StateHasChanged();
     }
@@ -21,8 +23,8 @@
         await Task.CompletedTask;
         IsReady = false;
         StateHasChanged();
-        var unit = new DeliveryServicesUnit(provider);
-        this.Report = unit.DoTest(false);
+       
+        this.Report = Unit.DoTest();
         IsReady = true;
         StateHasChanged();
         return this.Report;

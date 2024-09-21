@@ -37,10 +37,6 @@
     [Parameter]
     public EventCallback<InputEvent> AfterInput { get; set; }
 
-    
-
-    private static string NoName = "NoName";
-
     /// <summary>
     /// Скрипт обработчика события ввода номера телефона в поле формы
     /// </summary>    
@@ -529,7 +525,7 @@ else
         }
         catch(Exception ex)
         {
-            this.Error("Не удалось получить справочник "+exp);
+            this.Error("Не удалось получить справочник "+exp+" "+ex.Message);
         }
         return result;
     }

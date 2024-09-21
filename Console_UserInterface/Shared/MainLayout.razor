@@ -12,13 +12,14 @@
         <NavMenu></NavMenu>
     </div>
 
-    <main class="@( signin.IsSignin()? signin.Verify().Settings.ColorTheme: "dark" )">
+    <main class="@( signin.IsSignin()? signin.Verify().Settings.ColorTheme: "light" )">
         @if(signin.IsSignin())
         {
             <p>@signin.Verify().Settings.ColorTheme</p>
         }
         
         <div style="position: fixed;" class="card">
+            <UpdateLocation></UpdateLocation>
             <GeoPositionUpdater></GeoPositionUpdater>
             <UserNotifications></UserNotifications>
             <LocalStorageAuth></LocalStorageAuth>

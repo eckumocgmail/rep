@@ -2,19 +2,23 @@
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
-    <Nullable>enable</Nullable>
-	<NoWarn>RAZORSDK1006;NETSDK1138</NoWarn>
+    <Nullable>disable</Nullable>
+	<NoWarn>RAZORSDK1006;NETSDK1138;BL0005;BL0007;CS0649</NoWarn>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Remove="Shared\Attributes\**" />
+    <Compile Remove="Shared\InputModal\**" />
     <Compile Remove="Shared\ViewModels\**" />
     <Content Remove="Shared\Attributes\**" />
+    <Content Remove="Shared\InputModal\**" />
     <Content Remove="Shared\ViewModels\**" />
     <EmbeddedResource Remove="Shared\Attributes\**" />
+    <EmbeddedResource Remove="Shared\InputModal\**" />
     <EmbeddedResource Remove="Shared\ViewModels\**" />
     <None Remove="Shared\Attributes\**" />
+    <None Remove="Shared\InputModal\**" />
     <None Remove="Shared\ViewModels\**" />
   </ItemGroup>
 	<ItemGroup>
@@ -47,6 +51,10 @@
   <ItemGroup>
     <ProjectReference Include="..\Console_DataConnector\Console_DataConnector.csproj" />
     <ProjectReference Include="..\Console_InputApplication\Console_InputApplication.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="AppUnits\InterfaceModule\InterfaceModel\" />
+    <Folder Include="AppUnits\InterfaceModule\InterfaceApi\" />
   </ItemGroup>
 
 </Project>

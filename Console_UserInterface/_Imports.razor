@@ -1,27 +1,36 @@
 ﻿@using System.Net.Http
+@using Microsoft.JSInterop
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components.Routing
 @using Microsoft.AspNetCore.Components.Web
 @using Microsoft.AspNetCore.Components.Web.Virtualization
-@using Microsoft.JSInterop
+@using Microsoft.EntityFrameworkCore;
+@using BlazorContextMenu
+@using Blazored.Modal
+@using Blazored.Modal.Services
 @using Console_UserInterface
 @using Console_UserInterface.Shared
-@using pickpoint_delivery_service
+@using Console_UserInterface.Shared.Controls;
+@using Console_UserInterface.Shared.Deps
+@using Console_UserInterface.Shared.Layouts
+@using Console_UserInterface.Shared.Faces
+@using Console_UserInterface.Shared.Forms
+@using static Console_UserInterface.Shared.Forms.ValidationForm;
 @using Console_BlazorApp.AppUnits
 @using Console_BlazorApp.AppUnits.DeliveryModel;
 @using Console_BlazorApp.AppUnits.DeliveryServices;
 @using Console_BlazorApp.AppUnits.DeliveryApi;
-@using Console_UserInterface.Shared.Deps
 @using Console_UserInterface.AppUnits.AuthorizationBlazor;
 @using Console_UserInterface.Pages.User.Messages;
 @using Console_InputApplication;
-@using Console_UserInterface.Shared.Forms
-@using static Console_UserInterface.Shared.Forms.ValidationForm;
+@using Console_UserInterface.Services;
+@using Console_UserInterface.Services.Location;
+@using static Console_UserInterface.Services.Location.LocationDbContext
+@using static Console_UserInterface.Services.Location.LocationDbContext.AppPage
+@using static Console_UserInterface.Services.Location.LocationDbContext.AppRoute
+@using static Console_UserInterface.Services.Location.LocationDbContext.PageComponent
+@using pickpoint_delivery_service
 @using BlazorBootstrap;
-@using Console_UserInterface.Shared.Forms
-@using Microsoft.EntityFrameworkCore;
-@using Console_UserInterface.Shared.Controls;
-@using static Console_UserInterface.Shared.Forms.ValidationForm;
-@using BlazorContextMenu
+

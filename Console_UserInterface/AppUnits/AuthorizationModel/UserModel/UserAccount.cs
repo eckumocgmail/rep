@@ -23,26 +23,26 @@ public class UserAccount: BaseEntity
     [Icon("email")]
     [UniqValue("Этот адрес электронной почты уже зарегистрирован")]
     [JsonProperty("Email")]
-    public string Email { get; set; }
+    public string Email { get; set; } = "eckumoc@gmail.com";
 
 
     [Label("Пароль")]
     [NotNullNotEmpty]
     [InputPassword()]
-        
+
 
     [JsonProperty("Password")]
-    public string Password { get; set; }
+    public string Password { get; set; } = "sgdf1423";
 
 
     /// <summary>
     /// Время активации
     /// </summary>
-    [AllowNull]        
+    [AllowNull]
     //[InputDate( )]
     [InputHidden(true)]
     [NotInput("Свойство " + nameof(Activated) + " не вводится пользователем, оно устанавливается системой после ввода ключа активации")]
-    public DateTime? Activated { get; set; }
+    public DateTime? Activated { get; set; } = null;
 
     [InputHidden(true)]
     [NotInput("Свойство " + nameof(ActivationKey) + " не вводится пользователем, оно устанавливается системой перед созданием сообщения на эл. почту пользорвателя с инструкциями по активации")]

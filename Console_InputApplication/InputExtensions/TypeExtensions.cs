@@ -55,7 +55,7 @@ public static class StringExtensions
     }
     public static List<string> GetOwnPropertyNames(this Type type)
     {
-        var properties = type.GetType().GetProperties();
+        var properties = type.GetProperties();
         var own = properties.Where(p => p.DeclaringType.GetTypeName() == type.GetTypeName()).Select(p=>p.Name).ToList();
         return own;
     }

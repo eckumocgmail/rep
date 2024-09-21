@@ -197,7 +197,7 @@ public class TestingReport
 
             if(this.Failed)
                 this.WriteYellowLine($"\n[{(Failed?"-":"+")}]{space}{number}/{this.SubReports.Count()}: [{pair.Key}]" + pair.Value.Name + "");
-            else this.WriteWhite($"\n{space}{number}/{this.SubReports.Count()}: [{pair.Key}]" + pair.Value.Name + "");
+            else this.WriteWhiteLine($"\n{space}{number}/{this.SubReports.Count()}: [{pair.Key}]" + pair.Value.Name + "");
 
 
             document += pair.Value.PrintDocument(level + 1);

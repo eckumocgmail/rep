@@ -1,5 +1,5 @@
-﻿@using Console_UserInterface.Location;
-@using static Console_UserInterface.Location.LocationDbContext;
+﻿@using Console_UserInterface.Services.Location;
+@using static Console_UserInterface.Services.Location.LocationDbContext;
 @inject NavigationManager nav
 @inject LocationService location
 @code
@@ -15,32 +15,34 @@
         };
     }
 }
-<CascadingAuthenticationState>
-    <Router AppAssembly="@typeof(App).Assembly">
-        <Found Context="routeData">
-            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
-                <NotAuthorized>
-                    <PageTitle>Нет доступа</PageTitle>
-                    <div class="alert alert-danger" style="margins: 20px;">
-                        Нет доступа к странице <div><NavLink href="/">выполнить авторизацию</NavLink></div>
-                    </div>
-                </NotAuthorized>
-                <Authorizing>
-                    <div>Выполняется авторизация...</div>
-                </Authorizing>
-            </AuthorizeRouteView>
-            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
-        </Found>
-        <NotFound>
-            <MainMenu></MainMenu>
-            @if (Page is not null)
-            {
-                <PageView Model="Page"></PageView>
-            }
-            <PageTitle>Not found</PageTitle>
-            <LayoutView Layout="@typeof(MainLayout)">
-                <p role="alert">Sorry, there's nothing at this address.</p>
-            </LayoutView>
-        </NotFound>
-    </Router>
-</CascadingAuthenticationState>
+<CascadingBlazoredModal>
+    <CascadingAuthenticationState>
+        <Router AppAssembly="@typeof(App).Assembly">
+            <Found Context="routeData">
+                <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                    <NotAuthorized>
+                        <PageTitle>Нет доступа</PageTitle>
+                        <div class="alert alert-danger" style="margins: 20px;">
+                            Нет доступа к странице <div><NavLink href="/">выполнить авторизацию</NavLink></div>
+                        </div>
+                    </NotAuthorized>
+                    <Authorizing>
+                        <div>Выполняется авторизация...</div>
+                    </Authorizing>
+                </AuthorizeRouteView>
+                <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+            </Found>
+            <NotFound>
+                <MainMenu></MainMenu>
+                @if (Page is not null)
+                {
+                    <PageView Model="Page"></PageView>
+                }
+                <PageTitle>Not found</PageTitle>
+                <LayoutView Layout="@typeof(MainLayout)">
+                    <p role="alert">Sorry, there's nothing at this address.</p>
+                </LayoutView>
+            </NotFound>
+        </Router>
+    </CascadingAuthenticationState>
+</CascadingBlazoredModal>

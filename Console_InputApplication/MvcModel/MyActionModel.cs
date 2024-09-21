@@ -40,6 +40,9 @@ public static class MyActionModelExtensions
 public class MyActionModel
 {
 
+    public int ControllerId { get; set; }
+    public MyControllerModel Controller { get; set; }
+
     /// <summary>
     /// Http-метод
     /// </summary>

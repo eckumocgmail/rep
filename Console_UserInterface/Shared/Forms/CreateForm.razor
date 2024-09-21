@@ -1,0 +1,94 @@
+﻿@inject ILogger<CreateForm> logger
+@if (Model == null)
+{
+    <div class="alert alert-info">Нет данных для отображения</div>
+}
+else
+{
+     
+    <ValidationForm Model="@Model" @ref="@Ref">
+        <button class="btn btn-primary @(Ref.Model.IsValid?"":"disabled")" @onclick="@OnCreateButtonClicked">Создать</button>
+        <button class="btn btn-secondary" @onclick="@OnCancelButtonClicked">Отмена</button>
+    </ValidationForm>
+}
+@code {
+
+    public global::InputFormModel Model { get; set; }
+    public object Item { get; set; }
+
+    [Parameter]
+    public EventCallback<object> OnCreate { get; set; }
+    [Parameter]
+    public EventCallback<object> OnCancel { get; set; }
+
+    [Parameter]
+    public string TypeName
+    {
+        get{ return this._TypeName; }
+        set{ this._TypeName = value; this.Update(); }
+    }
+    public string _TypeName { get; set; }
+
+    [Parameter]
+    public string[] Properties { get; set; }
+    private bool Updated = false;
+    public ValidationForm Ref { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        this.Update();
+    }
+
+    public void Update()
+    {
+        try
+        {
+            if(Updated==false)
+            {
+                logger.LogInformation("Update()");
+                Type ItemType = TypeName.ToType();
+                Item = ItemType.New();
+                Properties = Properties == null || Properties.Length == 0 ?
+                    ItemType.GetInputProperties().ToArray() :
+                    Properties;
+                Model = new InputFormModel(Item, Properties);
+                StateHasChanged();
+                Updated = true;
+            }
+
+        }
+        catch (Exception ex)
+        {
+            logger.LogInformation(ex.ToString());
+        }
+    }
+
+
+
+    public async Task OnCancelButtonClicked()
+    {
+        await OnCancel.InvokeAsync(Item);
+    }
+
+    public async Task OnCreateButtonClicked()
+    {
+        if (Ref.Model.IsValid)
+        {
+            await OnCreate.InvokeAsync(Item);
+        }
+        else
+        {
+            Ref.Model.Error = "Проверьте данные на форме";
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        //Item = TypeName.ToType().New();
+        this.Updated = false;
+        this.Update();
+
+    }
+}

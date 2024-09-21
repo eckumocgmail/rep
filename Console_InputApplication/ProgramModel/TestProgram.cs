@@ -9,9 +9,9 @@ using System.Reflection;
 public class TestProgram: ConsoleProgram<TestRunner>
 {
     [Label("Выбор элемента в иерархической структуре")]
-    public ITypeNode<TNodeItem> SelectTreeNode<TNodeItem>(string title, ITypeNode<TNodeItem> root, Func<TNodeItem, string> print) where TNodeItem : class
+    public TypeNode<TNodeItem> SelectTreeNode<TNodeItem>(string title, TypeNode<TNodeItem> root, Func<TNodeItem, string> print) where TNodeItem : class
     {
-        ITypeNode<TNodeItem> p = root;
+        TypeNode<TNodeItem> p = root;
         var completed = false;
         do
         {

@@ -1,57 +1,42 @@
-﻿using Console_UserInterface.Services;
-
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Extensions;
-
-using Newtonsoft.Json;
-
-using System;
+﻿using Microsoft.AspNetCore.Http.Extensions;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-using System.Text;
-using System.Text.Encodings.Web;
-using System.Threading.Tasks;
-
-using static System.Collections.Specialized.BitVector32;
-using static System.Net.WebRequestMethods;
 
 [Label("Маршрутизатор http-запросов")]
-[Description("Использует динамически созданные объекты в качестве контроллеров приложения")]
+[Description(
+    "Использует динамически созданные объекты в " +
+    "качестве контроллеров приложения")]
 public class AppRouterMiddleware: TypeNode<AppRouterMiddleware>, IMiddleware
 {
-
     /// <summary>
     /// Параметры маршрутизации 
     /// </summary>
-    public ConcurrentDictionary<string, string> routing { get; set; } = new()
-    {
-         //"/api/test", "TestController.DoTests()"
-    };
-
+    public ConcurrentDictionary<string, string> routing { get; set; } = new(){};
    
     public AppRouterMiddleware(   )
     {
-        this.AddController(nameof(AppRouterMiddleware));
     }
-
-
-    /// <summary>
-    /// Регистрация маршрута в обработчике запроса
-    /// </summary>    
-    public void AddRoute(string route, string controller, string action)
-    {
-        var ctrl = controller.ToType();
-        var method = controller.ToType().GetMethod(action);
-        routing[route] = $"{controller}.{action}";
-    }
-
+    
     public void AddControllerAction( string controller, string action)
     {
         var route = $"/api/{controller}/{action}";
         var ctrl = controller.ToType();
         var method = controller.ToType().GetMethod(action);
+        if (ctrl is null)
+        {
+            throw new ArgumentException("controller", $"Не найден тип {controller}");
+        }
+        if (ctrl is null)
+        {
+            throw new ArgumentException("controller", $"Не метод {action} в типе {controller}");
+        }
+        try
+        {
+            ctrl.New();
+        }
+        catch(Exception) 
+        {
+            throw new ArgumentException("controller", $"Не удалось создать объект типа {controller}");
+        }
         routing[route] = $"{controller}.{action}";
     }
 
@@ -65,12 +50,16 @@ public class AppRouterMiddleware: TypeNode<AppRouterMiddleware>, IMiddleware
     }
 
 
-    public string CreateFormFile(InputFormModel model)
+    public string CreateFormFile(string name, InputFormModel model)
     {
-        string dir = System.IO.Directory.GetCurrentDirectory();
+        string dir = Path.Combine(System.IO.Directory.GetCurrentDirectory(), "Forms");
+        if(System.IO.Directory.Exists(dir) == false)
+        {
+            System.IO.Directory.CreateDirectory(dir);
+        }
         for(int i=0; i<100; i++)
         {
-            string filename = $"form_{i}";
+            string filename = name;
             if(System.IO.File.Exists(Path.Combine(dir,filename))==false) 
             {
                 System.IO.File.WriteAllText(Path.Combine(dir, filename), model.ToJsonOnScreen());
@@ -122,9 +111,8 @@ public class AppRouterMiddleware: TypeNode<AppRouterMiddleware>, IMiddleware
                         case "GET":
                             {
                                 var form = controllerType.GetInputForm(actionName);
-                                string filepath = CreateFormFile(form);
-                                
-                                http.Response.Redirect($"/forms/session/{filepath}");                                
+                                string filepath = CreateFormFile($"{controllerTypeName}.{actionName}.input", form);                                
+                                http.Response.Redirect($"/forms/{controllerTypeName}/{actionName}");                                
                             }
                             break;
                         case "POST":
@@ -197,6 +185,10 @@ public class AppRouterMiddleware: TypeNode<AppRouterMiddleware>, IMiddleware
         }
         return query == route;
     }
+
+    public ConcurrentDictionary<string, string> GetRoutes() => routing;
+
+
 }
 
 

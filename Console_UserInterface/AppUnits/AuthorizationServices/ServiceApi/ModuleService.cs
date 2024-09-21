@@ -8,23 +8,20 @@ using Microsoft.Extensions.DependencyInjection;
 public class ModuleService
 {
     public static void ConfigureServices(IConfiguration configure, IServiceCollection services)
-    {
-        
+    {        
         var segment = new object();
         lock (segment)
-        {
-             
-            InputConsole.GetLogger<ModuleService>().LogInformation("ConfigureServices .. ");
+        {             
+            InputConsole.GetLogger<ModuleService>().LogInformation("Регистрация служб ... ");
             services.AddDbContext<DbContextService>(ConfigureDbContext);
             if (services.Any(descr => descr.ServiceType == typeof(AuthorizationOptions)) == false)
                 services.AddSingleton<AuthorizationOptions>();
             services.AddSingleton<AuthorizationServices>();
             services.AddTransient(typeof(APIActiveCollection<ServiceContext>), sp => sp.GetRequiredService<AuthorizationServices>());
             services.AddTransient(typeof(APIServices), sp => sp.GetRequiredService<AuthorizationServices>());
-
             services.AddTransient<SigninService>();
             services.AddTransient<SignupService>();
-            InputConsole.GetLogger<ModuleService>().LogInformation("ConfigureServices .. COMPLETED");
+            InputConsole.GetLogger<ModuleService>().LogInformation("Регистрация служб ... Успешно завершена");
         }        
     }
 

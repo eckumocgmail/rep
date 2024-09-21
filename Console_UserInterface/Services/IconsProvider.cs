@@ -1,4 +1,4 @@
-﻿namespace Console_UserInterface.Shared
+﻿namespace Console_UserInterface.Services
 {
     public class IconsProvider
     {

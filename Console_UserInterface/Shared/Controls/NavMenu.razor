@@ -1,28 +1,24 @@
 ﻿@inject NavigationManager nav
 @inject SigninUser signin
-@inject UserAuthStateProvider auth
 @code
 {
     public bool IsSignin { get; set; } = false;
+
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
         nav.LocationChanged += (sender, evt) =>
         {
-            IsSignin = signin.IsSignin();
-            if (IsSignin)
-            {
-                try
-                {
-                    signin.UpdateUrlLocation(nav.Uri);
-                }
-                catch (Exception ex)
-                {
-                    this.Error("Ошибка обновления URL: " + ex.Message);
-                }
-            }
+            IsSignin = signin.IsSignin();            
             StateHasChanged();
         };
+    }
+}
+@code
+{
+    public void ToggleNavMenu()
+    {
+        
     }
 }
 <div class="top-row ps-3 navbar navbar-dark">
@@ -34,7 +30,7 @@
     </div>
 </div>
 
-<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+<div>
     <nav class="flex-column" style="color: white; height: 100%; overflow-y: auto; border: 1px solid black;">
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
@@ -152,14 +148,3 @@
         }
     </nav>
 </div>
-
-@code {
-    private bool collapseNavMenu = true;
-
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
-    private void ToggleNavMenu()
-    {
-        collapseNavMenu = !collapseNavMenu;
-    }
-}

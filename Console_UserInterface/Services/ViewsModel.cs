@@ -2,7 +2,7 @@
 
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Console_UserInterface.Shared
+namespace Console_UserInterface.Services
 {
     public class FormModel : BaseEntity
     {

@@ -10,7 +10,7 @@
 
 
     [Parameter]
-    public global::FormModel Model { get; set; }
+    public global::InputFormModel Model { get; set; }
 
     [Parameter]
     public bool Border { get; set; }
@@ -61,7 +61,7 @@ else
         <div class="text-black-50 text-info">@Model.Description</div>
        
       
-        <div class="text-black-50 text-danger">@Model.Message</div>
+        <div class="text-black-50 text-danger">@Model.Error</div>
         <form>
             <div>
                 @foreach (var field in Model.FormFields)
@@ -112,7 +112,7 @@ else
         }
         catch(Exception ex)
         {
-            Model.Message = ex.Message;
+            Model.Error = ex.Message;
         }
 
 

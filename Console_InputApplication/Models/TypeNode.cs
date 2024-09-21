@@ -8,7 +8,7 @@ using System.Xml;
 /// Иерархическая структура данных
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public class TypeNode<T> : IDictionary<string, ITypeNode<T>>, ITypeNode<T> where T : class
+public class TypeNode<T> : IDictionary<string, TypeNode<T>>
 {
     /// <summary>
     /// Уникальное имя обьекта в родительском контексте
@@ -23,22 +23,22 @@ public class TypeNode<T> : IDictionary<string, ITypeNode<T>>, ITypeNode<T> where
     /// <summary>
     /// Дочерние элементы
     /// </summary>
-    public IDictionary<string, ITypeNode<T>> ChildNodes { get; set; }
+    public IDictionary<string, TypeNode<T>> ChildNodes { get; set; }
 
     public TypeNode()
     {
-        this.NodeItem = null;// (T)typeof(T).GetConstructors().First(c => c.GetParameters().Count() == 0).Invoke(new object[0]);
+        // (T)typeof(T).GetConstructors().First(c => c.GetParameters().Count() == 0).Invoke(new object[0]);
         this.NodeName = typeof(T).GetLabel();
         this.Parent = null;
     }
-    public TypeNode(ITypeNode<T> parent)
+    public TypeNode(TypeNode<T> parent)
     {
-        this.NodeItem = null;// (T)typeof(T).GetConstructors().First(c => c.GetParameters().Count() == 0).Invoke(new object[0]);
+        // (T)typeof(T).GetConstructors().First(c => c.GetParameters().Count() == 0).Invoke(new object[0]);
         this.NodeName = typeof(T).GetLabel();
         this.Parent = parent;
     }
 
-    public void ForEach(Action<ITypeNode<T>> todo)
+    public void ForEach(Action<TypeNode<T>> todo)
     {
         todo(this);
         GetChildren().ForEach(child => child.ForEach(todo));
@@ -50,12 +50,8 @@ public class TypeNode<T> : IDictionary<string, ITypeNode<T>>, ITypeNode<T> where
     /// <param name="name"></param>
     /// <param name="item"></param>
     /// <param name="parent"></param>
-    public TypeNode(string name, T item, ITypeNode<T> parent)
-    {
-        if (name == null)
-        {
-            throw new ArgumentNullException("name");
-        }
+    public TypeNode(string name, T item, TypeNode<T> parent)
+    {        
         if (item == null)
         {
             throw new ArgumentNullException("item");
@@ -63,7 +59,7 @@ public class TypeNode<T> : IDictionary<string, ITypeNode<T>>, ITypeNode<T> where
         NodeName = name;
         NodeItem = item;
         Parent = parent;
-        ChildNodes = new SortedDictionary<string, ITypeNode<T>>();
+        ChildNodes = new SortedDictionary<string, TypeNode<T>>();
     }
 
 
@@ -74,7 +70,7 @@ public class TypeNode<T> : IDictionary<string, ITypeNode<T>>, ITypeNode<T> where
     /// <returns></returns>
     public bool Remove(string name)
     {
-        ITypeNode<T> output;
+        TypeNode<T> output;
         return ChildNodes.Remove(name, out output);
     }
 
@@ -95,7 +91,7 @@ public class TypeNode<T> : IDictionary<string, ITypeNode<T>>, ITypeNode<T> where
     /// </summary>
     /// <param name="pchild"></param>
     /// <returns></returns>
-    public ITypeNode<T> Append(ITypeNode<T> pchild)
+    public TypeNode<T> Append(TypeNode<T> pchild)
     {
         if (pchild == null)
         {
@@ -118,16 +114,16 @@ public class TypeNode<T> : IDictionary<string, ITypeNode<T>>, ITypeNode<T> where
     /// </summary>
     /// 
     [JsonIgnore]
-    private ITypeNode<T> _Parent { get; set; }
+    private TypeNode<T> _Parent { get; set; }
 
-    public List<ITypeNode<T>> GetChildren()
-        => new List<ITypeNode<T>>(this.ChildNodes.Values);
+    public List<TypeNode<T>> GetChildren()
+        => new List<TypeNode<T>>(this.ChildNodes.Values);
 
     /// <summary>
     /// Перемещение узла
     /// </summary>
     [JsonIgnore]
-    public ITypeNode<T> Parent
+    public TypeNode<T> Parent
     {
         get
         {
@@ -156,7 +152,7 @@ public class TypeNode<T> : IDictionary<string, ITypeNode<T>>, ITypeNode<T> where
     public int GetLevel()
     {
         int level = 1;
-        ITypeNode<T> p = this;
+        TypeNode<T> p = this;
         while (p.Parent != null)
         {
             p = p.Parent;
@@ -214,10 +210,10 @@ public class TypeNode<T> : IDictionary<string, ITypeNode<T>>, ITypeNode<T> where
     /// </summary>
     /// <typeparam name="TNode"></typeparam>
     /// <param name="handle"></param>
-    public void GoToChildren(Action<ITypeNode<T>> handle)
+    public void GoToChildren(Action<TypeNode<T>> handle)
     {
         handle(this);
-        foreach (ITypeNode<T> pchild in ChildNodes.Values)
+        foreach (TypeNode<T> pchild in ChildNodes.Values)
         {
             pchild.GoToChildren(handle);
         }
@@ -229,9 +225,9 @@ public class TypeNode<T> : IDictionary<string, ITypeNode<T>>, ITypeNode<T> where
     /// </summary>
     /// <typeparam name="TNode"></typeparam>
     /// <param name="handle"></param>
-    public void GoFromChildren(Action<ITypeNode<T>> handle)
+    public void GoFromChildren(Action<TypeNode<T>> handle)
     {
-        foreach (ITypeNode<T> pchild in ChildNodes.Values)
+        foreach (TypeNode<T> pchild in ChildNodes.Values)
         {
             pchild.GoFromChildren(handle);
         }
@@ -244,9 +240,9 @@ public class TypeNode<T> : IDictionary<string, ITypeNode<T>>, ITypeNode<T> where
     /// </summary>
     /// <typeparam name="TNode"></typeparam>
     /// <param name="handle"></param>
-    public void GoToParent(Action<ITypeNode<T>> handle)
+    public void GoToParent(Action<TypeNode<T>> handle)
     {
-        handle((ITypeNode<T>)this);
+        handle((TypeNode<T>)this);
         if (Parent != null)
         {
             Parent.GoToParent(handle);
@@ -259,17 +255,17 @@ public class TypeNode<T> : IDictionary<string, ITypeNode<T>>, ITypeNode<T> where
     /// </summary>
     /// <typeparam name="TNode"></typeparam>
     /// <param name="handle"></param>
-    public void GoByLevels(Action<ITypeNode<T>> handle)
+    public void GoByLevels(Action<TypeNode<T>> handle)
     {
         if (Parent == null)
         {
-            handle((ITypeNode<T>)this);
+            handle((TypeNode<T>)this);
         }
-        foreach (ITypeNode<T> pchild in ChildNodes.Values)
+        foreach (TypeNode<T> pchild in ChildNodes.Values)
         {
-            handle((ITypeNode<T>)pchild);
+            handle((TypeNode<T>)pchild);
         }
-        foreach (ITypeNode<T> pchild in ChildNodes.Values)
+        foreach (TypeNode<T> pchild in ChildNodes.Values)
         {
             pchild.GoByLevels(handle);
         }
@@ -281,7 +277,6 @@ public class TypeNode<T> : IDictionary<string, ITypeNode<T>>, ITypeNode<T> where
 
     }
 
-    ConcurrentDictionary<string, ITypeNode<T>> ITypeNode<T>.HierElements { get; set; }
 
     public string GetIntPath()
     {
@@ -306,23 +301,23 @@ public class TypeNode<T> : IDictionary<string, ITypeNode<T>>, ITypeNode<T> where
 
     private object SerializeObject(List<string> list, Formatting indented) => list.ToJson();
 
-    public void Add(string key, ITypeNode<T> value) => this.ChildNodes[key] = value;
+    public void Add(string key, TypeNode<T> value) => this.ChildNodes[key] = value;
 
     public bool ContainsKey(string key) => ChildNodes.ContainsKey(key);
 
 
-    public bool TryGetValue(string key, [MaybeNullWhen(false)] out ITypeNode<T> value)
+    public bool TryGetValue(string key, [MaybeNullWhen(false)] out TypeNode<T> value)
 
        => ChildNodes.TryGetValue(key, out value);
 
 
-    public ITypeNode<T> this[string key] { get => ChildNodes[key]; set => ChildNodes[key] = value; }
+    public TypeNode<T> this[string key] { get => ChildNodes[key]; set => ChildNodes[key] = value; }
 
     public ICollection<string> Keys => ChildNodes.Keys;
 
-    public ICollection<ITypeNode<T>> Values => ChildNodes.Values;
+    public ICollection<TypeNode<T>> Values => ChildNodes.Values;
 
-    public void Add(KeyValuePair<string, ITypeNode<T>> item)
+    public void Add(KeyValuePair<string, TypeNode<T>> item)
     {
         ChildNodes.Add(item);
     }
@@ -335,19 +330,19 @@ public class TypeNode<T> : IDictionary<string, ITypeNode<T>>, ITypeNode<T> where
         }
     }
 
-    public bool Contains(KeyValuePair<string, ITypeNode<T>> item)
+    public bool Contains(KeyValuePair<string, TypeNode<T>> item)
     {
         return ChildNodes is null? false: ChildNodes.Contains(item);
     }
 
-    public void CopyTo(KeyValuePair<string, ITypeNode<T>>[] array, int arrayIndex)
+    public void CopyTo(KeyValuePair<string, TypeNode<T>>[] array, int arrayIndex)
     {
         if(ChildNodes is null)
             throw new ArgumentNullException(nameof(ChildNodes));
         ChildNodes.CopyTo(array, arrayIndex);
     }
 
-    public bool Remove(KeyValuePair<string, ITypeNode<T>> item)
+    public bool Remove(KeyValuePair<string, TypeNode<T>> item)
     {
         return ChildNodes.Remove(item);
     }
@@ -356,7 +351,7 @@ public class TypeNode<T> : IDictionary<string, ITypeNode<T>>, ITypeNode<T> where
 
     public bool IsReadOnly => ChildNodes.IsReadOnly;
 
-    public IEnumerator<KeyValuePair<string, ITypeNode<T>>> GetEnumerator()
+    public IEnumerator<KeyValuePair<string, TypeNode<T>>> GetEnumerator()
     {
         return ChildNodes.GetEnumerator();
     }

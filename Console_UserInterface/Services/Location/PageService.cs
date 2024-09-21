@@ -1,8 +1,8 @@
 ﻿using Newtonsoft.Json;
 
-using static Console_UserInterface.Location.LocationDbContext;
+using static Console_UserInterface.Services.Location.LocationDbContext;
 
-namespace Console_UserInterface.Location
+namespace Console_UserInterface.Services.Location
 {
     public class PageService : NamedObject
     {
@@ -16,7 +16,7 @@ namespace Console_UserInterface.Location
             result.PageModel = model.ToJson();
             foreach (var kv in model)
             {
-                var navLink = CreateNavLink(kv.Key,kv.Value);
+                var navLink = CreateNavLink(kv.Key, kv.Value);
                 var listItem = CreateListItem(navLink);
                 result.PageComponents.Add(listItem);
             }
@@ -114,7 +114,7 @@ namespace Console_UserInterface.Location
                 page.PageModel = instance.ToJson();
                 page.ModelInstance.Validate();
             };
-          
+
             return result;
         }
 
@@ -129,7 +129,7 @@ namespace Console_UserInterface.Location
             return control;
         }
 
-        public AppPage CreatePage<TEntity>( )
+        public AppPage CreatePage<TEntity>()
         {
             return CreatePage(typeof(TEntity), typeof(TEntity).New());
         }
@@ -170,6 +170,6 @@ namespace Console_UserInterface.Location
             return result;
         }
 
-       
+
     }
 }

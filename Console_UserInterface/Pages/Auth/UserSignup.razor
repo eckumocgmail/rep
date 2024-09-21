@@ -15,13 +15,27 @@
 }
 
 <PageTitle>ЕвроАвто/Регистрация</PageTitle>
-<FormEditor Model="@account" OnReady="(evt => { account  = (UserAccount)evt; OnSaveButtonClicked(); } )">
-    <div class="text-danger">@message</div>
-</FormEditor>
-<FormEditor Model="@person" OnReady="(evt => { account  = (UserAccount)evt; OnSaveButtonClicked(); } )">
-</FormEditor>
-
-@((new InputFormModel(account)).ToJsonOnScreen())
+<MasterDialog Models='@(new List<object>(){ new UserAccount("customer@gmail.com", "customer@gmail.com"), new UserPerson()
+    {
+        Tel = "7-921-090-3572",
+        FirstName = "Константин",
+        LastName = "Александрович",
+        SurName = "Батов",
+        Birthday = DateTime.Now
+    }})'>
+</MasterDialog>
+@*
+<div>
+    <div>
+        <FormEditor Model="@account" OnReady="(evt => { account  = (UserAccount)evt; OnSaveButtonClicked(); } )">
+            <div class="text-danger">@message</div>
+        </FormEditor>
+    </div>
+    <div>
+        <FormEditor Model="@person" OnReady="(evt => { account  = (UserAccount)evt; OnSaveButtonClicked(); } )">
+        </FormEditor>
+    </div>
+</div>*@
 @code
 {
     string role = "customer";

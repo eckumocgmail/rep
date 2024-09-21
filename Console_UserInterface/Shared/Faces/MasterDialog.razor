@@ -1,0 +1,69 @@
+﻿@inherits BaseComponent
+@code
+{
+    [Parameter]
+    [NotNullNotEmpty]
+    public List<object> Models { get; set; }
+    private int Cursor { get; set; } = 0;
+    [NotNullNotEmpty]
+    private EventCallback OnCancel { get; set; }
+    [NotNullNotEmpty]
+    private EventCallback OnComplete { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+    }
+}
+
+<CardContainer>
+    <CardHeader>
+        <h2>Заголовок диалога</h2>
+    </CardHeader>
+    <CardBody>
+        <FormModel Form="@(new InputFormModel(Models[Cursor]))"></FormModel>
+    </CardBody>
+    <CardFooter>
+        <button class="btn btn-sm btn-primary" @onclick="OnSubmitClicked">@(Cursor == (Models.Count()-1) ? "готово" : "далее")</button>
+        <button class="btn btn-sm btn-primary" @onclick="OnReturnClicked">@(Cursor == 0 ? "отмена" : "назад")</button>
+    </CardFooter>
+</CardContainer>
+@code
+{
+    public async Task OnCompleted()
+    {
+        await OnComplete.InvokeAsync();
+    }
+    public async Task OnSubmitClicked()
+    {        
+        if (Cursor == (Models.Count()-1))
+        {
+            await OnCompleted();
+        }
+        else
+        {
+            Cursor++;
+            StateHasChanged();
+        }
+
+    }
+    public async Task OnCanceled()
+    {
+        await OnCancel.InvokeAsync();
+    }
+    public async Task OnReturnClicked()
+    {
+        
+        if (Cursor == 0)
+        {
+            await OnCanceled();
+        }
+        else
+        {
+            Cursor--;
+            StateHasChanged();
+        }
+        
+    }
+}
+

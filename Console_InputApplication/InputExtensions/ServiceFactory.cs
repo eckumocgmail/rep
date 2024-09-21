@@ -18,6 +18,8 @@ using System.Threading.Tasks;
 /// </summary>
 public class ServiceFactory 
 {
+    public List<string> GetTypeNames() => ByShortNames.Keys.ToList();
+
     private static ServiceFactory Instance = null;
     public static ServiceFactory Get()
     {
@@ -197,10 +199,6 @@ public class ServiceFactory
             ByShortNames[typeName] = ptype;
             ByFullNames[ptype.Namespace + "." + typeName] = ptype;
         }
-        this.Info(ptype.GetOwnTypeName());
-        this.Info(ptype.GetTypeName());
-        this.Info(ptype.Name);
-        this.Info(ptype.Namespace + "." + ptype.GetTypeName());
         ByShortNames[ptype.GetOwnTypeName()] = ptype;
         ByShortNames[ptype.GetTypeName()] = ptype;
         ByShortNames[ptype.Name] = ptype;

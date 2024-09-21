@@ -10,7 +10,7 @@ public class ModuleUser
 {
     public static void ConfigureServices(IConfiguration configure, IServiceCollection services)
     {
-        InputConsole.GetLogger<ModuleUser>().LogInformation("ConfigureServices .. ");
+        InputConsole.GetLogger<ModuleUser>().LogInformation("Регистрация служб ... ");
         services.AddHttpContextAccessor();
         services.AddDbContext<DbContextUser>(ConfigureDbContext);
         if (services.Any(descr => descr.ServiceType == typeof(AuthorizationOptions)) == false)
@@ -29,7 +29,7 @@ public class ModuleUser
         services.AddScoped<SignupUser>();
         services.AddScoped<SigninUser>();
         services.AddScoped<ManageUser>();
-        InputConsole.GetLogger<ModuleUser>().LogInformation("ConfigureServices .. COMPLETED");
+        InputConsole.GetLogger<ModuleUser>().LogInformation("Регистрация служб ... Успешно завершена");
 
     }
 

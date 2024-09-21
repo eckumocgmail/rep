@@ -1,30 +1,40 @@
 using Console_AuthModel.AuthorizationModel;
 using Google_LoginApplication.Areas.Identity.Modules.ReCaptcha;
 using Microsoft.AspNetCore.Components.Authorization;
-using Console_DataConnector.DataModule.DataODBC.Connectors;
 using Newtonsoft.Json;
 using pickpoint_delivery_service;
 using Console_UserInterface.AppUnits.AuthorizationBlazor;
-using Microsoft.AspNetCore.Http.Extensions;
-using Blazored.Modal.Services;
 using System.Reflection;
 using Console_DataConnector.DataModule.DataADO.ADOWebApiService;
 using Console_UserInterface.AppUnits;
 using Console_UserInterface.Services;
-using Console_UserInterface.Location;
-using Console_UserInterface.Shared;
+using Blazored.Modal;
+using Console_UserInterface.AppUnits.InterfaceModule;
 
+/// приложение
 namespace Console_UserInterface
 {
+    /// <summary>
+    /// Программирование
+    /// </summary>
     public class Program
     {
+
+        /// <summary>
+        /// Тестирование
+        /// </summary>
         public static class Test
         {
-            public static void SessionTest() =>
-                new SessionUnit(AppProviderService.GetInstance()).DoTest(false).ToDocument().WriteToConsole();
             public static void TestApp()            
-                => new DeliveryServicesUnit().DoTest(true).ToDocument().WriteToConsole();
-            
+                => new UserInterfaceUnit(AppProviderService.GetInstance()).DoTest(false).ToDocument().WriteToConsole();
+
+            public static void TestTypes()
+            {
+                ServiceFactory.Get().AddType(typeof(Dictionary<,>));
+                ServiceFactory.Get().Info(typeof(Dictionary<,>).GetTypeName());
+                "Dictionary<String,Object>".ToType();
+            }
+
             public static void TestInputField()
             {
                 var model = new InputFormModel();
@@ -34,38 +44,43 @@ namespace Console_UserInterface
             }
         }
 
+
+        /// <summary>
+        /// Точка входа
+        /// </summary>
         public static void Main(string[] args)
         {
-            RegTypes();
+            RegTypes();           
             //UpdateDatabases();
             var builder = WebApplication.CreateBuilder(args);
             ConfigureServices(builder);
             Configure(builder);
         }
 
+
+        /// <summary>
+        /// Регистрация типов
+        /// </summary>
         private static void RegTypes()
         {
-
-
-            ServiceFactory.Get().AddType(typeof(Dictionary<,>));
-            ServiceFactory.Get().AddTypes(typeof(string).Assembly);
-            ServiceFactory.Get().AddTypes(typeof(JsonPropertyAttribute).Assembly);
-            ServiceFactory.Get().AddTypes(typeof(Newtonsoft.Json.JsonArrayAttribute).Assembly);
-            ServiceFactory.Get().AddTypes(typeof(System.Data.SqlClient.SqlClientPermission).Assembly);
+            ServiceFactory.Get().Info("регистрирую типы данных ");
             ServiceFactory.Get().AddTypes(Assembly.GetExecutingAssembly());
             ServiceFactory.Get().AddTypes(Assembly.GetCallingAssembly());
             ServiceFactory.Get().AddTypes(Assembly.GetEntryAssembly());
             ServiceFactory.Get().AddTypes(Assembly.GetExecutingAssembly().Modules.Select(mod => mod.Assembly));
             ServiceFactory.Get().AddTypes(Assembly.GetCallingAssembly().Modules.Select(mod => mod.Assembly));
             ServiceFactory.Get().AddTypes(Assembly.GetEntryAssembly().Modules.Select(mod => mod.Assembly));
-            ServiceFactory.Get().AddTypes(typeof(Program).Assembly);
+            ServiceFactory.Get().AddTypes(typeof(Program).Assembly.Modules.Select(mod => mod.Assembly));
             ServiceFactory.Get().AddTypes(typeof(Program).Assembly);
             ServiceFactory.Get().AddTypes(typeof(System.Object).Assembly);
-            ServiceFactory.Get().AddTypes(typeof(Program).Assembly.Modules.Select(mod => mod.Assembly));
-            ServiceFactory.Get().Info(typeof(Dictionary<,>).GetTypeName());
-            "Dictionary<String,Object>".ToType();
+            ServiceFactory.Get().AddTypes(typeof(string).Assembly);
+            ServiceFactory.Get().AddTypes(typeof(JsonPropertyAttribute).Assembly);
+            ServiceFactory.Get().AddTypes(typeof(Newtonsoft.Json.JsonArrayAttribute).Assembly);
+            ServiceFactory.Get().AddTypes(typeof(System.Data.SqlClient.SqlClientPermission).Assembly);
         }
 
+
+        
         public static void Configure(WebApplicationBuilder builder)
         {
             var app = builder.Build();
@@ -73,11 +88,14 @@ namespace Console_UserInterface
             app.UseDeveloperExceptionPage();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            app.UseMiddleware<AppRouterMiddleware>();
+            
             app.UseRouting();
             app.MapControllers();
-            //UseOdbc(app);
-            //UseApi(app);
+
+            app.UseMiddleware<AppRouterMiddleware>();
+            ApiOdbc.UseOdbc(app);
+            ApiCall.UseApi(app)
+                ;
             app.MapBlazorHub();
             app.MapFallbackToPage("/_Host");
             app.Run();
@@ -87,7 +105,8 @@ namespace Console_UserInterface
         {
             builder.Services.AddBlazorContextMenu();        
             builder.Services.AddBlazorBootstrap();
-            
+            builder.Services.AddBlazoredModal();
+
             // Add services to the container.
             builder.Services.AddRazorPages();
             builder.Services.AddControllers();
@@ -140,89 +159,8 @@ namespace Console_UserInterface
             }
         }
 
-        public static void UseApi(WebApplication app)
-        {
-            app.MapWhen(http => http.Request.GetDisplayUrl().IndexOf("/api") != -1, app => {
-                app.Run(async http => {
-                    var uri = http.Request.GetDisplayUrl().Substring(http.Request.GetDisplayUrl().IndexOf("/api")+3);
-                    if(uri.IndexOf("?")!=-1)
-                    {
-                        uri = uri.Substring(0, uri.IndexOf("?"));
-                    }
+        
+
                     
-                    var api = http.RequestServices.Get<SqlServerWebApi>();
-                    var args = new Dictionary<string, string>(http.Request.Query.Select(q => new KeyValuePair<string, string>(q.Key, q.Value.First())));
-                    var headers = new Dictionary<string, string>(http.Request.Headers.Select(q => new KeyValuePair<string, string>(q.Key, q.Value.First())));
-                    var response = await api.Request(uri, args, headers);
-                    //http.Response.StatusCode = response.Item1;
-                    http.Response.ContentType = "application/json; utf-8";
-                    await http.Response.WriteAsync(response.Item2.ToJson());                    
-                });
-            });
-            //app.Use(async (http, next) => { await http.Response.WriteAsync(new { }.ToJsonOnScreen()); await next.Invoke(); });
-            app.Use(async (http, next) =>
-            {
-                if(http.Request.GetDisplayUrl().IndexOf("/api") != -1)
-                {
-                    
-                    /*var signin = http.RequestServices.GetService<SigninUser>();
-                    if (signin.IsSignin())
-                    {
-                        UserContext context = signin.Verify();
-                        context.UserAgent = http.Request.Headers.UserAgent;
-                        using (var db = new DbContextUser())
-                        {
-                            db.Update(context);
-                            db.SaveChanges();
-                        }
-                        
-                    }*/
-                }
-                else
-                {
-                    await next.Invoke();
-                }
-                
-            });
-        }
-
-        private static void UseOdbc(WebApplication app)
-        {
-            var odbc = new OdbcSqlServerDataSource("DSN=" + "ASpbMarketPlace" + ";UId=" + "root" + ";PWD=" + "sgdf1423" + ";");
-            odbc.EnsureIsValide();
-            var dm = new OdbcDatabaseManager(odbc);
-
-            string html = "";
-            var tables = dm.GetTables();
-            tables.Select(t => html += $@"<a href=""https://localhost:7243/{t}"">{t}</a>").ToList();
-            app.MapGet($"/nav", () => html);
-            app.MapGet($"/tables", () => JsonConvert.SerializeObject(tables));
-            foreach (var table in tables)
-            {
-                try
-                {
-
-                    var tm = dm.GetTableManager(table);
-                    var all = tm.SelectAll();
-                    app.MapGet($"/{table}", () => JsonConvert.SerializeObject(all));
-                    app.MapPut($"/{table}" + "/{json}", (string json) => tm.Update(JsonConvert.DeserializeObject<Dictionary<string, object>>(json)));
-                    app.MapPost($"/{table}" + "/{json}", (string json) => tm.Create(JsonConvert.DeserializeObject<Dictionary<string, object>>(json)));
-                    app.MapDelete($"/{table}" + "/{id:int}", (int id) => tm.Delete(id));
-                    app.MapGet($"/{table}" + "/{id:int}", (int id) => JsonConvert.SerializeObject(tm.Select(id)));
-
-
-                    //TODO: add foreight table to route
-                    app.MapGet($"/{table}" + "/{id:int}" + $"/{"CarsModels"}", (int id) => JsonConvert.SerializeObject(dm.GetTableManager("CarsModels").SelectAll().Where(item => id.ToString() == item.Value<string>("BrandId"))));
-                    app.MapPut($"/{table}" + "/{id:int}" + $"/{"CarsModels"}" + "/{json}", (string json) => tm.Update(JsonConvert.DeserializeObject<Dictionary<string, object>>(json)));
-                    app.MapPost($"/{table}" + "/{id:int}" + $"/{"CarsModels"}" + "/{json}", (string json) => tm.Create(JsonConvert.DeserializeObject<Dictionary<string, object>>(json)));
-                    app.MapDelete($"/{table}" + "/{id:int}" + $"/{"CarsModels"}" + "/{id:int}", (int id) => tm.Delete(id));
-                    app.MapGet($"/{table}" + "/{id:int}" + $"/{"CarsModels"}" + "/{id:int}", (int id) => JsonConvert.SerializeObject(tm.Select(id)));
-                }
-                catch (Exception)
-                {
-
-                }
-            }
-        }             
     }
 }

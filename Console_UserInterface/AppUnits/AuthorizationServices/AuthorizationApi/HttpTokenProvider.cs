@@ -150,13 +150,13 @@ public class ClientLocalStorageTokenProvider :  ITokenProvider
     public async Task<string> Get()
     {
      
-        string token = await _localStorage.GetItem("Authorization");
+        string token = await _localStorage.GetItem(KEY);
         return token;
     }
 
     public async Task Set(string token)
     {
-        await _localStorage.SetItem("Authorization", token);
+        await _localStorage.SetItem(KEY, token);
     }
 
     string ITokenProvider.Get()

@@ -938,7 +938,7 @@ public class InputConsole: ProgramDialog
         bool ready = false;
 
         
-        static void PrintNode(ITypeNode<BaseEntity> pnode, int level) 
+        static void PrintNode(TypeNode<BaseEntity> pnode, int level) 
         {
             int next = level + 1;
             while (level > 0)

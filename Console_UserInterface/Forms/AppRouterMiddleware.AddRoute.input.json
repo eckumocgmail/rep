@@ -1,0 +1,89 @@
+{
+  "Json": "{}",
+  "Title": "AddRoute",
+  "Description": "",
+  "Error": "",
+  "Container": "v-group",
+  "Size": "normal",
+  "Item": {},
+  "ItemType": "Dictionary<String,Object>",
+  "FormFields": [
+    {
+      "InputFormModelId": 0,
+      "Order": 0,
+      "Visible": true,
+      "Name": "route",
+      "Icon": "home",
+      "Description": "",
+      "Type": "text",
+      "Label": "route",
+      "Edited": false,
+      "IsPrimitive": true,
+      "IsCollection": false,
+      "Size": "normal",
+      "State": "undefined",
+      "Help": "",
+      "Errors": [],
+      "Attributes": {
+        "SerializableAttribute": "",
+        "NullableContextAttribute": "(Byte)1",
+        "NullableAttribute": "(Byte)0",
+        "DefaultMemberAttribute": "\"Chars\"",
+        "NonVersionableAttribute": "",
+        "TypeForwardedFromAttribute": "\"mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089\""
+      }
+    },
+    {
+      "InputFormModelId": 0,
+      "Order": 0,
+      "Visible": true,
+      "Name": "controller",
+      "Icon": "home",
+      "Description": "",
+      "Type": "text",
+      "Label": "controller",
+      "Edited": false,
+      "IsPrimitive": true,
+      "IsCollection": false,
+      "Size": "normal",
+      "State": "undefined",
+      "Help": "",
+      "Errors": [],
+      "Attributes": {
+        "SerializableAttribute": "",
+        "NullableContextAttribute": "(Byte)1",
+        "NullableAttribute": "(Byte)0",
+        "DefaultMemberAttribute": "\"Chars\"",
+        "NonVersionableAttribute": "",
+        "TypeForwardedFromAttribute": "\"mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089\""
+      }
+    },
+    {
+      "InputFormModelId": 0,
+      "Order": 0,
+      "Visible": true,
+      "Name": "action",
+      "Icon": "home",
+      "Description": "",
+      "Type": "text",
+      "Label": "action",
+      "Edited": false,
+      "IsPrimitive": true,
+      "IsCollection": false,
+      "Size": "normal",
+      "State": "undefined",
+      "Help": "",
+      "Errors": [],
+      "Attributes": {
+        "SerializableAttribute": "",
+        "NullableContextAttribute": "(Byte)1",
+        "NullableAttribute": "(Byte)0",
+        "DefaultMemberAttribute": "\"Chars\"",
+        "NonVersionableAttribute": "",
+        "TypeForwardedFromAttribute": "\"mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089\""
+      }
+    }
+  ],
+  "Edited": false,
+  "IsValid": false
+}

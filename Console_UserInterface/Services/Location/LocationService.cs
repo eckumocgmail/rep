@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-using static Console_UserInterface.Location.LocationDbContext;
+using static Console_UserInterface.Services.Location.LocationDbContext;
 
 
-namespace Console_UserInterface.Location
+namespace Console_UserInterface.Services.Location
 {
 
     /// <summary>

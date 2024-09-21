@@ -6,7 +6,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
-namespace Console_UserInterface.Location
+namespace Console_UserInterface.Services.Location
 {
     /// <summary>
     /// Хранилище динамических форм ввода с навигацией
@@ -37,7 +37,7 @@ namespace Console_UserInterface.Location
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);
-            if(optionsBuilder.IsConfigured == false)
+            if (optionsBuilder.IsConfigured == false)
             {
                 optionsBuilder.UseSqlServer($@"Data Source=DESKTOP-IHJM9RD;Initial Catalog={typeof(LocationDbContext).GetTypeName()};Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False");
             }
@@ -70,13 +70,14 @@ namespace Console_UserInterface.Location
             [NotNullNotEmpty()]
             public string PageModel { get; set; }
 
-            [Newtonsoft.Json.JsonIgnore][JsonIgnore]
+            [Newtonsoft.Json.JsonIgnore]
+            [JsonIgnore]
             public List<PageComponent> PageComponents { get; set; } = new List<PageComponent>();
 
             [NotMapped()]
             [JsonIgnore()]
             [NotInput]
-            public Dictionary<string, List<String>> ValidationErrors { get; set; } = new();
+            public Dictionary<string, List<string>> ValidationErrors { get; set; } = new();
 
             [Label("Тип модель данных")]
             [InputText]
@@ -84,7 +85,8 @@ namespace Console_UserInterface.Location
             public string ModelType { get; set; }
 
             [Label("Ссылка на модель")]
-            [Newtonsoft.Json.JsonIgnore][JsonIgnore]
+            [Newtonsoft.Json.JsonIgnore]
+            [JsonIgnore]
             [NotMapped]
             [NotInput]
             public object ModelInstance { get; set; }
@@ -141,7 +143,7 @@ namespace Console_UserInterface.Location
             public bool IsCollection { get; set; } = false;
 
             [NotMapped]
-            
+
             public CollectionSettings CollectionSetup { get; set; }
             public class CollectionSettings
             {
@@ -172,28 +174,33 @@ namespace Console_UserInterface.Location
             [Label("Ошибки")]
             [NotMapped]
             [NotInput]
-            [Newtonsoft.Json.JsonIgnore][JsonIgnore]
-            public Dictionary<string,List<string>> Errors { get; set; } = new ();
+            [Newtonsoft.Json.JsonIgnore]
+            [JsonIgnore]
+            public Dictionary<string, List<string>> Errors { get; set; } = new();
 
             [Label("Атрибуты")]
             [NotMapped]
             [NotInput]
-            [Newtonsoft.Json.JsonIgnore][JsonIgnore]
+            [Newtonsoft.Json.JsonIgnore]
+            [JsonIgnore]
             public Dictionary<string, string> Attributes { get; set; } = new Dictionary<string, string>();
 
             [NotMapped]
-            [Newtonsoft.Json.JsonIgnore][JsonIgnore]
+            [Newtonsoft.Json.JsonIgnore]
+            [JsonIgnore]
             [NotInput]
 
             public Func<object> Getter { get; set; }
 
             [NotMapped]
-            [Newtonsoft.Json.JsonIgnore][JsonIgnore]
+            [Newtonsoft.Json.JsonIgnore]
+            [JsonIgnore]
             [NotInput]
             public Action<object> Setter { get; set; }
 
             [NotMapped]
-            [Newtonsoft.Json.JsonIgnore][JsonIgnore]
+            [Newtonsoft.Json.JsonIgnore]
+            [JsonIgnore]
             [NotInput]
             public object Value
             {

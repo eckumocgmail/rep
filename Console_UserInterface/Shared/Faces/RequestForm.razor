@@ -1,13 +1,16 @@
-﻿@page "/forms/session/{Key}"
+﻿@page "/forms/{Controller}/{Action}"
 @using System.Text;
-@Key
+@inherits BaseComponent
 @inject IHttpContextAccessor accessor
-<FormModel Form="Model"></FormModel>
+<FormModel Form="Model" OnReady="OnReady"></FormModel>
 @code 
 {
     [Parameter]
     [NotNullNotEmpty]
-    public string Key { get; set; }
+    public string Controller { get; set; }
+    [Parameter]
+    [NotNullNotEmpty]
+    public string Action { get; set; }
     public InputFormModel Model { get; set; }
 
     protected override async Task OnInitializedAsync()
@@ -17,10 +20,22 @@
         var filePath = Path.Combine
         (
             System.IO.Directory.GetCurrentDirectory(),
-            Key
+            Path.Combine("Forms",$"{Controller}.{Action}.input")
         );
-        var json = System.IO.File.ReadAllText(filePath);
-        this.Model = json.FromJson<InputFormModel>();
-        this.Model.Item = this.Model.ItemType.New(); //this.Model.Json is not null ? this.Model.Json.FromJson<object>() : this.Model.ItemType.New();
+        if (System.IO.File.Exists(filePath)==false)
+        {
+            throw new Exception($"Не найден файл {filePath}");
+        }
+        else
+        {
+            var json = System.IO.File.ReadAllText(filePath);
+            this.Model = json.FromJson<InputFormModel>();
+            this.Model.Item = this.Model.ItemType.New(); //this.Model.Json is not null ? this.Model.Json.FromJson<object>() : this.Model.ItemType.New();
+        }        
+    }
+
+    public void OnReady(object evt)
+    {
+        this.Info(evt.ToJsonOnScreen());
     }
 }

@@ -1,4 +1,21 @@
-﻿<h3>ModalDialog</h3>
+﻿@page "/modal"
+<h3>ModalDialog</h3>
+@code
+{
+    public Modal ModalRef { get; set; }
+    public void OnOpenModalClicked()
+
+    {
+        
+    }
+
+}
+<button onclick="OnOpenModalClicked">open</button>
+<Modal @ref="@ModalRef">
+    <BodyTemplate>
+        <FormEditor></FormEditor>
+    </BodyTemplate>
+</Modal>
 
 @code {
 

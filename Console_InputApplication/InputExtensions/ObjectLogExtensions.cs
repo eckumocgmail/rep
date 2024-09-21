@@ -635,7 +635,7 @@ public static class ObjectLogExtensions
         
         Console.ResetColor();
     }
-    public static void WriteWhite(this object target, params object[] messages)
+    public static void WriteWhiteLine(this object target, params object[] messages)
     {
         Console.ForegroundColor = ConsoleColor.White;
         foreach(var message in messages)
@@ -712,9 +712,14 @@ public static class ObjectLogExtensions
 
     private static void WriteLine(params object[] messages)
     {
-        if(messages != null)
+        if(messages == null)
+        {
+            return;
+        }
         foreach(var message in messages)
+        {
             Console.WriteLine(message);
+        }
     }
 
     public static void LogError(this object target, object[] messages, Exception ex) => target.LogError(ex, messages);
@@ -772,7 +777,8 @@ public static class ObjectLogExtensions
     }
     public static void WriteLine(this object target, object message)
     {
-        AppProviderService.GetInstance().Info(message);
+        Console.ForegroundColor = ConsoleColor.White;
+        Console.WriteLine(message);
     }
     public static void WriteLine(this object target, object[] messages)
     {
@@ -790,16 +796,17 @@ public static class ObjectLogExtensions
         {
             if (message == null)
                 return;
+            WriteGreenLine(target, $"[{target.GetId()}]");
             if (IsPrimitiveType(message.GetType()) == false)
             {
 
-                WriteLine(message.ToJsonOnScreen());
+                WriteWhiteLine(target, message.ToJsonOnScreen());
             }
             else
             {
                 if (message is String)
                 {
-                    WriteLine(message);
+                    WriteLine(target, message);
                   
                 }
                 else if (IsImplements(message, typeof(IEnumerable)) == true)
@@ -812,7 +819,7 @@ public static class ObjectLogExtensions
                 else
                 {
                     string json = ToJsonOnScreen(message);
-                    WriteLine(json);
+                    WriteLine(target, json);
 
                 }
             }

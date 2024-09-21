@@ -11,7 +11,7 @@ using System.Text;
 /// Иерархическая структура данных
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public class TypeNode<T>   
+public class TreeNode<T>   
 {
     /// <summary>
     /// Уникальное имя обьекта в родительском контексте
@@ -26,7 +26,7 @@ public class TypeNode<T>
     /// <summary>
     /// Дочерние элементы
     /// </summary>
-    public ConcurrentDictionary<string, TypeNode<T>> HierElements { get; set; }
+    public ConcurrentDictionary<string, TreeNode<T>> Children { get; set; }
 
 
     /// <summary>
@@ -35,7 +35,7 @@ public class TypeNode<T>
     /// <param name="name"></param>
     /// <param name="item"></param>
     /// <param name="parent"></param>
-    public TypeNode( string name, T item, TypeNode<T> parent )
+    public TreeNode( string name, T item, TreeNode<T> parent )
     {
         if (name == null)
         {
@@ -48,7 +48,7 @@ public class TypeNode<T>
         Name = name;
         Item = item;
         Parent = parent;
-        HierElements = new ConcurrentDictionary<string, TypeNode<T>>();
+        Children = new ConcurrentDictionary<string, TreeNode<T>>();
     }
 
 
@@ -59,8 +59,8 @@ public class TypeNode<T>
     /// <returns></returns>
     public bool Remove(string name)
     {
-        TypeNode<T> output;
-        return HierElements.TryRemove(name,out output);
+        TreeNode<T> output;
+        return Children.TryRemove(name,out output);
     }
 
 
@@ -71,7 +71,7 @@ public class TypeNode<T>
     /// <returns></returns>
     public bool Has(string name)
     {
-        return HierElements.ContainsKey(name);
+        return Children.ContainsKey(name);
     }
 
 
@@ -80,7 +80,7 @@ public class TypeNode<T>
     /// </summary>
     /// <param name="pchild"></param>
     /// <returns></returns>
-    public TypeNode<T> Append(TypeNode<T> pchild)
+    public TreeNode<T> Append(TreeNode<T> pchild)
     {
         if(pchild == null)
         {
@@ -92,7 +92,7 @@ public class TypeNode<T>
         }
         else
         {
-            return HierElements[pchild.Name] = pchild;
+            return Children[pchild.Name] = pchild;
         }
     }
 
@@ -102,14 +102,14 @@ public class TypeNode<T>
     /// </summary>
     /// 
     [JsonIgnore]
-    private TypeNode<T> _Parent { get; set; }
+    private TreeNode<T> _Parent { get; set; }
 
 
     /// <summary>
     /// Перемещение узла
     /// </summary>
     [JsonIgnore]
-    public TypeNode<T> Parent 
+    public TreeNode<T> Parent 
     {
         get
         {
@@ -138,7 +138,7 @@ public class TypeNode<T>
     public int GetLevel()
     {
         int level = 1;
-        TypeNode<T> p = this;
+        TreeNode<T> p = this;
         while (p.Parent != null)
         {
             p = p.Parent;
@@ -194,7 +194,7 @@ public class TypeNode<T>
     public void DoBroadcastToHierElements( Action<object> handle )
     {
         handle(this);
-        foreach(TypeNode<T> pchild in HierElements.Values)
+        foreach(TreeNode<T> pchild in Children.Values)
         {
             pchild.DoBroadcastToHierElements(handle);
         }
@@ -206,9 +206,9 @@ public class TypeNode<T>
     /// </summary>
     /// <typeparam name="TNode"></typeparam>
     /// <param name="handle"></param>
-    public void DoBroadcastFromHierElements<TNode>(Action<TNode> handle) where TNode : TypeNode<T>
+    public void DoBroadcastFromHierElements<TNode>(Action<TNode> handle) where TNode : TreeNode<T>
     {            
-        foreach (TypeNode<T> pchild in HierElements.Values)
+        foreach (TreeNode<T> pchild in Children.Values)
         {
             pchild.DoBroadcastFromHierElements<TNode>(handle);
         }
@@ -221,7 +221,7 @@ public class TypeNode<T>
     /// </summary>
     /// <typeparam name="TNode"></typeparam>
     /// <param name="handle"></param>
-    public void DoBroadcastToParent<TNode>(Action<TNode> handle) where TNode : TypeNode<T>
+    public void DoBroadcastToParent<TNode>(Action<TNode> handle) where TNode : TreeNode<T>
     {
         handle((TNode)this);
         if(Parent!=null)
@@ -236,17 +236,17 @@ public class TypeNode<T>
     /// </summary>
     /// <typeparam name="TNode"></typeparam>
     /// <param name="handle"></param>
-    public void DoBroadcastToBrothers<TNode>(Action<TNode> handle) where TNode : TypeNode<T>
+    public void DoBroadcastToBrothers<TNode>(Action<TNode> handle) where TNode : TreeNode<T>
     {            
         if(Parent == null)
         {
             handle((TNode)this);
         }
-        foreach (TypeNode<T> pchild in HierElements.Values)
+        foreach (TreeNode<T> pchild in Children.Values)
         {
             handle((TNode)pchild);                
         }
-        foreach (TypeNode<T> pchild in HierElements.Values)
+        foreach (TreeNode<T> pchild in Children.Values)
         {
             pchild.DoBroadcastToBrothers<TNode>(handle);
         }            
@@ -287,7 +287,7 @@ public class TypeFile : BaseEntity
 /// Модель директории в файловой системе.
 /// При инициаллизации считывает все внутрении файлы.
 /// </summary>
-public class TypeCatalog : TypeNode<Dictionary<string, TypeFile>>
+public class TypeCatalog : TreeNode<Dictionary<string, TypeFile>>
 {
     /// <summary>
     /// Конструктор корня иерархии

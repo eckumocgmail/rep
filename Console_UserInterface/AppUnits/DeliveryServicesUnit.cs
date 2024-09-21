@@ -17,15 +17,11 @@ namespace Console_UserInterface.AppUnits
             {
                 provider = AppProviderService.GetSingletonInstance();
             }
-            Append(new HolderServicesTestUnit(provider));
-
-
-            //this.Append(new CustomerOrderCheckoutUnit(provider));
-            //this.Append(new TransportOrderDeliveryUnit(provider));
-            //this.Append(new ReservationOrderCheckoutUnit(provider));
-            //this.Append(new AuthorizationUnit(provider));
+            this.Append(new HolderServicesTestUnit(provider));
+            this.Append(new CustomerOrderCheckoutUnit(provider));
+            this.Append(new TransportOrderDeliveryUnit(provider));
+            this.Append(new ReservationOrderCheckoutUnit(provider));
+            this.Append(new AuthorizationUnit(provider));
         }
-
-
     }
 }

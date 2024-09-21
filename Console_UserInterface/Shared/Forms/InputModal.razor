@@ -1,0 +1,44 @@
+﻿@code
+{
+    [Parameter]
+    [NotNullNotEmpty]
+    public string TypeName { get; set; }
+    public object TargetInstance { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        this.EnsureIsValide();
+        this.TargetInstance = TypeName.ToType().New();
+    }
+}
+
+@if (TargetInstance != null)
+{  
+    <div style="max-width: 480px;">
+        <FormEditor Model="@TargetInstance">
+            <button class="btn btn-sm btn-primary" @onclick="async evt => { await OnCreatedEvent(TargetInstance); StateHasChanged(); }">сохранить</button>
+            <button class="btn btn-sm btn-danger" @onclick="OnCanceledEvent">отменить</button>
+        </FormEditor>
+    </div>
+}
+else 
+{ 
+    <div class="alert alert-warning">Установите параметр TypeName</div>
+}
+
+@code
+{
+    [CascadingParameter]
+    public BlazoredModalInstance ModalInstance { get; set; }
+
+    public async Task OnCreatedEvent(object item)
+    {
+        await ModalInstance.CloseAsync(ModalResult.Ok<object>(item));
+    }
+
+    public async Task OnCanceledEvent()
+    {
+        await ModalInstance.CloseAsync();
+    }
+}

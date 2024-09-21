@@ -25,6 +25,7 @@ public class TestingUnit : TestingElement
     {
     }
 
+
     public override void OnTest()
     {
         
@@ -38,6 +39,8 @@ public class TestingUnit : TestingElement
         result.AddRange(GetElementNames(1));
         return result;
     }
+
+
 }
 
 
@@ -54,24 +57,37 @@ public abstract class TestingElement: TestingReport
 
     protected TestingElement(IServiceProvider provider)
     {
+        this.Name = this.GetType().GetLabel();
         this.provider = provider;
     }
 
     private IEnumerable<TestingElement> GetChildren() => Children;
     public void Push(TestingElement pchild) => Append(pchild);
 
+    public global::TypeNode<global::TestingElement> ToTreeNode()
+    {
+        TypeNode<TestingElement> result = new TypeNode<TestingElement>(
+            $"[{this.GetTypeName()}]: {this.GetType().GetLabel()}", this, null);
+        foreach (TestingElement PChild in Children)
+        {
+            var ChildNode = PChild.ToTreeNode();            
+            ChildNode.Parent = result;
+        }        
+        return result;
+    }
+
     public IEnumerable<string> GetElementNames(int level)
     {
         var result = new List<string>();
         foreach (var p in Children)
         {
-            /*string s = "";
+            string s = "";
             for (int i = 0; i < level; i++)
             {
                 s += "  ";
             }
             result.Add(s + p.GetTypeName());
-            result.AddRange(p.GetElementNames(level+1));*/
+            result.AddRange(p.GetElementNames(level+1));
         }
         return result;
     }

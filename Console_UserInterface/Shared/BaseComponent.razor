@@ -5,6 +5,7 @@
     {
         await base.OnInitializedAsync();
         this.ValidationErrors = this.Validate();
+        this.EnsureIsValide();
     }
     protected bool IsValid() => this.ValidationErrors.Where(kv => kv.Value.Count() > 0).Count() == 0;
 }

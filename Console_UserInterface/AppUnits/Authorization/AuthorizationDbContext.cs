@@ -107,10 +107,10 @@ public partial class AuthorizationDbContext : DbContext
 
     public static void ConfigureServices(IServiceCollection services)
     {
-        InputConsole.GetLogger<AuthorizationDbContext>().LogInformation("ConfigureServices .. ");
+        InputConsole.GetLogger<AuthorizationDbContext>().Info("Регистрация служб ... ");
         services.AddDbContext<AuthorizationDbContext>(options =>
             options.UseSqlServer($@"Data Source=DESKTOP-IHJM9RD;Initial Catalog={typeof(AuthorizationDbContext).GetTypeName()};Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False"));
-        InputConsole.GetLogger<AuthorizationDbContext>().LogInformation("ConfigureServices .. COMPLETED");
+        InputConsole.GetLogger<AuthorizationDbContext>().Info("Регистрация служб ... Успешно завершена");
         services.AddTransient<RegistrationService>();
 
     }

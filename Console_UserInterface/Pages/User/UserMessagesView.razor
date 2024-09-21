@@ -45,20 +45,27 @@
             <div class="row">
                
                 <div class="col-12">
-                    @switch (view)
+                    @if (isLoading)
                     {
-                        case "message":
-                            <MessageCard></MessageCard>
-                            break;
-                        case "outbox":
-                            <MessagesList Messages="@outbox"></MessagesList>
-                            break;
-                        case "inbox":
-                            <MessagesList Messages="@inbox"></MessagesList>                      
-                            break;
-                        case "new_message":
-                            <CreateMessage OnSend="(evt => { OnSendMessage(evt); StateHasChanged();  })"></CreateMessage>
-                            break;
+                        <p>loading</p>
+                    }
+                    else
+                    {
+                        @switch (view)
+                        {
+                            case "message":
+                                <MessageCard></MessageCard>
+                                break;
+                            case "outbox":
+                                <MessagesList Messages="@outbox"></MessagesList>
+                                break;
+                            case "inbox":
+                                <MessagesList Messages="@inbox"></MessagesList>                      
+                                break;
+                            case "new_message":
+                                <CreateMessage OnSend="(evt => { OnSendMessage(evt); StateHasChanged();  })"></CreateMessage>
+                                break;
+                        }
                     }
                 </div>
             </div>

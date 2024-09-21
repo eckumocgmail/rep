@@ -1,4 +1,4 @@
-﻿namespace Console_UserInterface.Location
+﻿namespace Console_UserInterface.Services.Location
 {
     public class LayoutRow : BaseEntity
     {

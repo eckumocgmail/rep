@@ -69,6 +69,7 @@ public class MainMenuBuilder
             this.labelText = Text;
         }
 
+        public List<IMenuItemModel> GetChildNodes() => childNodes;
         public string GetSize() => fontSize;    // font-size
         public string GetText() => labelText;    // label text
         public string GetIcon() => iconCode;    // icon-code

@@ -12,14 +12,14 @@ namespace Google_LoginApplication.Areas.Identity.Modules.ReCaptcha
     {
         public static void ConfigureServices(IConfiguration configuration, IServiceCollection services)
         {
-            InputConsole.GetLogger<RecaptchaModule>().LogInformation("ConfigureServices .. ");
+            InputConsole.GetLogger<RecaptchaModule>().Info("Регистрация служб ... ");
             services.AddSingleton(typeof(ReCaptchaOptions), sp =>
             {
                 var options = configuration.GetSection(nameof(ReCaptchaOptions)).Get<ReCaptchaOptions>();
                 return options == null ? new ReCaptchaOptions() : options;
             });
             services.AddScoped<ReCaptchaService>();
-            InputConsole.GetLogger<RecaptchaModule>().LogInformation("ConfigureServices .. COMPLETED");
+            InputConsole.GetLogger<RecaptchaModule>().Info("Регистрация служб ... Успешно завершена");
         }
     }
 }

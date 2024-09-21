@@ -50,7 +50,7 @@ namespace Console_BlazorApp.AppUnits.DeliveryTests
                 "");
             try
             {
-                /*using (var db = new DeliveryDbContext())
+                using (var db = new DeliveryDbContext())
                 {
                     var customer = provider.Get<CustomerService>();
                     var holder = provider.Get<HolderService>();
@@ -75,15 +75,12 @@ namespace Console_BlazorApp.AppUnits.DeliveryTests
                     }
                     var shouldBe = holder.GetProductsCountsInStock(pholder.Id);
                     var orderItems = holder.CreateOrder(pholder.Id, shouldBe);
-                }*/
+                }
             }
             catch (Exception ex)
             {
                 Messages.Add("Функции работы сос кладом не работают");
             }
-
-
-
         }
     }
 }

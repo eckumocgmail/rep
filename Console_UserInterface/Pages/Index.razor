@@ -1,83 +1,24 @@
 ﻿@page "/"
-@using Console_UserInterface.Location;
-@using static Console_UserInterface.Location.LocationDbContext;
+@inherits BaseComponent
 @inject IServiceProvider provider
-@inject SigninUser signin
-@inject RouteService route
-@inject PageService page
-@inject LocationService location
 @code
 {
-    public List<object> Routes { get; set; }
+    public TestingUnit Unit { get; set; }
+    public global::TypeNode<TestingElement> Root { get; set; }
+}
+@code
+{
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        this.Routes = new LocationDbContext().AppRoutes.ToList().Select(r => r.Uri).ToList().Select(p => (object)p).ToList();
-        var builder = new MainMenuBuilder.MenuBuilder();
-        var fileMenu = builder.CreateMenu("File", new List<string>() { "Create", "Open", "Close" }.Select(text => builder.CreateButtonMenu(text)).ToArray());
-        MenuItems.Add(fileMenu);
-        InitPage();
+        this.Unit = new UserInterfaceUnit(provider);
+        this.Root = this.Unit.ToTreeNode();
     }
-
-    void InitPage()
-    {
-        this.PageInstance = new AppPage();
-        foreach (var type in InputTypes.GetAll())
-        {
-            PageInstance.PageComponents.Add(new PageComponent()
-            {
-                    Type = type,
-                    Name = type,
-                    Label = type,
-                    Icon = "home",
-                    Attributes = new Dictionary<string, string>(),
-                    Help = "help",
-                    Description = type,
-                    Edited = true,
-                    IsPrimitive = true,//type != InputTypes.StructureCollection && type != InputTypes.Custom,
-                    IsCollection = type == InputTypes.PrimitiveCollection || type == InputTypes.StructureCollection,
-                    CollectionSetup = type == InputTypes.PrimitiveCollection || type == InputTypes.StructureCollection ? new PageComponent.CollectionSettings()
-                    {
-                        ItemType = "DateTime"
-                    }: null 
-            });
-        }
-    }
-    public List<MainMenuBuilder.MenuItemModel> MenuItems { get; set; } = new();
-    public List<MainMenuBuilder.MenuItemModel> ToolItems { get; set; } = new();
-    public TabsContainer TabPanes { get; set; }
-    public AppPage PageInstance { get; set; }
 }
-
-<CardContainer Width="512px" Height="512px">
-    <CardHeader>
-        <MenuItemView Model="MenuItems"></MenuItemView>
-        <ToolsBar Model="ToolItems"></ToolsBar>
-        <SearchPane OnSearchSubmit="((SearchPane evt) => { 
-            this.PageInstance = location.Navigate(evt.SearchQuery);
-        })">
-        </SearchPane>
-    </CardHeader>
+<CardContainer>
+    <CardHeader></CardHeader>
     <CardBody>
-        @if (PageInstance is not null)
-        {
-            <PageView Model="PageInstance"></PageView>
-        }
-        <TabsContainer @ref="TabPanes">
-            <ListPrimitiveEditor                                 
-                ItemType="@typeof(String)"
-                OnAdd="(evt => { route.AddRoute<AppPage>(evt.ToString()); StateHasChanged(); } )"
-                Attributes="new Dictionary<string, string>()" 
-                Items="@Routes" >
-            </ListPrimitiveEditor>
-        </TabsContainer>
+        <TypeNodeView TITem="TestingElement" Item="Root"></TypeNodeView>
     </CardBody>
-    <CardFooter>
-        <StatusBar StatusName="@StatusName" IsActive="@IsActive" ></StatusBar>
-    </CardFooter>
+    <CardFooter></CardFooter>
 </CardContainer>
- @code
-{
-    public bool IsActive { get; set; }
-    public string StatusName { get; set; } = "waiting";
- }
