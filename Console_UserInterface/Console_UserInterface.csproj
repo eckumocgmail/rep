@@ -55,6 +55,7 @@
   <ItemGroup>
     <Folder Include="AppUnits\InterfaceModule\InterfaceModel\" />
     <Folder Include="AppUnits\InterfaceModule\InterfaceApi\" />
+    <Folder Include="Help\" />
   </ItemGroup>
 
 </Project>

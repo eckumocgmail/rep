@@ -18,6 +18,29 @@ public static class TextFactoryExtensions
     /// <summary>
     /// Поиск типа по имени
     /// </summary>
+    public static void ForEach(this object target, Func<string, object, bool> todo)
+    {
+        target.GetType().GetProperties().ToList().ForEach(p => todo(  p.Name, target.GetValue(p.Name)  )  );
+    }
+    public static Dictionary<string, string> ToTextDictionary(this object target)
+    {
+        var result = new Dictionary<string, string>();
+        if(target.IsExtends(typeof(Dictionary<string,object>)))
+        {
+            Dictionary<string, object> dict = (Dictionary<string, object>)target;
+            foreach(var p in dict.Select(kv => new KeyValuePair<string, string>(kv.Key, kv.Value?.ToString())))
+            {
+                result[p.Key] = p.Value;
+            }
+            return result;
+        }
+        else
+        {
+            target.ForEach((k, v) => String.IsNullOrEmpty(result[k] = v.ToString()));
+            return result;
+        }
+        
+    }
     public static Type ToType(this string text)
     {                      
         if(text == null)
@@ -25,12 +48,20 @@ public static class TextFactoryExtensions
         if (text.IndexOf("<") != -1)
         {
             var genericArgs = text.Substring(text.IndexOf("<")+1, text.IndexOf(">")- text.IndexOf("<")-1).Split(",");
-            var genericTypes = genericArgs.Select(parg => parg.ToType()).ToArray();
+            
             var mainType = text.Substring(0, text.IndexOf("<"));
 
-            mainType += $"`{genericTypes.Count()}";
-            var result = mainType.ToType().MakeGenericType(genericTypes);
-            return result;
+            mainType += $"`{genericArgs.Count()}";
+            if(genericArgs.All(a => a.IsType()))
+            {
+                var genericTypes = genericArgs.Select(parg => parg.ToType()).ToArray();
+                var result = mainType.ToType().MakeGenericType(genericTypes);
+                return result;
+            }
+            else
+            {
+                return mainType.ToType();
+            }
         }
         Type ptype = text.Contains(".")? ReflectionService.TypeForName(text): ReflectionService.TypeForShortName(text);
         

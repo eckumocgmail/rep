@@ -796,7 +796,7 @@ public static class ObjectLogExtensions
         {
             if (message == null)
                 return;
-            WriteGreenLine(target, $"[{target.GetId()}]");
+            WriteGreenLine(target, $"\n[{target.GetId()}]");
             if (IsPrimitiveType(message.GetType()) == false)
             {
 

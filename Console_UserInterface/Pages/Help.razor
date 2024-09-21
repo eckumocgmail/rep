@@ -1,0 +1,70 @@
+﻿@page "/help"
+@using ApplicationCommon.CommonResources;
+@inherits BaseComponent
+@inject IServiceProvider provider
+@code
+{
+   
+    public global::TypeNode<object> Root { get; set; }
+}
+@code
+{
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        
+        this.Root = new global::TypeNode<object>();
+    }
+}
+@code
+{
+    public InputFormModel ContentModel { get; set; } = new InputFormModel();
+}
+<CardContainer>
+    <CardHeader>
+        <TextComponent>Спарвочная информация</TextComponent>
+        <SearchControl SearchOptions="@SearchOptions" SearchQuery="@SearchQuery" Placeholder="@Placeholder" OnInput="OnInputSearch" OnSearch="OnSearchSubmited"></SearchControl>
+    </CardHeader>
+    <CardBody>
+        <SplitPane LeftSize="1" RightSize="2">
+            <Left></Left>
+            <Right></Right>
+        </SplitPane>
+    </CardBody>
+    <CardFooter>
+        <StatusBar StatusName="StatusName" CurrentValue="CurrentValue"></StatusBar>
+    </CardFooter>
+</CardContainer>
+
+@code
+{
+    public string Placeholder { get; set; } = "Поиск";
+    public string SearchQuery { get; set; } = "";
+    public List<string> SearchOptions { get; set; } = new();
+    public EventCallback<string> OnInput { get; set; }
+    public EventCallback<string> OnSearch { get; set; }
+
+    public void OnSearchSubmited()
+    {
+
+    }
+
+    public void OnInputSearch()
+    {
+
+    }
+
+
+    public string StatusName { get; set; }
+    public int CurrentValue { get; set; }
+
+    public void ProgressStart()
+    {
+    }
+    public void Progress()
+    {
+    }
+    public void ProgressEnd()
+    {
+    }
+} 

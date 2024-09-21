@@ -1,0 +1,11 @@
+﻿@inherits BaseComponent
+@code
+{
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+}
+<button class="btn btn-sm btn-primary" @onclick="async evt => await OnClick.InvokeAsync()">
+    @ChildContent
+</button>

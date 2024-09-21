@@ -32,8 +32,14 @@ public static class TextLangExtensions
     }
     public static bool IsType(this string text)
     {
-
-        return text.ToType() != null;
+        try
+        {
+            return text.ToType() != null;
+        }
+        catch(Exception)
+        {
+            return false;
+        }
     }
 
     public static IEnumerable<string> GetTypeNames(this string text)

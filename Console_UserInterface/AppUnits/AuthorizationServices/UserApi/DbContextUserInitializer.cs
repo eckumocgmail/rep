@@ -1,5 +1,4 @@
-﻿using Console_AuthModel.AuthorizationModel.UserModel;
-
+﻿
 public class DbContextUserInitializer
 {
     public IDictionary<string, int> Init(DbContextUser context, params string[] roles)

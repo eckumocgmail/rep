@@ -1,4 +1,5 @@
-﻿@code 
+﻿@inherits LayoutComponentBase
+@code 
 {
     protected Dictionary<string, List<string>> ValidationErrors { get; set; } 
     protected override async Task OnInitializedAsync()
@@ -9,3 +10,13 @@
     }
     protected bool IsValid() => this.ValidationErrors.Where(kv => kv.Value.Count() > 0).Count() == 0;
 }
+<div>
+    @if (IsValid())
+    {
+        <div>@Body</div>
+    }
+    else
+    {
+        <ValidationErrorsView Model="ValidationErrors" Name="GetType().GetTypeName()"></ValidationErrorsView>
+    }    
+</div>

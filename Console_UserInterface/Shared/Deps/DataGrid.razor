@@ -49,12 +49,11 @@
         StateHasChanged();
     }
 
-    public void OnSearchSubmit(SearchPane search)
+    public void OnSearchSubmit(SearchControl search)
     {
         this.SearchQuery = search.SearchQuery;
         this.SearchOptions = search.SearchOptions;
-        this.ShowLeft = search.ShowLeft;
-        this.SortRule = search.SortRule;
+
         DoSearch();
         StateHasChanged();
     }

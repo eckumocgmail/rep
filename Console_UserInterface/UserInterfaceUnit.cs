@@ -2,12 +2,15 @@
 
 namespace Console_UserInterface
 {
+
     [Label("Модуль тестирования пользовательского интерфейса")]
     public class UserInterfaceUnit : TestingUnit
     {      
         public UserInterfaceUnit(IServiceProvider parent) : base(parent)
         {
-            Append(new DeliveryServicesUnit());
+            this.Append(new AuthorizationUnit(provider));
+            this.Append(new DeliveryServicesUnit());
         }
     }
+
 }

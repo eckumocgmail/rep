@@ -1,16 +1,6 @@
-﻿using Console_AuthModel.AuthorizationModel.UserModel;
-
-
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.Security.Claims;
-using System.Threading.Tasks;
 
-using static AuthorizationDbContext;
 
 /// <summary>
 /// Обьект модели пользователя сеансов

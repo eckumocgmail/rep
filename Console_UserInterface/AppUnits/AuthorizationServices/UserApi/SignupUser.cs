@@ -6,18 +6,11 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-
-using Console_AuthModel.AuthorizationModel.UserModel;
-
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.EntityFrameworkCore;
-
 using Newtonsoft.Json;
-
 using pickpoint_delivery_service;
-
-using static AuthorizationDbContext;
 
 public sealed class SignupUser : BaseSignup<UserContext, UserAccount, UserPerson>
 {

@@ -28,7 +28,7 @@ namespace Mvc_Apteka.Entities
         public float ProductPrice { get; set; }
 
 
-        public ICollection<ProductImage> ProductImages { get; set; }
+        public System.Collections.Generic.ICollection<ProductImage> ProductImages { get; set; }
 
     }
 }

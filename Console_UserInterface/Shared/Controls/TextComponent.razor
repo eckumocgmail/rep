@@ -1,18 +1,20 @@
-﻿@inherits LayoutComponentBase
+﻿@inherits BaseComponent
 @code
 {
-    //[InputSelect("info,warn,success,danger,warning,primary,secondary")]
-    public string Color { get; set; }
+    [InputSelect("white,dark,info,warn,success,danger,warning,primary,secondary")]
+    public string Color { get; set; } = "dark";
 
-    //[InputSelect("info,warn,success,danger,warning,primary,secondary")]
-    public string Background { get; set; }
+    [InputSelect("white,dark,info,warn,success,danger,warning,primary,secondary")]
+    public string Background { get; set; } = "white";
 
-    //[InputSelect("start,end,center")]
-    public string Align { get; set; }
+    [InputSelect("start,end,center")]
+    public string Align { get; set; } = "start";
 
     [InputNumber]
-    [InputPositiveInt]   
-    public string FontSize { get; set; }
+    [InputPositiveInt]
+    public int FontSize { get; set; } = 12;
 
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
 }
-<div class="text text-@(Color)">@Body</div>
+<div class="text text-@(Color)">@ChildContent</div>

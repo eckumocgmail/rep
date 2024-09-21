@@ -1,5 +1,6 @@
 ﻿@page "/user/signup"
-@using static AuthorizationDbContext;
+@using Console_UserInterface.ControlAttributes;
+
 @inject DbContextUser db
 @inject NavigationManager nav
 @inject SignupUser signup
@@ -12,10 +13,81 @@
         base.OnInitialized();
         this.Info("Initialized");
     }
-}
+    public void OnSignupComplete(List<object> args)
+    {
+        var account = (UserAccount)args.FirstOrDefault(a => a is UserAccount);
+        var person = (UserPerson)args.FirstOrDefault(a => a is UserPerson);
+        try
+        {
+            account.Hash = UserAccount.GetHashSha256(account.Password);
+            if (signup.HasWith(account))
+            {
+                message = "Пользователь с таким Email уже зарегистрирован";
+                StateHasChanged();
+                return;
+            }
+            var result = signup.Signup(account, person);
 
+            if (result.Succeeded)
+            {
+                var roles = new string[] { "customer", "transport", "holder", "webuser", role };
+                result.Result.BusinessFunctions = new();
+                result.Result.Roles = roles.Select(name =>
+                {
+                    var role = db.UserRoles_.FirstOrDefault(r => r.Code.ToLower() == name);
+                    if (role == null)
+                    {
+                        db.UserRoles_.Add(role = new()
+                            {
+                                Code = name.ToLower(),
+                                Name = name.ToLower()
+                            });
+                        db.SaveChanges();
+                    }
+                    UsersRoles p = null;
+                    db.UsersRoles_.Add(p = new()
+                        {
+                            RoleId = role.Id,
+                            UserId = result.Result.Id
+                        });
+                    result.Result.BusinessFunctions.Add(p);
+                    db.SaveChanges();
+                    return role;
+                }).ToList();
+                db.SaveChanges();
+                result.Result.BusinessFunctions = db.UsersRoles_.Where(ur => ur.UserId == result.Result.Id).ToList();
+            }
+            if (result.Succeeded)
+            {
+                nav.NavigateTo("/public/search-products");
+            }
+            else
+            {
+                message = result.Exception;
+            }
+        }
+        catch (Exception ex)
+        {
+            message = ex.ToString();
+        }
+        StateHasChanged();
+    }
+}
+@code
+{
+    public class RoleSelectionModel
+    {
+        [SelectData(nameof(UserRole), nameof(UserRole.Code))]
+        public string Role { get;set; }
+    }
+}
 <PageTitle>ЕвроАвто/Регистрация</PageTitle>
-<MasterDialog Models='@(new List<object>(){ new UserAccount("customer@gmail.com", "customer@gmail.com"), new UserPerson()
+<MasterDialog
+    OnComplete="OnSignupComplete"
+    Models='@(new List<object>(){ 
+    new UserAccount("customer@gmail.com", "customer@gmail.com"),
+    new RoleSelectionModel(),
+    new UserPerson()
     {
         Tel = "7-921-090-3572",
         FirstName = "Константин",
@@ -39,160 +111,7 @@
 @code
 {
     string role = "customer";
-    public UserAccount account = new UserAccount("customer@gmail.com", "customer@gmail.com");
-    public UserPerson person = new UserPerson()
-    {
-        Tel = "7-921-090-3572",
-        FirstName = "Константин",
-        LastName = "Александрович",
-        SurName = "Батов",
-        Birthday = DateTime.Now
-    };
-    public string message { get; set; } = "";
-    
-    public void OnSaveButtonClicked()
-    {
-        try
-        {
-            account.Hash = UserAccount.GetHashSha256(account.Password);
-            if (signup.HasWith(account))
-            {
-                message = "Пользователь с таким Email уже зарегистрирован";
-                StateHasChanged();
-                return;
-            }
-            var result = signup.Signup(account, person);
-
-            if (result.Succeeded)
-            {
-                var roles = new string[] { "customer", "transport", "holder", "webuser", role };
-                result.Result.BusinessFunctions = new();
-                result.Result.Roles = roles.Select(name =>
-                {
-                    var role = db.UserRoles_.FirstOrDefault(r => r.Code.ToLower() == name);
-                    if (role == null)
-                    {
-                        db.UserRoles_.Add(role = new()
-                        {
-                            Code = name.ToLower(),
-                            Name = name.ToLower()
-                        });
-                        db.SaveChanges();
-                    }
-                    UsersRoles p = null;
-                    db.UsersRoles_.Add(p = new()
-                    {
-                        RoleId = role.Id,
-                        UserId = result.Result.Id
-                    });
-                    result.Result.BusinessFunctions.Add(p);
-                    db.SaveChanges();
-                    return role;
-                }).ToList();
-                db.SaveChanges();
-                result.Result.BusinessFunctions = db.UsersRoles_.Where(ur => ur.UserId == result.Result.Id).ToList();
-            }
-            if (result.Succeeded)
-            {                
-                nav.NavigateTo("/public/search-products");
-            }
-            else
-            {
-                message = result.Exception;
-            }
-        }
-        catch (Exception ex)
-        {
-            message = ex.ToString();
-        }
-        StateHasChanged();
-    }
-
-    public void Valdiate()
-    {
-        account.Validate();
-        person.Validate();
-    }
+ 
+    public string message { get; set; } = "";    
 }
-
-@if(account is not null && person is not null)
-{
-    
-   @* <div style="padding: 20px; margin: 20px;" class="card">
-        <h3>Регистрация пользователя</h3>
-        @if (String.IsNullOrWhiteSpace(message) == false)
-        {
-            <div class="alert alert-danger">
-                @message
-            </div>
-        }
-        <div class="form-group">
-            <label>Зарегистрироваться как</label>
-            <select class="form-control" @onchange="(evt => { role = evt.Value.ToString(); })">
-                <option value="Customer">Покапатель</option>          
-                <option value="Transport">Перевозчик</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label >Электронная почта</label>
-            <input type="email" value="@account.Email" @oninput="(evt => {account.Email = evt.Value.ToString(); StateHasChanged();})" class="form-control">
-        </div>
-        <div class="form-group">
-            <label>Пароль</label>
-            <input type="password" value="@account.Password" @oninput="(evt => { account.Password = evt.Value.ToString(); StateHasChanged();})" class="form-control">
-        </div>
-    
-        <div class="form-group">
-            <label>Полное имя @person.GetFullName()</label>
-            <input type="text" value="@person.GetFullName()" @oninput='(evt => { var arr = evt.Value.ToString().Split(" "); person.SurName = arr[0]; person.FirstName = arr.Length==1? "": arr[1]; person.LastName = arr.Length<=2? "": arr[2]; StateHasChanged();})' class="form-control">
-        </div>
-
-        <div class="form-group">
-            <label>День рождения </label>
-            <input type="date" value='@(((DateTime)person.Birthday).ToString("yyyy-MM-dd"))' @oninput="(evt => {person.Birthday = DateTime.Parse(evt.Value.ToString()); StateHasChanged();})" class="form-control">
-        </div>
-
-        <div class="form-group">
-            <label>Телефон</label>
-            <input type="text" value="@person.Tel" oninput=" 
-                        var evt = window.event;
-                        try {
-                            console.log(evt);
-
-                            var s = '';
-                            var v = evt.target.value;
-                            for (let i = 0; i < v.length; i++) {
-                                if ('0123456789-'.indexOf(v[i]) != -1) {
-                                    s += v[i];
-                                    if (s.length > 13) {
-                                        break;
-                                    }
-                                }
-                            }
-                            if (s.length > 1 && s[1] != '-') s = s.substring(0, 1) + '-' + s.substring(1);
-                            if (s.length > 4 && s[5] != '-') s = s.substring(0, 5) + '-' + s.substring(5);
-                            if (s.length > 8 && s[9] != '-') s = s.substring(0, 9) + '-' + s.substring(9);
-                            v = s;
-                            if (v.endsWith('-')) v = v.substring(0, v.length - 1);
-                            this.value = v;
-
-                        } catch (e) {
-                            console.error(e);
-                        };" @onchange="(evt => { person.Tel = evt.Value.ToString(); StateHasChanged(); })" class="form-control">
-        </div>
-
-        <div align="center">
-            <a @onclick='(evt => { nav.NavigateTo("/User/Signin"); })'>
-                Перейти к странице авторизации
-            </a>
-        </div>
-        <div>
-            <button class="btn btn-primary btn-sm" @onclick="OnSaveButtonClicked">Сохранить</button>
-        </div>
-    </div> *@
-}
-
-
-
-
-                           
+        

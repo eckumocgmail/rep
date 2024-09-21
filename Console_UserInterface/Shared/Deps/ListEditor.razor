@@ -23,12 +23,11 @@
     [Parameter]
     public bool ShowLeft { get; set; }
 
-    public async Task OnSearchSubmit(SearchPane search)
+    public async Task OnSearchSubmit(SearchControl search)
     {
         SearchQuery = search.SearchQuery;
         SearchOptions = search.SearchOptions;
-        SortRule = search.SortRule;
-        ShowLeft = search.ShowLeft;
+      
 
         VisibleItems = Items.Where(item => item.ToJson().IndexOf(SearchQuery.ToLower()) != -1).ToList();
 
@@ -39,7 +38,7 @@
 <CardContainer>
     <CardHeader>
         <div>
-            <SearchPane OnSearchSubmit="@OnSearchSubmit" SearchOptions="@SearchOptions" SearchQuery="@SearchQuery" ShowLeft="@ShowLeft" SortRule="@SortRule"></SearchPane>
+            <SearchControl OnSearch="@OnSearchSubmit" SearchOptions="@SearchOptions" SearchQuery="@SearchQuery"></SearchControl>
         </div>
         <div align="left">
             <label> Настроить фильтры </label>

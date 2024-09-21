@@ -247,6 +247,7 @@ namespace Console_DataConnector.DataModule.DataODBC.Connectors
         /// Получение списка таблиц
         /// </summary>
         public IEnumerable<string> GetTables()
+
         {
             List<string> tableNames = new List<string>();
             using (OdbcConnection connection = GetConnection())
@@ -255,11 +256,16 @@ namespace Console_DataConnector.DataModule.DataODBC.Connectors
                 DataTable tables = connection.GetSchema("Tables");
                 foreach (JObject next in convert(tables))
                 {
-                    string tableName = next["TABLE_NAME"].Value<string>();
-                    if (tableName.StartsWith("__") == false)
+                    this.Info(next);
+                    if (next["TABLE_SCHEM"].Value<string>()!="sys")
                     {
-                        tableNames.Add(tableName);
+                        string tableName = next["TABLE_NAME"].Value<string>();
+                        if (tableName.StartsWith("__") == false)
+                        {
+                            tableNames.Add(tableName);
+                        }
                     }
+                    
                 }
             }
             return tableNames.ToArray();

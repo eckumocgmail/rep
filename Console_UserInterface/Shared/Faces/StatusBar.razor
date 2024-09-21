@@ -1,9 +1,12 @@
-﻿<h3>StatusBar</h3>
-
+﻿
+<div class="progress">
+  <div class="progress-bar" role="progressbar" style="width: @(CurrentValue)%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">@StatusName</div>
+</div
 @code 
 {
     [Parameter]
     public string StatusName { get; set; }
+
     [Parameter]
-    public bool IsActive { get; set; }
+    public int CurrentValue { get; set; }
 }

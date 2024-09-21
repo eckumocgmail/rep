@@ -23,7 +23,7 @@ public class TypeNode<T> : IDictionary<string, TypeNode<T>>
     /// <summary>
     /// Дочерние элементы
     /// </summary>
-    public IDictionary<string, TypeNode<T>> ChildNodes { get; set; }
+    public IDictionary<string, TypeNode<T>> ChildNodes { get; set; } = new Dictionary<string, TypeNode<T>>();
 
     public TypeNode()
     {

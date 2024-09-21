@@ -1,10 +1,32 @@
-﻿@code
+﻿@*
+<SearchControl SearchOptions="SearchOptions" SearchQuery="SearchQuery" Placeholder="Placeholder" OnInput="OnInputSearch" OnSearch="OnSearchSubmited"></SearchControl>
+@code
+{
+    public string Placeholder { get; set; } = "Поиск";
+    public string SearchQuery { get; set; } = "";
+    public string[] SearchOptions { get; set; } = new string[0];
+    public EventCallback<string> OnInput { get; set; }
+    public EventCallback<string> OnSearch { get; set; }
+
+    public void OnSearchSubmited()
+    {
+
+    }
+
+    public void OnInputSearch()
+    {
+
+    }
+}
+*@
+@code
 {    
     /// <summary>
     /// Заполнитель пустого поля
     /// </summary>
     [Parameter]
     public string Placeholder { get; set; } = "Поиск";
+    
 
     /// <summary>
     /// Текст в строке поиска
@@ -16,7 +38,7 @@
     /// Значения для автоподстановки
     /// </summary>
     [Parameter]
-    public string[] SearchOptions { get; set; } = new string[0];
+    public List<string> SearchOptions { get; set; } = new ();
 
 }
 
@@ -27,19 +49,20 @@
     /// </summary>
     [Parameter]
     public EventCallback<string> OnInput { get; set; }
+    
 
     /// <summary>
     /// Событие при выполнении поиска
     /// </summary>
     [Parameter]
-    public EventCallback<string> OnSearch { get; set; }
+    public EventCallback<SearchControl> OnSearch { get; set; }
 }
 
 <div @onsubmit="@OnSearchSubmit"
-     style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: baseline; justify-content: flex-start;">
+     style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: baseline; justify-content: flex-start;  ">
     <input type="text" class="form-control" list="SearchOptions-@GetHashCode()"
-           style="top: 0px; left: 0px; width: 100%;"
-           placeholder="@Placeholder"
+           style="top: 0px; left: 0px; width: 100%; "
+          
            @bind-value="@SearchQuery"
            @oninput="@OnSearchInput">
     <button class="btn btn-primary my-2 my-sm-0" type="submit" @onclick="@OnSearchSubmit">@Placeholder</button>

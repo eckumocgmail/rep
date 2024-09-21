@@ -21,7 +21,7 @@ namespace Console_UserInterface.AppUnits
             this.Append(new CustomerOrderCheckoutUnit(provider));
             this.Append(new TransportOrderDeliveryUnit(provider));
             this.Append(new ReservationOrderCheckoutUnit(provider));
-            this.Append(new AuthorizationUnit(provider));
+            
         }
     }
 }

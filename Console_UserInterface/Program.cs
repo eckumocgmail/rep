@@ -10,6 +10,7 @@ using Console_UserInterface.AppUnits;
 using Console_UserInterface.Services;
 using Blazored.Modal;
 using Console_UserInterface.AppUnits.InterfaceModule;
+using Ex;
 
 /// приложение
 namespace Console_UserInterface
@@ -50,8 +51,10 @@ namespace Console_UserInterface
         /// </summary>
         public static void Main(string[] args)
         {
+            
+             
             RegTypes();           
-            //UpdateDatabases();
+            UpdateDatabases();
             var builder = WebApplication.CreateBuilder(args);
             ConfigureServices(builder);
             Configure(builder);
@@ -128,7 +131,6 @@ namespace Console_UserInterface
             UserInterfaceModule.AddUserInterfaceServices(builder.Services, builder.Configuration);
             SesionModule.AddSessionService(builder.Services);
             RecaptchaModule.ConfigureServices(builder.Configuration, builder.Services);
-            AuthorizationDbContext.ConfigureServices(builder.Services);
             AuthorizationModule.ConfigureServices(builder.Services);
             ModuleUser.ConfigureServices(builder.Configuration, builder.Services);
             ModuleService.ConfigureServices(builder.Configuration, builder.Services);
@@ -140,12 +142,7 @@ namespace Console_UserInterface
 
         [Label("Создание структуры баз данных")]
         public static void UpdateDatabases()
-        {
-            using (var db = new AuthorizationDbContext())
-            {
-                db.Database.EnsureDeleted();
-                db.Database.EnsureCreated();
-            }
+        {          
             using (var db = new DbContextUser())
             {
                 db.Database.EnsureDeleted();

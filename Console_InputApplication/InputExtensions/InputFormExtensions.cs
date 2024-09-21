@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+
 using System.Reflection;
 
 /// <summary>
@@ -39,17 +41,24 @@ public static class InputFormExtensions
         formModel.Item = new Dictionary<string, object>();
         formModel.ItemType = formModel.Item.GetTypeName();
         foreach (var param in controller.GetActionParameters(action))
-        {            
-            var paramModel = new MyParameterDeclarationModel();
-            paramModel.Name = param.Name;
-            paramModel.Type = param.ParameterType.GetTypeName(); ;
-            paramModel.IsOptional = param.IsOptional;
-            paramModel.Position = param.Position;            
-            paramModel.Attributes = controller.GetArgumentAttributes(action, param.Name);
-            actionModel.Parameters[param.Name] = paramModel;
+        {
+            try
+            {
+                var paramModel = new MyParameterDeclarationModel();
+                paramModel.Name = param.Name;
+                paramModel.Type = param.ParameterType.GetTypeName(); ;
+                paramModel.IsOptional = param.IsOptional;
+                paramModel.Position = param.Position;
+                paramModel.Attributes = controller.GetArgumentAttributes(action, param.Name);
+                actionModel.Parameters[param.Name] = paramModel;
 
-            var field = formModel.CreateFormField(paramModel);
-            formModel.FormFields.Add(field);
+                var field = formModel.CreateFormField(paramModel);
+                formModel.FormFields.Add(field);
+            }
+            catch(Exception ex)
+            {
+                formModel.Error($"{ex}");
+            }
         }
         formModel.Item = new Dictionary<string, object>();
         formModel.Json = "{}";

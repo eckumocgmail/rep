@@ -8,12 +8,12 @@ using System.Reflection;
 using System.Threading.Tasks;
 
 
-public class StatisticsService
+public class UserStatsService
 {
-    private readonly AuthorizationDbContext _context;
-    private readonly ILogger<StatisticsService> _logger;
+    private readonly DbContext _context;
+    private readonly ILogger<UserStatsService> _logger;
 
-    public StatisticsService(ILogger<StatisticsService> logger, AuthorizationDbContext db)
+    public UserStatsService(ILogger<UserStatsService> logger, DbContext db)
     {
         this._context = db;
         _logger = logger;
@@ -36,7 +36,7 @@ public class StatisticsService
         await _context.SaveChangesAsync();
     }
 
-    private IEnumerable<Type> GetFactsTables(AuthorizationDbContext context)
+    private IEnumerable<Type> GetFactsTables(DbContext context)
     {
         throw new NotImplementedException();
     }

@@ -4,11 +4,16 @@
     [Parameter]
     [NotNullNotEmpty]
     public List<object> Models { get; set; }
+
     private int Cursor { get; set; } = 0;
+
     [NotNullNotEmpty]
-    private EventCallback OnCancel { get; set; }
+    [Parameter]
+    public EventCallback<List<object>> OnCancel { get; set; }
+
     [NotNullNotEmpty]
-    private EventCallback OnComplete { get; set; }
+    [Parameter]
+    public EventCallback<List<object>> OnComplete { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -32,7 +37,7 @@
 {
     public async Task OnCompleted()
     {
-        await OnComplete.InvokeAsync();
+        await OnComplete.InvokeAsync(Models);
     }
     public async Task OnSubmitClicked()
     {        
@@ -49,7 +54,7 @@
     }
     public async Task OnCanceled()
     {
-        await OnCancel.InvokeAsync();
+        await OnCancel.InvokeAsync(Models);
     }
     public async Task OnReturnClicked()
     {

@@ -251,10 +251,17 @@ else
                             id="@Model.GetInputId()"
                             @onchange:preventDefault
                             @oninput="@((e) => OnInputValue(Model.Name)(e))">
-                        
+                        @if (Model.Value is null)
+                        {
+                            <option selected>Не установлено</option>
+                        }
+                        else
+                        {
+                            <option>Не установлено</option>
+                        }                        
                         @foreach (string option in Model.Attributes.First(attribute => attribute.Key == nameof(InputSelectAttribute)).Value.Split(","))
                         {
-                            @if (option == Model.Value.ToString())
+                            @if (Model.Value is not null && option == Model.Value.ToString())
                             {
                                 <option selected value="@option">@option</option>
                             }
@@ -370,7 +377,7 @@ else
                 }
                 else if (Model.Type == "image")
                 {
-                    @inject IJSRuntime js
+                    @*inject IJSRuntime js
                     @code
                     {
                         public string ImageSource { get; set;  }
@@ -410,6 +417,23 @@ else
                         </div>
                         <input type="hidden" value="@Model.Value" />                        
                         
+                    </div>*@
+                @Model.Value
+                    <div class="d-flex flex-column flex-nowrap">
+                    <img id="img_from_file_@GetHashCode()" src="@(@Model.Value)" onclick="document.getElementById('file_input_@GetHashCode()').click()" style="width: 100%; height: 100%; min-height: 320px; min-width: 320px; max-height: 640px; max-width: 640px; margin: 0px; padding: 0px;" class="btn" />
+                        <input type="hidden" value="@Model.Value" id="data_input_@GetHashCode()" @onchange="(evt => { OnInputValue(Model.Name)( new ChangeEventArgs(){ Value = Model.Value = evt.Value} ); StateHasChanged(); })" name="@Model.Name" />
+                        <input type="file" id="file_input_@GetHashCode()" hidden onchange="
+                                for(let i=0; i<this.files.length; i++)
+                                {
+                                    let file= this.files[i];
+                                    let reader = new FileReader();
+                                    reader.onload = function() {                                                     
+                                            document.getElementById('img_from_file_@GetHashCode()').src=reader.result;
+                                            document.getElementById('data_input_@GetHashCode()').value=reader.result;
+                                    };
+                                    reader.readAsDataURL(file);
+                                }
+                            " />
                     </div>
                 
                 }

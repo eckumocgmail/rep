@@ -14,17 +14,10 @@
         };
     }
 }
-@code
-{
-    public void ToggleNavMenu()
-    {
-        
-    }
-}
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">Console_UserInterface</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+        <button title="Navigation menu" class="navbar-toggler">
             <span class="navbar-toggler-icon"></span>
         </button>
     </div>
@@ -130,6 +123,11 @@
         }
         else
         {
+            <div class="nav-item px-3" style="color: white;">
+                <NavLink class="nav-link" href="/help">
+                    <span class="oi oi-box" aria-hidden="true"></span> Помощь
+                </NavLink>
+            </div>
             <div class="nav-item px-3" style="color: white;">
                 <NavLink class="nav-link" href="/app/routing">
                     <span class="oi oi-account-login" aria-hidden="true"></span> Маршруты

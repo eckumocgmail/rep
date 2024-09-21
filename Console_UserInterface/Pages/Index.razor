@@ -1,24 +1,80 @@
 ﻿@page "/"
+@using static NavMenuService;
 @inherits BaseComponent
 @inject IServiceProvider provider
+@inject NavigationManager nav
+@inject INavMenuService navMenuService
+@inject IInputModalService input
 @code
 {
-    public TestingUnit Unit { get; set; }
-    public global::TypeNode<TestingElement> Root { get; set; }
-}
-@code
-{
+    public IEnumerable<NavLinkNavLink> Links { get; set; }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        this.Unit = new UserInterfaceUnit(provider);
-        this.Root = this.Unit.ToTreeNode();
+        Update();
+    }
+
+    public void Update()
+    {
+        Links = navMenuService.GetPageLinks();
+    }
+
+    /// <summary>
+    /// /
+    /// </summary>
+    public async Task OnAddMenuItemClicked(object? evt)
+    {
+        NavLinkNavLink link = await input.Create<NavLinkNavLink>();
+        navMenuService.CreateNavLink(link.Icon, link.Label, link.Href);
+        Update();
+        StateHasChanged();
     }
 }
 <CardContainer>
-    <CardHeader></CardHeader>
+    <CardHeader>
+        <ButtonClick OnClick="OnAddMenuItemClicked">Добавить</ButtonClick>
+    </CardHeader>
     <CardBody>
-        <TypeNodeView TITem="TestingElement" Item="Root"></TypeNodeView>
+ 
+        <NavModel Links="@Links"></NavModel>
     </CardBody>
     <CardFooter></CardFooter>
 </CardContainer>
+
+@code
+{
+    public string Placeholder { get; set; } = "Поиск";
+    public string SearchQuery { get; set; } = "";
+    public List<string> SearchOptions { get; set; } = new();
+    public EventCallback<string> OnInput { get; set; }
+    public EventCallback<string> OnSearch { get; set; }
+
+    public void OnSearchSubmited()
+    {
+
+    }
+
+    public void OnInputSearch()
+    {
+
+    }
+
+
+    public string StatusName { get; set; }
+    public int CurrentValue { get; set; }
+
+    public void ProgressStart()
+    {
+    }
+    public void Progress()
+    {
+    }
+    public void ProgressEnd()
+    {
+    }
+} 

@@ -1,22 +1,23 @@
 ﻿@page "/app/routing"
 @using Console_UserInterface.AppUnits.InterfaceModule.InterfaceServices.InputModal;
 @inject AppRouterMiddleware router
+@inject IModalService modal
 @inject IInputModalService input
-@inject IBootstrapModalService modal
+@inject IBootstrapModalService bmodal
 @code
 {
     public List<string> Checked { get; set; } = new();
 }
 @code
 {
-    public class RouteModel
+
+    public async Task OnAddRouteButtonClicked()
     {
-        [InputTypeAttribute]
-        public string Controller { get; set; }
-    }
-    public void OnAddRouteButtonClicked()
-    {
-        input.Create<RouteModel>();
+        var modalRef = modal.Show<CreateRoute>("Создание маршрута");
+        await Task.CompletedTask;
+
+        //CreateRoute created = await input.Create<CreateRoute>();
+        //router.AddControllerAction(created.ControllerType, created.ControllerAction);
     }
 }
 <CardContainer>

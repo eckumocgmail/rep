@@ -1,4 +1,5 @@
-﻿<div class="form-group">
+﻿@*<ComboBox Label="Test" OnInput="evt => {}" OnSelect="evt => {}" Value="Test" Options="SearchOptions.ToList()"></ComboBox>*@
+<div class="form-group">
     <label>@Label</label>
     <input type="search" class="form-control" style="width: 100%;" @oninput="(async evt => { await OnInput.InvokeAsync(evt.Value.ToString()); StateHasChanged(); })" list="list_@GetHashCode()"/>
     <datalist id="list_@GetHashCode()">
@@ -12,6 +13,9 @@
 {
     [Parameter]
     public EventCallback<string> OnInput { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnSelect { get; set; }
 
     [Parameter]
     public string Label { get; set; } = "";

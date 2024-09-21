@@ -1,10 +1,5 @@
-using System;
-
-using Console_AuthModel.AuthorizationModel.UserModel;
-
 using Microsoft.EntityFrameworkCore;
 
-using static AuthorizationDbContext;
 public class DbContextUser: DbContext {
     public virtual DbSet<UserAccount> UserAccounts_ { get; set; }
     public virtual DbSet<UserContext> UserContexts_ { get; set; }
@@ -23,9 +18,8 @@ public class DbContextUser: DbContext {
     public virtual DbSet<UserMessageFile> UserMessageFiles { get; set; }
     public virtual DbSet<UserPerson> UserPersons_ { get; set; }
     public virtual DbSet<UserSettings> UserSettings_ { get; set; }
- 
-    
- 
+    public virtual DbSet<RoleFunction> RoleFunctions { get; set; }
+
     public DbContextUser(){}
     public DbContextUser(DbContextOptions<DbContextUser> options) : base(options){}
 

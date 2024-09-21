@@ -2,6 +2,42 @@
 
 using Microsoft.EntityFrameworkCore;
 
+/// <summary>
+/// Методы работы с сообщениями пользователя
+/// </summary>
+public interface IUserMessagesService
+{
+
+    /// <summary>
+    /// Получение справочника пользователей
+    /// </summary>    
+    Dictionary<string, int> GetUsers();
+
+    /// <summary>
+    /// Получение входящих сообщенимй
+    /// </summary>
+    List<UserMessage> GetInbox();
+
+    /// <summary>
+    /// Получение исходящих сообщенимй
+    /// </summary>
+    List<UserMessage> GetOutbox();
+
+    /// <summary>
+    /// Отправка нового сообщения
+    /// </summary>
+    Task<int> Send(UserMessage p, List<ProductImage> files);
+
+    /// <summary>
+    /// Кол-во непрочитанных сообщений
+    /// </summary>    
+    int GetInboxNotReaded();
+}
+
+
+/// <summary>
+/// Реализация методов работы с сообщениями
+/// </summary>
 public class UserMessagesService : IUserMessagesService
 {
     private readonly DbContextUser _context;
@@ -13,7 +49,6 @@ public class UserMessagesService : IUserMessagesService
         _signin = signin;
     }
 
-
     public async Task<int> Send(UserMessage p, List<ProductImage> files)
     {
         await Task.CompletedTask;
@@ -23,7 +58,6 @@ public class UserMessagesService : IUserMessagesService
         _context.SaveChanges();
         return 1;      
     }
-
 
     public List<UserMessage> GetInbox()
     {
@@ -55,4 +89,3 @@ public class UserMessagesService : IUserMessagesService
         return (from p in _context.UserMessages_ where p.FromUserId == userId && p.Readed == false select p).Count();
     }
 }
-

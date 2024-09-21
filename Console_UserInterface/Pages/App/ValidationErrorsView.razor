@@ -1,0 +1,31 @@
+﻿@code
+{
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();        
+        this.EnsureIsValide();
+    }
+}
+<div class="card alert alert-info">
+    <h2>@Name</h2>
+    @foreach (var kv in this.Model)
+    {
+        <div>@kv.Key</div>
+        <div>
+            @foreach (var error in kv.Value)
+            {
+                <div class="text-black text-danger">@error</div>
+            }
+        </div>
+    }
+</div>
+@code
+{
+    [Parameter]
+    [NotNullNotEmpty]
+    public Dictionary<string, List<string>> Model { get; set; }
+
+    [Parameter]
+    [NotNullNotEmpty]
+    public string Name { get; set; }
+}

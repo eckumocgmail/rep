@@ -10,7 +10,7 @@ using System.Collections.Generic;
 [Label("Переменная содержит одно из значений заданных через атрибут")]
 [Description("Конструктор форм использует этот аттрибут для формирования выпадающего списка с выбором значения."+
     "Приложение использует его в процессе выполнения валидации модели для проверки значений переменной. ")]
-public class InputSelectAttribute : ControlAttribute {
+public class InputSelectAttribute : BaseInputAttribute {
 
     [Parameter]
     public List<string> Options { get; set; } = new List<string>();
@@ -43,6 +43,7 @@ public class InputSelectAttribute : ControlAttribute {
             return $"Значение может быть только одним из заданных значений";
         return null;
     }
+
     public override string OnGetMessage(object model, string property, object value)
     {
         return $"{nameof(InputSelectAttribute)} утверждает что свойству {property} может быть задано только одно из заданных значений.";

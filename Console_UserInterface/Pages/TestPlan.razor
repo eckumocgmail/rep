@@ -1,0 +1,81 @@
+﻿@page "/testplan"
+@inherits BaseComponent
+@inject IServiceProvider provider
+@code
+{
+    public TestingReport Report { get; set; }
+    public TestingUnit Unit { get; set; }
+    public global::TypeNode<TestingElement> Root { get; set; }
+}
+@code
+{
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        this.Unit = new UserInterfaceUnit(provider);
+        this.Root = this.Unit.ToTreeNode();
+    }
+}
+@code
+{
+    bool ShowReport = false;
+    public void OnTestRunClicked()
+    {
+        this.ShowReport = true ;
+        StateHasChanged();
+    }
+}
+<CardContainer>
+    <CardHeader>
+        <TextComponent>Тестирование приложения</TextComponent>
+        <div>
+            <SearchControl SearchOptions="@SearchOptions" SearchQuery="@SearchQuery" Placeholder="@Placeholder" OnInput="OnInputSearch" OnSearch="OnSearchSubmited"></SearchControl>
+        </div>
+        <div>
+            <ButtonClick OnClick="OnTestRunClicked">Выполнить</ButtonClick>
+        </div>
+    </CardHeader>
+    <CardBody>
+        @if(ShowReport)
+        {
+            <TestReportView Model="this.Unit.DoTest(false)"></TestReportView>
+        }
+        <TypeNodeView TITem="TestingElement" Item="Root"></TypeNodeView>
+    </CardBody>
+    <CardFooter>
+        <StatusBar StatusName="StatusName" CurrentValue="CurrentValue"></StatusBar>
+    </CardFooter>
+</CardContainer>
+
+@code
+{
+    public string Placeholder { get; set; } = "Поиск";
+    public string SearchQuery { get; set; } = "";
+    public List<string> SearchOptions { get; set; } = new();
+    public EventCallback<string> OnInput { get; set; }
+    public EventCallback<string> OnSearch { get; set; }
+
+    public void OnSearchSubmited()
+    {
+
+    }
+
+    public void OnInputSearch()
+    {
+
+    }
+
+
+    public string StatusName { get; set; }
+    public int CurrentValue { get; set; }
+
+    public void ProgressStart()
+    {
+    }
+    public void Progress()
+    {
+    }
+    public void ProgressEnd()
+    {
+    }
+} 

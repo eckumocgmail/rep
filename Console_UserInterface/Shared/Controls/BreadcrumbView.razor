@@ -12,5 +12,9 @@
 @code 
 {
     [Parameter]
-    public IDictionary<string,string> links { get; set; }
+    public IDictionary<string, string> links { get; set; } = new Dictionary<string,string>()
+    {
+        { "Home", "http://localhost:8080" },
+        { "About", "http://localhost:8080/about" }
+    };
 }

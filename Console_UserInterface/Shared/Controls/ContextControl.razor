@@ -1,12 +1,8 @@
-﻿
-@code {
-
+﻿@code 
+{
     [Parameter]
     public global::ContextMenu Model { get; set; }
-
 }
-
-
 <ContextMenu Id="myMenu">
     @if (Model != null && Model.Items != null && Model.Items.Count() > 0)
     {
@@ -31,8 +27,6 @@
             </Item>
         }
     }
-
-
 </ContextMenu>
 
 <ContextMenuTrigger MenuId="@("ContextMenu"+(Model!=null?Model.GetHashCode():""))">

@@ -1,16 +1,25 @@
-﻿using System.Xml.Linq;
+﻿using System.Reflection;
+using System.Xml.Linq;
 
-namespace Console_UserInterface.AppUnits
+namespace Console_UserInterface.Services
 {
     public class AppBuilder
     {
+
+        public static Dictionary<string, Assembly> MODULES = new() 
+        {
+            { "Console_InputApplication" ,  typeof(Console_InputApplication.Program).Assembly },
+            { "Console_DataConnector" ,     typeof(Console_DataConnector.Program).Assembly },
+            { "Console_UserInterface" ,     typeof(Console_UserInterface.Program).Assembly }
+        };
+
         /// <summary>
         /// Модель меню навигации по типам из пространства имён
         /// </summary>        
         /// <param name="mapping">
         /// Маппинг значений для маршрута
         /// </param>
-        public static Dictionary<string, string> CreateNavMenu<T>(Dictionary<string, string> mapping = null)
+        public Dictionary<string, string> CreateNavMenu<T>(Dictionary<string, string> mapping = null)
         {
             Dictionary<string, string> result = new();
             var snamespace = typeof(T).Namespace;

@@ -1,0 +1,12 @@
+﻿@inject AppBuilder builder
+@inherits BaseComponent
+@code
+{
+    public Dictionary<string, string> MenuModel { get; set; }
+    protected override Task OnInitializedAsync()
+    {
+        return base.OnInitializedAsync();
+        this.MenuModel = builder.CreateNavMenu<HolderMenu>();
+    }
+}
+<NavModel Model="@MenuModel"></NavModel>

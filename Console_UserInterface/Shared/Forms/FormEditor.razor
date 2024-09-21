@@ -132,7 +132,7 @@ else
                 <div align="left" class="text text-danger">@kv.Key : @error</div>
             }
         }
-        @if(Debug)
+        @*if(Debug)
         {
             <p>@Model.GetType().GetTypeName()</p>
             <p>@Form.FormFields.Select(f => f.Name).ToJsonOnScreen()</p>
@@ -142,7 +142,7 @@ else
             <div align="left" class="text-black-50 text-success">
                 @Form.ToJsonOnScreen()
             </div>
-        }
+        }*@
         <div class="text-black-50 text-danger" align="left">@Form.Error</div>
         <div>            
             <div align="left">

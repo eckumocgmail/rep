@@ -20,7 +20,7 @@ namespace Mvc_Apteka.Entities
 
         [Required]
         public string ProductCatalogName { get; set; }
-        public virtual ICollection<ProductInfo> Products { get; set; }
+        public virtual System.Collections.Generic.ICollection<ProductInfo> Products { get; set; }
 
         public ProductCatalog()
         {

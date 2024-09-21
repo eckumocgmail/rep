@@ -10,10 +10,10 @@ using static InputConsole;
 /// <summary>
 /// Необходимо чтобы объект был Singleton
 /// </summary>
-public class AppProviderService: IServiceProvider   
-{   
-    
-    private static AppProviderService _instance = null;    
+public partial class AppProviderService : IServiceProvider
+{
+
+    private static AppProviderService _instance = null;
     public static AppProviderService GetInstance()
     {
         if (_instance == null)
@@ -30,12 +30,11 @@ public class AppProviderService: IServiceProvider
                 _instance.AddSingletons(Assembly.GetEntryAssembly().GetClassTypes());
                 _instance.AddSingletons(Assembly.GetExecutingAssembly().GetClassTypes());
             }
-            
+
         }
         return _instance;
     }
-
-  
+ 
 
 
     /// <summary>

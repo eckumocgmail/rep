@@ -11,8 +11,8 @@
 
         @if(menu.Expanded)
         {
-            <MenuItemView Model="@(menu.GetChildren().Select( node => (MainMenuBuilder.MenuItemModel)(node) ).ToList())">
-            </MenuItemView>
+            <MenuItem Model="@(menu.GetChildren().Select( node => (MainMenuBuilder.MenuItemModel)(node) ).ToList())">
+            </MenuItem>
         }
     }
 </div>

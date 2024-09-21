@@ -19,7 +19,13 @@ public class TextDataSetter
 
     public static void SetValue(object target, string property, object value)
     {
-        
+        if(target.IsExtends(typeof(Dictionary<string,object>)))
+        {
+            Dictionary<string, object> dict = (Dictionary<string, object>)target;
+            dict[property] = value;
+            return;
+        }
+
         var p = target.GetType().GetProperty(property);
         var ptype = p.PropertyType;
         if (Typing.IsDateTime(ptype))

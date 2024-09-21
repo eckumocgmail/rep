@@ -4,7 +4,6 @@
 
 @inject NavigationManager nav
 @inject SigninUser signin
-@inject AuthorizationDbContext authdb
 
 @code 
 {
@@ -30,18 +29,18 @@
                 return;
             var user = signin.Verify();
             var uid = user.AccountId;
-            authdb.UserAccounts_.First(u => u.Id == uid).ActivationKey = code;
-            authdb.SaveChanges();
+            //authdb.UserAccounts_.First(u => u.Id == uid).ActivationKey = code;
+            //authdb.SaveChanges();
         }
         catch (Exception)
         {
-            
+
         }
     }
     public string GetActivetionCode() {
         if (signin.IsSignin() == false)
             return null;
-        return authdb.UserAccounts_.First(a => a.Id == signin.Verify().Account.Id).ActivationKey;
+        return "";// authdb.UserAccounts_.First(a => a.Id == signin.Verify().Account.Id).ActivationKey;
     }
     public string GenerateActivationCode()
     {

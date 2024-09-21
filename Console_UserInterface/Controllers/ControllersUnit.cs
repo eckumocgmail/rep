@@ -1,6 +1,6 @@
-﻿namespace Console_UserInterface.AppUnits
+﻿namespace Console_UserInterface.Controllers
 {
-    internal class DeliveryControllersTest : TestingElement
+    internal class ControllersUnit : TestingElement
     {
         public override void OnTest()
         {
