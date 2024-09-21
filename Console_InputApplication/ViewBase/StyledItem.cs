@@ -80,6 +80,7 @@ public class StyledItem : ViewBuilder
         TextAlign = "left";
         Cursor = "inherit";
         Changed = false;
+        Padding = Margin = TextIndent = 0;
     }
 
     public StyledItem GetStyle()
