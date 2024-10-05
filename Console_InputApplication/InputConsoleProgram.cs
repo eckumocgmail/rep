@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
+using System.Reflection;
 
 namespace Console_InputApplication 
 {
@@ -58,12 +59,17 @@ namespace Console_InputApplication
         /// Выполнение программы
         /// </summary>       
         public static void Main(string[] args)
+        {            
+            args.Info(Assembly.GetExecutingAssembly().GetName().Name);
+            ServiceFactory.Get().AddTypes(typeof(Console_InputApplication.Program).Assembly);            
 
-        {
-            Host.CreateDefaultBuilder()
-                .ConfigureWebHostDefaults(webBuilder =>
-                    webBuilder.UseStartup<Program.HttpStartup>())
-                .Build().Run();
+            if (args.Contains("http"))
+            {
+                Host.CreateDefaultBuilder()
+                    .ConfigureWebHostDefaults(webBuilder =>
+                        webBuilder.UseStartup<Program.HttpStartup>())
+                    .Build().Run();
+            }            
         }
 
 

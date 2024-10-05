@@ -2,6 +2,10 @@
 {
     public class SelectControlAttribute: ControlAttribute
     {
+        public SelectControlAttribute(string ControlType) : base(ControlTypes.Select)
+        {
+        }
+
         public string Value { get; set; }
         public List<string> Options { get; set; }
 

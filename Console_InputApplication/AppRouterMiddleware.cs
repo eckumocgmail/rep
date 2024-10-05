@@ -16,7 +16,7 @@ public class AppRouterMiddleware: TypeNode<AppRouterMiddleware>, IMiddleware
     {
     }
     
-    public void AddControllerAction( string controller, string action)
+    public void AddControllerAction( [SelectType]string controller, string action, [InputSelect("Basic,Bearer,KeyCloak,GateKeeper")]string authorization="no")
     {
         var route = $"/api/{controller}/{action}";
         var ctrl = controller.ToType();
@@ -47,6 +47,21 @@ public class AppRouterMiddleware: TypeNode<AppRouterMiddleware>, IMiddleware
         {
             AddControllerAction(controller, actionName);
         }
+    }
+
+    public object Call(string controller, string action, Dictionary<string, object> arguments)
+    {
+        try
+        {
+            var result = controller.New().Call(action, arguments);
+            return result;
+        }
+        catch(Exception ex)
+        {
+            this.Error(ex.ToDocument());
+            throw;
+        }
+
     }
 
 

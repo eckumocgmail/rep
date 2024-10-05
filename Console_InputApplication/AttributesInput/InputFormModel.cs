@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+﻿using Console_InputApplication.ViewEvents.Property;
+
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 using Newtonsoft.Json;
 
@@ -72,8 +74,7 @@ public class InputFormModel
     [NotInput]
     [UpdateWhenChanged(false)]    
     public bool IsValid { get; set; } = false;
-
-
+    public List<string> Properties { get; }
 
     public InputFormModel() : base()
     {
@@ -83,6 +84,7 @@ public class InputFormModel
         Error = "";
         Container = "group";
         Size = "normal";
+        //IsValid = this.Errors.Where(kv => kv.Value.Count() > 0).Count() == 0;
     }
     public InputFormModel(object item) : this()
     {
@@ -96,14 +98,16 @@ public class InputFormModel
             Title = item.GetType().GetLabel();
             Description = item.GetType().GetDescription();
             var ptype = item.GetType();            
-            var properties = ptype.GetInputProperties();            
-            Update(properties.ToArray());
+            this.Properties = ptype.GetInputProperties();            
+            Update(Properties.ToArray());
             this.Json = this.Item.ToJsonOnScreen();
         }
         catch(Exception ex)
         {
             this.Error($"Ошибка при инициаллизации {GetType().GetTypeName()}: {ex}");
         }
+        this.Errors = this.Item.Validate(this.Properties);
+        IsValid = this.Errors.Where(kv => kv.Value.Count() > 0).Count() == 0;
     }
 
     public InputFormModel(object item, params string[] propertyNames) : this()
@@ -116,7 +120,8 @@ public class InputFormModel
         Description = item.GetType().GetDescription();
         Item = item;
         Update(propertyNames);
-
+        this.Errors = this.Item.Validate(this.Properties);
+        IsValid = this.Errors.Where(kv => kv.Value.Count() > 0).Count() == 0;
     }
 
 
@@ -153,7 +158,9 @@ public class InputFormModel
         form.Item = item;
         form.Title = form.Title == null ? AttrsUtil.LabelFor(item) : form.Title;
         form.Description = AttrsUtil.DescriptionFor(item);
-        if (Typing.ReferenceIsDictionary(item) == false)
+        var typeName = item.GetTypeName();
+        this.Info(typeName);
+        if (typeName.Contains("Dictionary")== true)
         {
             form.FormFields = CreateFormFields(item.GetType(), propertyNames, item);
 
@@ -346,8 +353,8 @@ public class InputFormModel
             }
             else
             {
-
-                /*var p = property.GetValue(Item);
+                var property = paramModel.Type.ToType().GetProperty(paramModel.Name);
+                var p = paramModel.Type.ToType().New();
                 if (p != null)
                 {
                     var table = ForDictionary(p);
@@ -360,9 +367,7 @@ public class InputFormModel
                     field.Value = propertyType.New();
                     field.Type = "custom";
                     field.Value = property.PropertyType.New();
-                }*/
-
-
+                }
             }
         }
         else
@@ -385,7 +390,7 @@ public class InputFormModel
                 Type fieldType = ReflectionService.TypeForShortName(field.Type);
                 ControlAttribute attribute = ReflectionService.Create<ControlAttribute>(fieldType, new object[] { input });
 
-                //field.Control = attribute.CreateControl(field);
+                field.Control = attribute.CreateControl(field);
                 field.Type = field.Type.Replace("Attribute", "");
                 field.TextValue = input;
                 switch (field.Type)
@@ -555,8 +560,8 @@ public class InputFormModel
                     throw new Exception("Не найден атрибут соответвующий типу элемента управления " + field.Type);
                 Type fieldType = ReflectionService.TypeForShortName(field.Type);
                 ControlAttribute attribute = ReflectionService.Create<ControlAttribute>(fieldType, new object[] { input });
-
-                //field.Control = attribute.CreateControl(field);
+                
+                field.Control = attribute.CreateControl(field);
                 field.Type = field.Type.Replace("Attribute", "");
                 field.TextValue = input;
                 switch (field.Type)

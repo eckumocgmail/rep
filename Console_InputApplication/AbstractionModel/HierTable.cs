@@ -18,7 +18,5 @@ public class HierTable<T>: DictionaryTable
         HierTable<T> parentHier = ((HierTable<T>)((object)Parent));
         return (Parent != null) ? parentHier.GetPath(separator) + separator + Name : Name;
     }
-
     
 }
- 

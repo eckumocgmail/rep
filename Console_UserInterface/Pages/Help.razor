@@ -2,18 +2,21 @@
 @using ApplicationCommon.CommonResources;
 @inherits BaseComponent
 @inject IServiceProvider provider
+@inject HelpService help
 @code
 {
-   
-    public global::TypeNode<object> Root { get; set; }
+    public Dictionary<string, string> Articles { get;set; }
+    public string Current { get; set; }
+    public global::TypeNode<string> Contents { get; set; }
 }
 @code
 {
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        
-        this.Root = new global::TypeNode<object>();
+
+        this.Contents = help.GetContents();
+        this.Articles = help.GetArticles();
     }
 }
 @code
@@ -22,13 +25,29 @@
 }
 <CardContainer>
     <CardHeader>
-        <TextComponent>Спарвочная информация</TextComponent>
+        <TextComponent>Спарвочная информация/@Current</TextComponent>
         <SearchControl SearchOptions="@SearchOptions" SearchQuery="@SearchQuery" Placeholder="@Placeholder" OnInput="OnInputSearch" OnSearch="OnSearchSubmited"></SearchControl>
     </CardHeader>
     <CardBody>
         <SplitPane LeftSize="1" RightSize="2">
-            <Left></Left>
-            <Right></Right>
+            <Left>
+                <ListGroup Items="@(Contents.GetChildren().Select(ch => ch.NodeName).ToList())" OnListGroupItemClickedCallback="evt=> { Current=evt; StateHasChanged(); }"></ListGroup>
+            </Left>
+            <Right>
+                 
+                @if(Current is not null)
+                {
+                    @if (Articles.ContainsKey(Current)==false)
+                    {
+                        <div class="alert alert-warning">Не найдено содержимое статьи @Current</div>
+                    }
+                    else
+                    {
+                        <p>@Articles[Current]</p>
+                    }
+                    
+                }
+            </Right>
         </SplitPane>
     </CardBody>
     <CardFooter>

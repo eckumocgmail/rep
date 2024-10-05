@@ -1,0 +1,32 @@
+﻿@*
+    Список забронированных услуг
+*@
+@page "/booking/list-bookings"
+@inject ServiceController sc
+@code 
+{
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        WorkNames = sc.GetWorkList().Select( wrk => wrk.WorkName ).ToList();
+    }
+}
+<CardContainer>
+    <CardHeader>
+        <SearchControl></SearchControl>
+        <TextComponent FontSize="@(20)">Выбранные услуги</TextComponent>
+        <ListGroup Items="@SelectedWorks" OnListGroupItemClickedCallback="item => { WorkNames.Add(item); SelectedWorks.Remove(item); StateHasChanged(); }">
+        </ListGroup>
+    </CardHeader>
+    <CardBody>
+        <TextComponent FontSize="@(20)">Доступные услуги</TextComponent>
+        <ListGroup Items="@WorkNames" OnListGroupItemClickedCallback="item => { WorkNames.Remove(item); SelectedWorks.Add(item); StateHasChanged(); }">
+        </ListGroup>
+    </CardBody>
+</CardContainer>
+@code
+{
+    [Parameter]
+    public List<string> WorkNames { get; set; }
+    public List<string> SelectedWorks { get; set; } = new();    
+}

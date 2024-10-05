@@ -10,6 +10,8 @@ namespace Console_UserInterface
         {
             this.Append(new AuthorizationUnit(provider));
             this.Append(new DeliveryServicesUnit());
+            this.Append(new AppServicesUnit());
+            
         }
     }
 

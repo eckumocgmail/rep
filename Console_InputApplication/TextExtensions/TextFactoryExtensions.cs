@@ -41,6 +41,19 @@ public static class TextFactoryExtensions
         }
         
     }
+
+    public static string ParseSubstring(this string text, string start, string end)
+    {
+        if (text == null)
+            throw new ArgumentNullException("text");
+        if (text.IndexOf(start) != -1)
+        {
+            var substr = text.Substring(text.IndexOf(start) + start.Length, text.IndexOf(end) - text.IndexOf(start) - start.Length);
+            return substr;
+        }
+        throw new ArgumentException($"Строка: {text} не содержит подстроки {start}");
+    }
+
     public static Type ToType(this string text)
     {                      
         if(text == null)

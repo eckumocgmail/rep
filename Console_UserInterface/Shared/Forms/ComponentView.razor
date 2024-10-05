@@ -1,4 +1,5 @@
 ﻿@using System.Reflection;
+@using Console_UserInterface.ControlAttributes;
 @using Console_UserInterface.Services;
 @using Mvc_Apteka.Entities;
 @using static Console_UserInterface.Services.Location.LocationDbContext;
@@ -158,7 +159,7 @@
                     @if (Model.Control is not null)
                     {
 
-                        @switch (Model.Control.GetType().GetTypeName())
+                        @switch (Model.Control.GetTypeName())
                         {
                             case nameof(InputSelectAttribute):
                                 InputSelectAttribute inputSelect = (InputSelectAttribute)Model.Control;
@@ -171,6 +172,10 @@
                             case nameof(InputComboboxAttribute):
                                 InputComboboxAttribute inputCombobox = (InputComboboxAttribute)Model.Control;
                                 <ComboBox Value="@Model.Value.ToString()" OnInput="((string evt) => OnInputHandle(evt))" Label="@Model.Label"></ComboBox>
+                                break;
+                            case nameof(SelectDataAttribute):
+                                SelectDataAttribute selectData = (SelectDataAttribute)Model.Control;
+                                <SelectBox Value="@Model.Value.ToString()" OnChange="((string evt) => OnInputHandle(evt))" Label="@Model.Label" Options="@(selectData.Options)"></SelectBox>
                                 break;
                             default:
                                 <div>Тип control @Model.Control.GetType() не поддерживается</div>

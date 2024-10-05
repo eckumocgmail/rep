@@ -70,9 +70,7 @@ public static class AttributesInfoExtensions
     }
 
     [Label("Получить атрибуты к свойству")]
-    public static Dictionary<string, string> GetPropertyAttributes(
-        this Type ptype, string property)
-
+    public static Dictionary<string, string> GetPropertyAttributes( this Type ptype, string property)
     {
         var res = new Dictionary<string, string>();
         var pproperty = ptype.GetProperties().First(p => p.Name == property);
@@ -93,6 +91,8 @@ public static class AttributesInfoExtensions
         if (methodInfo == null)
             throw new ArgumentException(nameof(method));
         var parInfo = methodInfo.GetParameters().FirstOrDefault(p => p.Name == parameter);
+        if (parInfo is null)
+            throw new ArgumentException("parameter",$"Не найден параметр {parameter} в методе {ptype.GetTypeName()}.{method}");
         var res = new Dictionary<string, string>();
         foreach (var kv in parInfo.ParameterType.GetCustomAttributesData())
         {

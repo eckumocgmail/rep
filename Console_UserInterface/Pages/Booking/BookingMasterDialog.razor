@@ -1,0 +1,30 @@
+﻿@inject IInputModalService input
+@code 
+{
+    int step = 1;
+}
+<CardContainer>
+    <CardHeader>
+        
+    </CardHeader>
+    <CardBody>
+        @switch( step )
+        {
+            case 1:
+                <SelectWorks></SelectWorks>
+                break;
+            case 2:
+                <SelectService></SelectService>
+                break;
+            case 3:
+                <SelectTime></SelectTime>
+                break;
+            case 4:
+                <SubmitBooking></SubmitBooking>
+                break;
+        }
+    </CardBody>
+    <CardFooter>
+
+    </CardFooter>
+</CardContainer>

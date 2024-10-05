@@ -1,5 +1,8 @@
 ﻿@inherits LayoutComponentBase
-
+@code{
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+}
 <div class="bb-page">
 
     <Sidebar @ref="sidebar"
@@ -14,6 +17,7 @@
 
         <article class="content px-4">
             <div class="py-2">
+                @ChildContent
                 @Body
             </div>
         </article>

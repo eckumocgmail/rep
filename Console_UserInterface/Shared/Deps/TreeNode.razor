@@ -35,7 +35,7 @@
     [Parameter]
     public EventCallback<bool> OnChanged { get; set; }
 
-    void CheckEvent(bool vchecked)
+    public void CheckEvent(bool vchecked)
     {
         Checked = vchecked;
         foreach (var pchild in Children)

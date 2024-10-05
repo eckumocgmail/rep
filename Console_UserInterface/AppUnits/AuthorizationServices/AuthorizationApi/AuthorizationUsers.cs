@@ -19,7 +19,7 @@ public class AuthorizationUsers: AuthorizationCollection<UserContext>, APIUsers
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public string GetByEmail(string email)
+    public string GetByEmail([InputEmail][NotNullNotEmpty]string email)
     {
         var p = this._memory.Where(u => u.Value is not null && u.Value.Account is not null && u.Value.Account.Email is not null &&
             u.Value.Account.Email.ToUpper() == email.ToUpper());
@@ -27,7 +27,7 @@ public class AuthorizationUsers: AuthorizationCollection<UserContext>, APIUsers
             return null;        
         return p.First().Key;
     }
-    public UserContext FindByEmail(string email)
+    public UserContext FindByEmail([InputEmail][NotNullNotEmpty] string email)
     {
         var p = this._memory.Where(u => u.Value.Account.Email.ToUpper() == email.ToUpper());
         if (p is null || p.Count() == 0)

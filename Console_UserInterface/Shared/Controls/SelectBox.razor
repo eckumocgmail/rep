@@ -13,9 +13,12 @@
 <div class="input-group">
     <label>@Label</label>
     <select class="form-control" @onchange="(evt => { OnChange.InvokeAsync( evt.Value.ToString()); StateHasChanged(); } )" value="@Value">
-        @foreach (var option in Options)
+        @if(Options is not null)
         {
-            <option>@option</option>
+            @foreach (var option in Options)
+            {
+                <option>@option</option>
+            }
         }
     </select>
 </div>

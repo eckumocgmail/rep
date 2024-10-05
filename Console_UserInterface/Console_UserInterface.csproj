@@ -5,6 +5,7 @@
     <Nullable>disable</Nullable>
 	<NoWarn>RAZORSDK1006;NETSDK1138;BL0005;BL0007;CS0649</NoWarn>
     <ImplicitUsings>enable</ImplicitUsings>
+    <StartupObject>Console_UserInterface.Program</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>
@@ -27,9 +28,9 @@
 		<PackageReference Include="Blazored.Modal" Version="6.0.1" />
 		<PackageReference Include="MailKit" Version="4.6.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Authorization" Version="7.0.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.1" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="7.0.1" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.1" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.20" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="7.0.20" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.20" />
 		<PackageReference Include="NSwag.CodeGeneration.CSharp" Version="14.1.0" />
 		<PackageReference Include="NSwag.MSBuild" Version="14.1.0">
 			<PrivateAssets>all</PrivateAssets>
@@ -44,11 +45,11 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shared\Forms\FormControl.razor" />
     <None Include="Shared\Forms\InputForm.razor" />
     <None Include="Shared\Forms\ValidationForm.razor" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\BookingModel\BookingModel.csproj" />
     <ProjectReference Include="..\ChartsLib\ChartsLib.csproj" />
     <ProjectReference Include="..\Console_DataConnector\Console_DataConnector.csproj" />
     <ProjectReference Include="..\Console_InputApplication\Console_InputApplication.csproj" />
@@ -56,7 +57,14 @@
   <ItemGroup>
     <Folder Include="AppUnits\InterfaceModule\InterfaceModel\" />
     <Folder Include="AppUnits\InterfaceModule\InterfaceApi\" />
-    <Folder Include="Help\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Help\Articles\Customer.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Help\Contents">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

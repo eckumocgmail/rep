@@ -1,16 +1,26 @@
 ﻿using System;
+using System.Collections;
 
 [Label("Массив простых значений")]
 public class InputPrimitiveCollectionAttribute : BaseInputAttribute
 {
-
-
-    public InputPrimitiveCollectionAttribute(): base(InputTypes.PrimitiveCollection){
+    public InputPrimitiveCollectionAttribute(): base(InputTypes.PrimitiveCollection)
+    {
         
     }
+
     public override bool IsValidValue(object value)
     {
-        return true;
+        if (value is null)
+            return true;
+        if (value.GetType().IsImplements(typeof(IEnumerable)) == false)
+            return false;
+        string typeName = value.GetType().GetTypeName();
+        if (typeName.IndexOf("<") == -1)
+            return false;
+        if (typeName.ParseSubstring("<", ">").Split(",").All(name => name.ToType().IsPrimitiveForType()))
+            return true;
+        return false;                
     }
 
     public override string OnValidate(object model, string property, object value)
@@ -27,6 +37,6 @@ public class InputPrimitiveCollectionAttribute : BaseInputAttribute
 
     public override string OnGetMessage(object model, string property, object value)
     {
-        return $"Валидация свойства {property} модели {model?.GetType()?.GetTypeName()} завершена с ошибкой для значения {value}";
+        return $"Валидация {GetType().GetTypeName()}  свойства {property} модели {model?.GetType()?.GetTypeName()} завершена с ошибкой для значения {value}";
     }
 }

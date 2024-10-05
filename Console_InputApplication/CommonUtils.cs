@@ -385,6 +385,13 @@ public static List<MyMessageProperty> ParseActions(Type type)
         return PRIMITIVE_TYPES.Contains(ParsePropertyType(propertyType));
     }
 
+    public static bool IsPrimitiveForType(this Type propertyType)
+    {
+        if (propertyType is null)
+            return false;
+        return PRIMITIVE_TYPES.Contains(ParsePropertyType(propertyType));
+    }
+     
     public static bool IsPrimitive(Type modelType, string property)
     {
         return PRIMITIVE_TYPES.Contains(ParsePropertyType(modelType.GetProperty(property).PropertyType));

@@ -15,7 +15,7 @@ public static class StringExtensions
     /// 
     /// </summary>
     public static Dictionary<string, string> GetMethodsLabels(this Type ptype)
-    {
+    {        
         var methods = new Dictionary<string, string>(
             ptype.GetOwnMethodNames().Select(name => new KeyValuePair<string, string>(ptype.GetMethodLabel(name), name)));
         return methods;
@@ -120,11 +120,20 @@ public static class StringExtensions
         return true;
     }
 }
+
+
+
 public static class TypeAttributesExtensions
 {
     public static Dictionary<string, string> GetAttributes(this Type p)
     {
-
+        var provider = new CustomDataProvider();
+        if (provider.GetTypes().Contains(p.GetTypeName()) == false)
+        {
+            provider.ToType(p);
+        }
+        var service = new CustomService();
+       
         Dictionary<string, string> attrs = new Dictionary<string, string>();
         if (p == null)
         {
@@ -225,8 +234,6 @@ public static class TypeExtensions2
         => Assembly.GetExecutingAssembly().GetTypes().Where(type=>type.IsClass).Where(t => t.IsExtendsFrom(method));
 
     
-
-
 
     public static TResult GetValue<TResult>(this PropertyInfo Property, object target)
     {

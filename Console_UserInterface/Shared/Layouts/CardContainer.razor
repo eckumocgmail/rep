@@ -2,7 +2,7 @@
 @code
 {
     [Parameter] public RenderFragment CardHeader { get; set; }
-    [Parameter] public RenderFragment CardFooter { get; set; }
+    [Parameter] public RenderFragment? CardFooter { get; set; }
     [Parameter] public RenderFragment CardBody { get; set; }
     [Parameter] public string Width { get; set; } = "100%";
     [Parameter] public string Height { get; set; } = "100%";

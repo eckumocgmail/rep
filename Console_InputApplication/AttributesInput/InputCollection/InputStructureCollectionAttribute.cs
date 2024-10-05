@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 
 [Label("Массив структурированного типа")]
@@ -8,7 +9,16 @@ public class InputStructureCollectionAttribute : BaseInputAttribute
     public Type ItemType { get; }
     public override bool IsValidValue(object value)
     {
-        return true;
+        if (value is null)
+            return true;
+        if (value.GetType().IsImplements(typeof(IEnumerable)) == false)
+            return false;
+        string typeName = value.GetType().GetTypeName();
+        if (typeName.IndexOf("<") == -1)
+            return false;
+        if (typeName.ParseSubstring("<", ">").Split(",").All(name => name.ToType().IsPrimitiveForType()==false))
+            return true;
+        return false;
     }
     public Type ProviderType { get; }
 
@@ -53,14 +63,7 @@ public class InputStructureCollectionAttribute : BaseInputAttribute
         return null;
     }
 
-    /// <summary>
-    /// Предоставляет объекты 
-    /// </summary>
-    public interface IOptionsProvider
-    {
-        public IEnumerable<object> Get();
-    }
-
+ 
     public override string OnValidate(object model, string property, object value)
     {
         return null;

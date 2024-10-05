@@ -1,0 +1,39 @@
+﻿@typeparam TITem
+@code
+{
+    [Parameter] public EventCallback<TypeNode<TITem>> OnSelect { get; set; }
+    [Parameter] public bool Selectable { get; set; } = false;
+}
+@if (Item is not null)
+{
+    <div class="form-check" @onclick="evt => { if(Selectable) OnSelect.InvokeAsync(Item); StateHasChanged();}">
+        <input class="form-check-input" type="checkbox" checked="@Checked" @onchange="(async evt => { Checked = !Checked; await OnChanged.InvokeAsync(this); StateHasChanged(); })">
+        <label class="form-check-label">
+            @Item.NodeName
+        </label>
+    </div>
+    @foreach (var p in Item.GetChildren())
+    {
+        <div style="margin-left: 20px;">
+            <NodeView TITem="TITem" Item="@p" OnChanged="OnChangedSubmit"></NodeView>
+        </div>
+    }
+}
+else
+{
+    <div>Не задан параметр Item</div>
+}
+@code
+{
+    [Parameter]
+    public TypeNode<TITem> Item { get; set; }
+    [Parameter]
+    public bool Checked { get; set; } = true;
+    [Parameter]
+    public EventCallback<NodeView<TITem>> OnChanged { get; set; }
+
+    public async Task OnChangedSubmit(NodeView<TITem> item)
+    {
+        await OnChanged.InvokeAsync(item);
+    }
+}

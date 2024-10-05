@@ -1,7 +1,7 @@
 ﻿<ul class="list-group" style="overflow-y: auto;">
     @foreach(var item in Items)
     {
-        <li id="code_@(GetHashCode())_@(Items.IndexOf(item))" onmouseleave="this.classList.remove('active')" onmouseover="this.classList.add('active')" class="list-group-item" @onclick="OnListGroupItemClicked">
+        <li id="code_@(GetHashCode())_@(Items.IndexOf(item))" onmouseleave="this.classList.remove('active')" onmouseover="this.classList.add('active')" class="list-group-item" @onclick="evt => { OnListGroupItemClicked(item); }">
        </li>
     } 
 </ul>
@@ -13,7 +13,7 @@
 
     [Parameter]
     public EventCallback<string> OnListGroupItemClickedCallback { get; set; }
-    public async Task OnListGroupItemClicked() { await OnListGroupItemClickedCallback.InvokeAsync(); }
+    public async Task OnListGroupItemClicked(string item) { await OnListGroupItemClickedCallback.InvokeAsync(item); }
 
     protected override void OnAfterRender(bool firstRender)
     {

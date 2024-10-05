@@ -82,10 +82,11 @@ public class HttpHeaderTokenProvider : ITokenProvider
                            "Authorization", id,
                            new CookieOptions() { SameSite = SameSiteMode.Unspecified });*/
 
-    }
-
-    
+    }    
 }
+
+
+
 public class HttpTokenProvider : ITokenProvider
 {
 

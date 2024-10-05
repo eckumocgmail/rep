@@ -1,0 +1,56 @@
+﻿@using Highcharts.Models.HighchartLineBasic;
+@inject IJSRuntime js
+@inherits BaseComponent
+@code 
+{
+    [Parameter]
+    public string Title { get; set; } 
+    [Parameter]
+    public string Subtitle { get; set; }
+    [Parameter]
+    public string YAxis { get; set; }
+    [Parameter]
+    public string SeriesName { get; set; }
+    [Parameter]
+    public List<float?> SeriesData { get; set; }
+
+}
+@code
+{
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        SeriesName = "Показатель";
+        SeriesData = new List<float?>() { 100f, 200f, 300f };
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if(firstRender)
+        {
+            await js.InvokeAsync<int>("createChart", $"container_{GetHashCode()}", 
+            new HighchartLineBasic()
+            {
+                Title = new HighchartLineBasicTitle() { Text = Title },
+                Subtitle = new HighchartLineBasicSubtitle() { Text = Subtitle },
+                YAxis = new HighchartLineBasicYAxis()
+                {
+                    Title = new HighchartLineBasicYAxisTitle()
+                    {
+                        Text = YAxis
+                    }
+                },
+                Series = new() 
+                { 
+                    new HighchartLineBasicSeriesItem()
+                    {
+                        Name=SeriesName, 
+                        Data = SeriesData
+                    }  
+                }
+            } );
+        }
+    }
+}
+<div id="container_@GetHashCode()"></div>

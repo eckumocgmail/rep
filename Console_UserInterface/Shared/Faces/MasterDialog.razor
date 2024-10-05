@@ -1,4 +1,5 @@
-﻿@inherits BaseComponent
+﻿@attribute [Label("")]
+@inherits BaseComponent
 @code
 {
     [Parameter]
@@ -14,31 +15,35 @@
     [NotNullNotEmpty]
     [Parameter]
     public EventCallback<List<object>> OnComplete { get; set; }
-
+    public Console_UserInterface.Shared.Forms.FormModel FormModelRef;
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
     }
 }
-
 <CardContainer>
     <CardHeader>
-        <h2>Заголовок диалога</h2>
+        <h2>@Title @(Cursor+1) шаг</h2>        
     </CardHeader>
     <CardBody>
-        <FormModel Form="@(new InputFormModel(Models[Cursor]))"></FormModel>
+        <FormModel @ref="@FormModelRef" Form="@(new InputFormModel(Models[Cursor]))"></FormModel>
     </CardBody>
     <CardFooter>
-        <button class="btn btn-sm btn-primary" @onclick="OnSubmitClicked">@(Cursor == (Models.Count()-1) ? "готово" : "далее")</button>
+        @FormModelRef?.Form?.Errors.ToJsonOnScreen()
+        <button class="btn btn-sm btn-primary @((FormModelRef is not null && FormModelRef.Form is not null && FormModelRef.Form.IsValid == false? "disabled": ""))" @onclick="OnSubmitClicked">@(Cursor == (Models.Count() - 1) ? "готово" : "далее")</button>
         <button class="btn btn-sm btn-primary" @onclick="OnReturnClicked">@(Cursor == 0 ? "отмена" : "назад")</button>
     </CardFooter>
 </CardContainer>
 @code
 {
+    [Parameter]
+    public string Title { get; set; }
+
     public async Task OnCompleted()
     {
         await OnComplete.InvokeAsync(Models);
     }
+
     public async Task OnSubmitClicked()
     {        
         if (Cursor == (Models.Count()-1))
@@ -52,10 +57,12 @@
         }
 
     }
+
     public async Task OnCanceled()
     {
         await OnCancel.InvokeAsync(Models);
     }
+
     public async Task OnReturnClicked()
     {
         

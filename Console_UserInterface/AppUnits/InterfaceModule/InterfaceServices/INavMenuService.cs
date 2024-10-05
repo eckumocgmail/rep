@@ -127,7 +127,17 @@ public interface INavMenuService
 public class NavMenuDbContext : DbContext
 {
     public DbSet<NavLinkNavLink> NavLinks { get; set; }
+    public NavMenuDbContext( ) : base( ) { }
     public NavMenuDbContext(DbContextOptions<NavMenuDbContext> options) : base(options) { }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        base.OnConfiguring(optionsBuilder);
+        if(optionsBuilder.IsConfigured==false)
+        {
+            optionsBuilder.UseSqlServer($@"Data Source=DESKTOP-IHJM9RD;Initial Catalog={GetType().GetTypeName()};Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False");
+        }
+    }
 }
 public static class NavMenuServiceExtension
 {
@@ -135,7 +145,8 @@ public static class NavMenuServiceExtension
     {
         services.AddOpenIcons();
         services.AddScoped<INavMenuService, NavMenuService>();
-        services.AddDbContext<NavMenuDbContext>(options => options.UseInMemoryDatabase(nameof(NavMenuDbContext)));
+        services.AddDbContext<NavMenuDbContext>(options => 
+            options.UseSqlServer($@"Data Source=DESKTOP-IHJM9RD;Initial Catalog={typeof(NavMenuDbContext).GetTypeName()};Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False"));
         return services;
     }
 }

@@ -48,7 +48,11 @@ public sealed class SigninService : BaseSignin<ServiceContext, ServiceSertificat
 
     public object SigninByLoginAndPassword(string username, string password)
     {
-        throw new NotImplementedException();
+        return new
+        {
+            username = username,
+            password = password
+        };
     }
 
     public override T GetFromSession<T>(string key)

@@ -35,13 +35,15 @@
         StateHasChanged();
     }
 }
+
+
 <CardContainer>
     <CardHeader>
         <ButtonClick OnClick="OnAddMenuItemClicked">Добавить</ButtonClick>
     </CardHeader>
     <CardBody>
- 
-        <NavModel Links="@Links"></NavModel>
+        <Console_UserInterface.Shared.Menu.MainMenu></Console_UserInterface.Shared.Menu.MainMenu>
+        <NavLinks Links="@Links"></NavLinks>
     </CardBody>
     <CardFooter></CardFooter>
 </CardContainer>

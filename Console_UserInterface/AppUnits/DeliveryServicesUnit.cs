@@ -8,7 +8,8 @@ using Console_BlazorApp.AppUnits.DeliveryTests;
 
 namespace Console_UserInterface.AppUnits
 {
-    [Label("Тестирование приложения для продажи и доставки авто-товаров.")]
+    [Label("Тестирование приложения для продажи и доставки " +
+        "авто-товаров.")]
     public class DeliveryServicesUnit : TestingUnit
     {
         public DeliveryServicesUnit(IServiceProvider provider = null) : base(provider)

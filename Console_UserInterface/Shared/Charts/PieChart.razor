@@ -1,0 +1,20 @@
+﻿@using Highcharts.Models.HighchartLineBasic;
+@inject IJSRuntime js
+@inherits BaseComponent
+@code
+{
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if(firstRender)
+        {            
+            await js.InvokeAsync<int>("createChart", $"container_{GetHashCode()}", new Highcharts.Models.HighchartPieDrilldown.HighchartPieDrilldown());
+        }
+    }
+}
+<div id="container_@GetHashCode()"></div>

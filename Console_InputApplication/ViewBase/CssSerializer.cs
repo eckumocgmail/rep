@@ -9,7 +9,7 @@ public class CssSerializer
     /// <param name="valuesMap"></param>
     /// <param name="attrsMap"></param>
     /// <returns></returns>
-    internal string Seriallize(Dictionary<string, object> valuesMap, Dictionary<string, Dictionary<string,string>> attrsMap)
+    public string Seriallize(Dictionary<string, object> valuesMap, Dictionary<string, Dictionary<string,string>> attrsMap)
     {
         string text = "";        
         foreach(var p in valuesMap)
@@ -20,7 +20,7 @@ public class CssSerializer
         return text;
     }
 
-    private object ToQualifiedString(object value, Dictionary<string, string> dictionary)
+    public object ToQualifiedString(object value, Dictionary<string, string> dictionary)
     {
         throw new NotImplementedException();
     }

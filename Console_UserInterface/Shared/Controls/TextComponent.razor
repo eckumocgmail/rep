@@ -2,16 +2,20 @@
 @code
 {
     [InputSelect("white,dark,info,warn,success,danger,warning,primary,secondary")]
+    [Parameter]
     public string Color { get; set; } = "dark";
 
     [InputSelect("white,dark,info,warn,success,danger,warning,primary,secondary")]
+    [Parameter]
     public string Background { get; set; } = "white";
 
     [InputSelect("start,end,center")]
+    [Parameter]
     public string Align { get; set; } = "start";
 
     [InputNumber]
     [InputPositiveInt]
+    [Parameter]
     public int FontSize { get; set; } = 12;
 
     [Parameter]

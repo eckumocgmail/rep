@@ -10,6 +10,7 @@ using static InputConsole;
 /// <summary>
 /// Необходимо чтобы объект был Singleton
 /// </summary>
+/// 
 public partial class AppProviderService : IServiceProvider
 {
 
@@ -71,7 +72,8 @@ public partial class AppProviderService : IServiceProvider
     /// <param name="serviceType"></param>
     /// <returns></returns>
     public virtual object GetService(Type serviceType)
-        => Factories.ContainsKey(serviceType) ?
+        => serviceType is null? throw new ArgumentNullException():
+            Factories.ContainsKey(serviceType) ?
             Factories[serviceType].Invoke(this) :
             throw new ArgumentException("serviceType",$"{serviceType}");
 
@@ -94,7 +96,9 @@ public partial class AppProviderService : IServiceProvider
         {
             try
             {
-                var constructor = type.GetConstructors().FirstOrDefault();
+                var constructor = type.GetConstructors().FirstOrDefault(c => c.GetParameters().Count() == 0);
+                if (constructor is null)
+                    constructor = type.GetConstructors().FirstOrDefault();
                 var argsList = new List<object>();
                 if(constructor == null)
                 {
@@ -163,12 +167,14 @@ public partial class AppProviderService : IServiceProvider
     public void AddSingletons(IEnumerable<Type> enumerable)
     {
         foreach (Type ptype in enumerable)
-        {
+        { 
             //this.Info("Приступаю к регистрации сервиса " + ptype.GetTypeName());
             this.Factories[ptype] = (sp) => {
                 try
                 {
-                    var constructor = ptype.GetConstructors().FirstOrDefault();
+                    var constructor = ptype.GetConstructors().FirstOrDefault(c => c.GetParameters().Count()==0);
+                    if(constructor is null)
+                        constructor = ptype.GetConstructors().FirstOrDefault();
                     var argsList = new List<object>();
                     foreach (Type ptype in constructor.GetParameters().Select(p => p.ParameterType).ToList())
                     {

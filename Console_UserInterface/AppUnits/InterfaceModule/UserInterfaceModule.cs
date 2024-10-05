@@ -10,6 +10,8 @@ namespace Console_UserInterface.AppUnits.InterfaceModule
         public static void AddUserInterfaceServices(IServiceCollection services, IConfiguration configuration)
         {
             services.AddTransient<AppBuilder>();
+            services.AddTransient<HelpService>();
+            
             services.AddNavMenu();
             services.AddBlazoredModal();
             services.AddInputModal();

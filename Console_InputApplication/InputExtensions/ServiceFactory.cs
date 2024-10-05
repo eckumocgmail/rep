@@ -18,17 +18,23 @@ using System.Threading.Tasks;
 /// </summary>
 public class ServiceFactory 
 {
+    public List<Assembly> GetAssemblies() => this.Assemblies.ToList();
+    public List<string> GetAssembliesNames() => 
+        this.Assemblies.Select(a =>
+        $"{a.GetName().Name}").ToList();
+    public List<string> GetAssembliesInfos() =>
+        this.Assemblies.Select(a =>
+        $"{a.GetName().Name + " v" + a.GetName().Version}").ToList();
     public List<string> GetTypeNames() => ByShortNames.Keys.ToList();
+    public List<string> GetTypeNames<T>() where T: class => ByShortNames.Where(p => p.Value.IsExtends(typeof(T))).Select( p => p.Key).ToList();
 
     private static ServiceFactory Instance = null;
     public static ServiceFactory Get()
-    {
-        
+    {        
         if (Instance == null)
         {
             Instance = new ServiceFactory();
         }
-
         Instance.AddType(typeof(Dictionary<,>));
         Instance.AddTypes(typeof(ServiceFactory).Assembly);
         Instance.AddTypes(typeof(DataColumnCollection).Assembly);
@@ -97,7 +103,10 @@ public class ServiceFactory
         return mvcBuilder;
     }*/
 
-
+    public List<Type> GetTypesExtendeds<T>() where T: class =>
+        ByShortNames.Values.Where(v => v.IsExtendsFrom(typeof(T))).ToList();
+    public List<Type> GetTypesImplements<T>() where T : class =>
+        ByShortNames.Values.Where(v => v.IsImplementsFrom(typeof(T))).ToList();
     public IEnumerable<string> GetNames() => this.ByShortNames.Keys.ToList();
 
     /// <summary>
@@ -164,7 +173,6 @@ public class ServiceFactory
     }
     public void AddTypes(Assembly assembly)
     {
-        
         if (Assemblies.Contains(assembly) == true)
         {
             return;
@@ -358,8 +366,10 @@ public class ServiceFactory
         
     }
 
-    public IEnumerable<Type> GetTypesExtended<T>()    
+    public IEnumerable<Type> GetTypesExtended<T>()
         => ByShortNames.Values.Where(v => v.IsExtends(typeof(T)));
-    
+    public IEnumerable<Type> GetTypesExtended(Type p)
+        => ByShortNames.Values.Where(v => v.IsExtends(p));
+
 }
- 
+

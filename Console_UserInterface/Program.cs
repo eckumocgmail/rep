@@ -11,6 +11,8 @@ using Console_UserInterface.Services;
 using Blazored.Modal;
 using Console_UserInterface.AppUnits.InterfaceModule;
 using Ex;
+using Console_UserInterface.ControlAttributes;
+using static Console_UserInterface.Pages.Auth.UserSignup;
 
 /// приложение
 namespace Console_UserInterface
@@ -51,13 +53,22 @@ namespace Console_UserInterface
         /// </summary>
         public static void Main(string[] args)
         {
-            
-             
-            RegTypes();           
+            /*new RoleSelectionModel()
+            {
+                Role = "customer"
+            }.Validate().ToJsonOnScreen().WriteToConsole();*/
+            Console_DataConnector.Program.Main(args);
+            new SelectDataAttribute($"{nameof(UserRole)}.{nameof(UserRole.Code)}").Options.ToJsonOnScreen().WriteToConsole();
+            RegTypes();
+            args.Info(Assembly.GetExecutingAssembly().GetName().Name);
+                      
             UpdateDatabases();
             var builder = WebApplication.CreateBuilder(args);
             ConfigureServices(builder);
-            Configure(builder);
+            Configure(builder); 
+            
+            //new HelpService().GetContents().ToJsonOnScreen().WriteToConsole();
+            //new HelpService().GetArticles().ToJsonOnScreen().WriteToConsole();
         }
 
 
@@ -109,6 +120,7 @@ namespace Console_UserInterface
             builder.Services.AddBlazorContextMenu();        
             builder.Services.AddBlazorBootstrap();
             builder.Services.AddBlazoredModal();
+            builder.Services.AddTransient(typeof(IServiceCollection), sp => builder.Services);
 
             // Add services to the container.
             builder.Services.AddRazorPages();
@@ -128,6 +140,7 @@ namespace Console_UserInterface
                 //todo configure authorization
             });
 
+            BookingModule.AddBooking(builder.Services, builder.Configuration);
             UserInterfaceModule.AddUserInterfaceServices(builder.Services, builder.Configuration);
             SesionModule.AddSessionService(builder.Services);
             RecaptchaModule.ConfigureServices(builder.Configuration, builder.Services);
@@ -142,7 +155,12 @@ namespace Console_UserInterface
 
         [Label("Создание структуры баз данных")]
         public static void UpdateDatabases()
-        {          
+        {
+            using (var db = new NavMenuDbContext())
+            {
+                db.Database.EnsureDeleted();
+                db.Database.EnsureCreated();
+            }
             using (var db = new DbContextUser())
             {
                 db.Database.EnsureDeleted();

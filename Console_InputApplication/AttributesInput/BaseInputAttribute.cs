@@ -77,7 +77,7 @@ public class BaseInputAttribute : DataTypeAttribute, MyValidation
     {
         if (model is null)
             return $"Значение {value} не является допустимым для адреса электронной почты";
-        return $"Валидация свойства {property} модели {model?.GetType()?.GetTypeName()} завершена с ошибкой для значения {value}";
+        return $"Валидация {GetType().GetTypeName()} свойства {property} модели {model?.GetType()?.GetTypeName()} завершена с ошибкой для значения {value}";
     }
     public virtual string GetMessage(object model, string property, object value)
         => OnGetMessage(model, property, value);

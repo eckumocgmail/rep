@@ -401,7 +401,8 @@ public partial class AttrsUtil: Utils
     public static string GetControlType(Type type, string property)
     {
         var attrs = AttrsUtil.ForProperty(type, property);
-        return (from p in attrs.Keys where GetControlTypes().Contains(p) select p).SingleOrDefault();
+        return attrs.Keys.FirstOrDefault(key => key.ToType().IsExtendsFrom(typeof(ControlAttribute)));
+        //return (from p in attrs.Keys where GetControlTypes().Contains(p) select p).SingleOrDefault();
     }
 
 

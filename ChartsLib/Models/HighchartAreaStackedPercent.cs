@@ -157,13 +157,13 @@ namespace Highcharts.Models.HighchartAreaStackedPercent
 	public class HighchartAreaStackedPercentPlotOptionsAreaAccessibility: Highchart {
 	
 		public HighchartAreaStackedPercentPlotOptionsAreaAccessibility():base(){
-			PointDescriptionFormatter=()=>{};
+			//PointDescriptionFormatter=()=>{};
 	
 		}
 	
-		[JsonProperty("pointDescriptionFormatter")]
+		/*[JsonProperty("pointDescriptionFormatter")]
 		[JsonIgnore()]
-		public Action PointDescriptionFormatter{ get; set; }
+		public Action PointDescriptionFormatter{ get; set; }*/
 	}
 	
 	

@@ -9,7 +9,7 @@ public class InputDictionaryAttribute : ControlAttribute
 {
     public List<string> Options { get; private set; }
 
-    public InputDictionaryAttribute() : base()
+    public InputDictionaryAttribute() : base(ControlTypes.Select)
     {
     }
     public override bool IsValidValue(object value)
@@ -17,7 +17,7 @@ public class InputDictionaryAttribute : ControlAttribute
         return true;
     }
 
-    public InputDictionaryAttribute(string exp) : base()
+    public InputDictionaryAttribute(string exp) : base(ControlTypes.Select)
     {
     }
      

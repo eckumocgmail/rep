@@ -80,10 +80,6 @@
         Model.Value.GetType().GetMethod("Add").Invoke(Model.Value, new object[] { item });
     }
 }
-@if( Debug )
-{
-    <div>@Model.ToJsonOnScreen()</div>
-}
 @if (Model == null)
 {
     <div class="alert alert-danger">Отсутсвует ссылка в свойстве Model</div>
@@ -100,7 +96,7 @@ else
         {
             @if (Model.Type != "bool" && Model.Type != "checkbox")
             {
-                <label class="text @(Model.State == "valid"? "": "text-danger")">@Model.Label</label>
+                <label class="text @(Model.State == "valid"? "": Model.State == "invalid"? "text-danger": "")">@Model.Label</label>
             }
             @if (Model.Type == "rusword" || Model.Type == "rusword" || Model.Type == "Text" || Model.Type == "rustext" || Model.Type == "engword" || Model.Type == "engtext" || Model.Type == "decimal" || Model.Type == "int" || Model.Type == "positiveint" || Model.Type == "number" || Model.Type == "email" || Model.Type == "text" || Model.Type == "date" || Model.Type == "datetime" || Model.Type == "password" || Model.Type == "color" || Model.Type == "text")
             {
@@ -244,7 +240,7 @@ else
                             @oninput="@((e) => OnInputValue(Model.Name)(e))" class="form-check-input input-sm" type="checkbox" checked="@Model.Value" id="@Model.GetInputId()" name="@Model.GetInputName()">
                         </div>          
                 }
-                else if (Model.Type.ToLower() == "select")
+            else if (Model.Type.ToLower() == "select" )
                 {
                     <select class="form-control input-sm" style="width: 100%;"
                             name="@Model.GetInputName()"
@@ -272,26 +268,47 @@ else
                         }
                     </select>
                 }
-                else if( Model.Type.ToLower() == "selectcontrol")
+                else if( Model.Type.ToLower() == "selectcontrol" || Model.Type.ToLower() == "selectdata" )
                 {
-                        <p>@Model.ToJsonOnScreen()</p>
-                        <select class="form-control input-sm" style="width: 100%;"
+
+                    <select class="form-control input-sm is-@Model.State" style="width: 100%;"
                             name="@Model.GetInputName()"
                             id="@Model.GetInputId()"
                             @onchange:preventDefault
                             @oninput="@((e) => OnInputValue(Model.Name)(e))">
-                        
-                        @foreach (var option in (((Select)Model.Control).Options))
+                            <option value="@null">Не выбрано</option>
+                        @if(Model.Control is not null)
                         {
-                            @if (option.Value.ToString() == Model.Value.ToString())
+
+                          
+                            @foreach (var option in (dynamic)Model.Control.GetValue("Options"))
                             {
-                                <option selected value="@option.Value">@option.Key</option>
-                            }
-                            else
-                            {
-                                <option value="@option.Value">@option.Key</option>
-                            }
+                                @if(option is String)
+                                {
+                                    if(Model.Value is not null && Model.Value.ToString() == option)
+                                    {
+                                        <option selected value="@option">@option</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@option">@option</option>
+                                    }
+                                }
+                                else if (Model.Value is not null && option.Value.ToString() == Model.Value.ToString())
+                                {
+                                    <option selected value="@option.Value">@option.Key</option>
+                                }
+                                else
+                                {
+                                    <option value="@option.Value">@option.Key</option>
+                                }
                         }
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning">Model.Control is null</div>
+                    }
+                            
                     </select>
                 }
                 else if (Model.Type == "primitivecollection")

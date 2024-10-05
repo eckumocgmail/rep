@@ -147,7 +147,7 @@ public class DataTableService: MyValidatableObject,IdataTableService
             {
                 if (value == null || string.IsNullOrEmpty(value.ToString()))
                 {
-                    if (Typing.IsNullable(p) && Typing.IsPrimitive(p.PropertyType) == false)
+                    if (Typing.IsNullable(p) && Typing.IsPrimitiveForType(p.PropertyType) == false)
                     {
                         p.SetValue(target, null);
                     }

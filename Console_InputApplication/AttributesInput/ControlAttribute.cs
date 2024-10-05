@@ -8,11 +8,24 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Reflection;
 
+public class ControlTypes
+{
+    public const string Select = "Select";
+    public const string Combo = "Combo";
+    public const string Check = "Select";
+    public const string Switch = "Select";
+    public const string SwitchMulti = "SwitchMulti";
+}
+
 public class ControlAttribute : BaseInputAttribute
 {
-    public ControlAttribute() : base(InputTypes.Custom)
+
+    public string ControlType { get; set; }
+    public ControlAttribute(string ControlType) : base(InputTypes.Custom)
     {
+        this.ControlType = ControlType;
     }
+    
 
     public virtual ViewItem CreateControl(InputFormField field) => throw new Exception();
     public virtual ViewItem CreateControl(FormField field) => throw new Exception();

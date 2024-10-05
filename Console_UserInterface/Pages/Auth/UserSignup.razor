@@ -77,7 +77,8 @@
 {
     public class RoleSelectionModel
     {
-        [SelectData(nameof(UserRole), nameof(UserRole.Code))]
+        [NotNullNotEmpty]
+        [SelectData($"{nameof(UserRole)}.{nameof(UserRole.Code)}")]
         public string Role { get;set; }
     }
 }

@@ -7,12 +7,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
  
 /// <summary>
 /// Реализует функцию связывания преждставления с источником данных и сквозными событиями приложения.
 /// </summary>
-public class ViewBuilder: ViewFactory
+[Label("Констуктор интефейса")]
+public class ViewBuilder : ViewFactory
 {
     [Label("Корневой тег компонента представления")]
     public string Tag { get; set; }
@@ -21,7 +21,7 @@ public class ViewBuilder: ViewFactory
     [InputCombobox("BusinessDatasource,Name")]
     public int DatasourceId { get; set; }
 
-    
+
     [Label("Набор данных")]
     [InputCombobox("BusinessDataset,Name")]
     public int DatasetId { get; set; }
@@ -30,9 +30,9 @@ public class ViewBuilder: ViewFactory
 
     //TODO: проверить работоспособность
     [OnChange("Datasource")]
-    public void OnDatasourceChanged( PropertyChangedMessage message )
+    public void OnDatasourceChanged(PropertyChangedMessage message)
     {
-        this.Info("ИЗменился источник данных "+message.After);   
+        this.Info("ИЗменился источник данных " + message.After);
     }
 
 
@@ -117,18 +117,18 @@ public class ViewBuilder: ViewFactory
         }
 
     }
-    
 
 
- 
+
+
     object this[string path]
     {
-        get 
+        get
         {
             return this;
         }
-        set 
-        { 
+        set
+        {
 
         }
     }
@@ -172,4 +172,4 @@ public class ViewBuilder: ViewFactory
     }
 
 }
- 
+

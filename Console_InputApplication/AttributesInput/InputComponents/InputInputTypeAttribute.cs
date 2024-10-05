@@ -1,21 +1,20 @@
-﻿namespace Console_InputApplication.AttributesInput.InputComponents
+﻿
+[Label("Укзывает на выбор из списка InputType")]
+public class InputInputTypeAttribute : InputSelectAttribute
 {
-    public class InputInputTypeAttribute : InputSelectAttribute
+    public static IEnumerable<string> GetInputTypes() => BaseInputAttribute.GetInputTypes();
+    public static string GetInputTypesString()
     {
-        public static IEnumerable<string> GetInputTypes() => BaseInputAttribute.GetInputTypes();
-        public static string GetInputTypesString()
+        string text = "";
+        foreach (string controlType in BaseInputAttribute.GetInputTypes())
         {
-            string text = "";
-            foreach (string controlType in BaseInputAttribute.GetInputTypes())
-            {
-                text += $"{controlType},";
-            }
-            if (text.EndsWith(","))
-                text = text.Substring(0, text.Length - 1);
-            return text;
+            text += $"{controlType},";
         }
-        public InputInputTypeAttribute() : base(GetInputTypesString())
-        {
-        }
+        if (text.EndsWith(","))
+            text = text.Substring(0, text.Length - 1);
+        return text;
+    }
+    public InputInputTypeAttribute() : base(GetInputTypesString())
+    {
     }
 }
