@@ -1,0 +1,17 @@
+﻿@using Console_DataConnector.DataModule.DataModels.MessageModel;
+@using Console_DataConnector.DataModule.DataModels.MessageService;
+@inject MessageService messages
+@code 
+{
+    [Parameter]
+    public string Uri { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+
+        
+
+
+    }
+}

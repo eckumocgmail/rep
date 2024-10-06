@@ -30,7 +30,7 @@ public class FromAttributes: MyValidatableObject
     
     public void Init(Type type)
     {
-        var attrs = type.GetAttributes();
+        var attrs = TypeAttributesExtensions.GetTypeAttributes(type);
         GetType().GetOwnPropertyNames().ToList().ForEach((name) => {
             string key = name + "Attribute";
             if ( attrs.ContainsKey(key))

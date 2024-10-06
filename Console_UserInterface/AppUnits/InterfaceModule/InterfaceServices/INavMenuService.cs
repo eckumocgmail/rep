@@ -80,7 +80,7 @@ public class NavMenuService : INavMenuService
         _logger.LogInformation($"Namespace: {ns}");
         foreach (var page in Assembly.GetCallingAssembly().GetPages(ns))
         {
-            var attrs = page.GetAttributes();
+            var attrs = TypeAttributesExtensions.GetTypeAttributes(page);
             if (attrs.ContainsKey("RouteAttribute"))
             {
                 navList.Add(new NavLinkNavLink() { Icon = "home", Label = page.GetName(), Href = attrs["RouteAttribute"] });

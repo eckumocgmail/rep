@@ -125,7 +125,7 @@ public static class StringExtensions
 
 public static class TypeAttributesExtensions
 {
-    public static Dictionary<string, string> GetAttributes(this Type p)
+    public static Dictionary<string, string> GetTypeAttributes(this Type p)
     {
         var provider = new CustomDataProvider();
         if (provider.GetTypes().Contains(p.GetTypeName()) == false)

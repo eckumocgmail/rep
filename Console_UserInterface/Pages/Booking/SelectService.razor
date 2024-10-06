@@ -2,10 +2,30 @@
     Список забронированных услуг
 *@
 @page "/booking/select-service"
+@using BookingModel.ServiceDataModel;
+@inject ServiceController sc
+
 @code
 {
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
+        this.DepartmentsList = new Dictionary<string, ServiceDepartment>(sc.GetServiceDepartments().Select(p => new KeyValuePair<string, ServiceDepartment>(p.ServiceDescription, p)).ToList());
+    }
+}
+@if (DepartmentsList is not null)
+{
+    <SelectList OnSelect="@OnServiceSelected" ListItems="@DepartmentsList.Keys.ToList()"></SelectList>
+}
+ 
+@code
+{
+    public Dictionary<string, ServiceDepartment> DepartmentsList { get; set; }
+    [Parameter]
+    public EventCallback<ServiceDepartment> OnChanged { get; set; }
+
+    public async Task OnServiceSelected(object evt)
+    {
+        await OnChanged.InvokeAsync(DepartmentsList[evt.ToString()]);
     }
 }

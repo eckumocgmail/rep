@@ -1,0 +1,15 @@
+﻿@inherits TextComponent
+@code {
+
+    [Parameter]
+    [InputSelect("1,2,3,4,5,6")]
+    public string Size { get; set; } = "1";
+
+    [Parameter]
+    [InputText]
+    public string Badge { get; set; } = "";
+}
+<div class="text text text-@(Color) text-@(Align) bg-@(Background)" style="font-size: @(FontSize+"px")">
+    @(TextContent)
+    <span class="badge badge-secondary">@Badge</span>
+</div>

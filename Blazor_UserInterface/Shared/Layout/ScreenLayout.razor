@@ -1,0 +1,17 @@
+﻿@* Просто тупо заполняем пространство *@
+@inherits BaseComponent
+@code
+{
+    [Parameter]
+    public override RenderFragment ChildContent { get; set; }
+}
+<div style="width: 100%; height: 100%; position: absolute; overflow-y: auto; left: 0px; right: 0px; padding: 20px;">
+    @ChildContent
+</div>
+@code
+{
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+    }
+}

@@ -1,0 +1,80 @@
+﻿@inherits ScriptableComponent
+
+@inject NavigationManager nav
+@code {
+
+
+
+    [NotInput()]
+    public bool Initiallized { get; internal set; } = false;
+
+    [NotInput()]
+    protected NavigationManager Router;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            this.OnAfterFirstRenderAsync();
+        }
+    }
+
+
+
+    protected virtual void OnAfterFirstRenderAsync()
+    {
+        //string role = GetType().GetAttribute<CanActivateAttribute>();
+        //TOOD: ValidateUserInRole
+
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Info("OnInitializedAsync");
+        this.Router = nav;
+        await base.OnInitializedAsync();
+        this.Initiallized = true;
+    }
+}
+
+
+@functions {
+    public static int AddLinkLabel<T>(string label) => CustomAttrs.AddLabelForType(typeof(T), label);
+    public void NavigateTo(string uri, bool forceLoad = false) => Router.NavigateTo(uri, forceLoad);
+}
+
+
+
+@code {
+
+    [NotInput]
+    public string StatusMessage { get; set; }
+
+    [Parameter]
+    public EventCallback<object> OnEvent { get; set; }
+
+    [Parameter]
+    public EventCallback<BaseComponent> OnInitSuccess { get; set; }
+
+    public BaseComponent Parent { get; set; }
+    public List<BaseComponent> Children { get; set; } = new List<BaseComponent>();
+
+    public async Task OnChildInitiallized(BaseComponent child)
+    {
+        Info($"OnChildInitiallized({child.GetHashCode()})");
+        if (child.Parent != null)
+        {
+            child.Parent.Children.Remove(child.Parent);
+        }
+        child.Parent = this;
+        Children.Add(child);
+        await OnInitSuccess.InvokeAsync(child);
+    }
+
+    public async Task OnEventSubmited(object evt)
+    {
+        Info($"OnEventSubmited({evt.GetHashCode()})");
+        await OnEvent.InvokeAsync(evt);
+    }
+}

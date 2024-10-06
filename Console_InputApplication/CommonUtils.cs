@@ -42,7 +42,7 @@ public static class Typing
     }
     public static IDictionary<string, string> GetUtils(this Type type)
     {
-        return type.GetAttributes();
+        return TypeAttributesExtensions.GetTypeAttributes(type);
     }
 
 

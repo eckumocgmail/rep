@@ -1,0 +1,12 @@
+﻿@if (Model != null)
+{
+    <div>
+        @*<ContentBox Model="@(((Pane)Model).Item)"></ContentBox>*@
+    </div>    
+}
+
+@code {
+
+    [Parameter]
+    public object Model { get; set; }
+}

@@ -1,8 +1,46 @@
 ﻿@using BookingModel.ServiceDataModel;
+@inject ServiceController controller
+
 @code 
 {
+    [Parameter]
     public BookingSlot Model { get; set; }
 }
-<FormEditor Model="@Model">
+@code
+{
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        this.Info(Model);
 
-</FormEditor>
+    }
+    public ServicePrice GetServicePrice(int id)
+    {
+        return controller.GetServicePrice(id);
+    }
+}
+<CardContainer>
+    <CardHeader>
+        Запись в работы в автосервис @GetServicePrice(Model.ServicePriceId).ServiceDepartment.ServiceDescription
+    </CardHeader>
+    <CardBody>
+        body
+
+            <div> Дата: <b>@Model.WorkDate</b> </div>
+            <div> Время: @Model.WorkTime </div>
+            <div> Стоймость работ: @GetServicePrice(Model.ServicePriceId).WorkPrice </div>
+            <div class="card">
+                <FormModel Form="@controller.GetAdditionalParams(GetServicePrice(Model.ServicePriceId).ServiceWork)"></FormModel>
+                @*foreach (var par in @)
+                {
+                    <div>@par.Key @par.Value</div>
+                }*@
+            </div>
+        
+        
+    </CardBody>
+    <CardFooter>
+        <button class="btn btn-sm btn-primary">Подтвердить</button>
+        <button class="btn btn-sm btn-danger">Отмена</button>
+    </CardFooter>
+</CardContainer>

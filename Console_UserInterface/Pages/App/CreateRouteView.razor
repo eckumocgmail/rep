@@ -1,0 +1,206 @@
+﻿@using System.Reflection;
+@inject AppRouterMiddleware router
+@inject IServiceCollection services
+@inject IServiceProvider provider
+@code
+{
+    public string AuthorizationPolicy { get; set; }
+    public List<string> AuthorizationPolicies { get; set; }
+    public void OnAuthorizationChanged(string auth)
+    {
+        AuthorizationPolicy = auth;
+        StateHasChanged();
+    }
+}
+@code
+{
+    public List<string> GetServicesInjected() => services.Select(disc => disc.ServiceType.GetTypeName()).ToList();
+    public List<string> GetServices() => AssemblyRef.GetTypes().Select(ptype => ptype.GetTypeName()).ToList();
+    
+    public string ControllerType { get; set; } = "SignupUser";
+    public string ControllerAction { get; set; } = "PasswordSignInAsync";
+    public List<string> AvailableTypes { get; set; } = new();
+    public List<string> AvailableActions { get; set; } = new();
+    public List<string> ServiceProviders { get; set; } =
+        new List<string>() { "Контейнер приложения", "Файловая система", "Конструктор по-умолчанию" };    
+
+    public InputFormModel InputForm { get; set; }
+    public object Result { get; set; } = new object();
+    public string Error { get; set; }
+}
+
+@code
+{
+    public void OnSaveClicked()
+    {
+        try
+        {
+            this.Error = "";
+            router.AddControllerAction(ServiceProvider, ControllerType, ControllerAction);
+        }
+        catch(Exception ex)
+        {
+            this.Error(this.Error = $"Ошибка при попытки сохранения: {ex.ToDocument()}");
+        }
+        StateHasChanged();
+    }
+
+    public void OnExecuteClicked()
+    {
+        var arguments = (Dictionary<string, object>)InputForm.Item;
+        try
+        {
+            var service = provider.GetService(ControllerType.ToType());
+            this.Warn($"Тип {ControllerType} не зарегистрирован в куонтейнере");
+            if (service is null)
+                service = AppProviderService.GetInstance().GetService(ControllerType.ToType());
+            this.Result = service.Call(ControllerAction, arguments);
+            this.Error = "";
+        } 
+        catch(Exception ex)
+        {
+            this.Error(this.Error = $"Ошибка при выполнении вызова {ControllerType}.{ControllerAction} с аргументами {arguments.ToJson()}: {ex.ToDocument()}");
+            this.Result = new
+            {
+                message = $"Ошибка при выполнении вызова {ControllerType}.{ControllerAction} с аргументами {arguments.ToJson()}: {ex.ToDocument()}",
+                details = ex.ToDocument()
+            };
+        }
+    }
+
+    public string URI { get; set; }
+    public string AssemblyName { get; set; }
+    public Assembly AssemblyRef { get; set; }
+
+    public void OnAssemblyChanged(string assembly)
+    {
+        try
+        {
+            this.AssemblyName = assembly;
+            this.AssemblyRef = global::ServiceFactory.Get().Assemblies.First(a => a.GetName().Name == assembly);
+            this.AvailableTypes = GetServices();// this.AssemblyRef.GetTypes().Where(t => t.GetMethods().Count() > 0 && t.IsInterface == false).Select(t => t.GetTypeName()).ToList();
+        } 
+        catch(Exception ex)
+        {
+            this.Error(this.Error = $"Ошибка при обновлении формы: {ex.ToDocument()}");
+        }
+
+        StateHasChanged();
+    }
+    public List<string> ParseGenericArguments(string typeName)
+    {
+        int i1 = typeName.IndexOf('<');
+        if (i1 == -1)
+            return new();
+        int i2 = typeName.IndexOf('>');
+        if(i1<i2)
+        {
+            return typeName.Substring(i1 + 1, i2 - i1 + 1).Split(",").ToList();
+        }
+        return new();
+    }
+    public List<string> GetTypesFor(string genericType)
+    {
+        return ServiceFactory.Get().GetTypesExtended(genericType.ToType()).Select(ptype => ptype.GetTypeName()).ToList();
+    }
+
+
+    public Console_UserInterface.Shared.Forms.FormModel FormModelRef { get; set; }
+}      
+<CardContainer>
+    <CardHeader>
+        <div>Регистрация контроллера</div>
+        @if (String.IsNullOrWhiteSpace(Error)==false)
+        {
+            <p class="alert alert-danger">
+                @Error
+            </p>
+        }
+    </CardHeader>
+    <CardBody>                 
+        <SplitPane>
+            <Left>                
+                <div class="input-group">
+                    <label> Аутентификация </label>
+                    <SelectBox Label="" Options="@AuthorizationPolicies" OnChange="OnAuthorizationChanged"></SelectBox>
+                </div>
+                <div class="input-group">
+                    <label>Сборка </label>
+                    <SelectBox Label="" Options="@ServiceFactory.Get().GetAssembliesNames()" OnChange="OnAssemblyChanged"></SelectBox>
+                </div>   
+                <div class="input-group">
+                    <label>Сервис</label>
+                    <SelectBox Label="" Options="@AvailableTypes" OnChange="OnControllerTypeChanged"></SelectBox>
+                </div>
+                <div class="input-group">
+                    <label>Поставщик</label>
+                    <SelectBox Label="" Options="ServiceProviders" OnChange="OnProviderChanged"></SelectBox>
+                </div>
+                <div class="input-group">
+                    <label>Метод</label>
+                    <SelectBox Label="" Options="AvailableActions" OnChange="OnControllerActionChanged"></SelectBox>
+                </div>
+                @if (ControllerType is not null && ParseGenericArguments(ControllerType).Count() > 0)
+                {
+
+                    @foreach (var genericArgument in ParseGenericArguments(ControllerType))
+                    {
+                        <div class="input-group">
+                            <label>@genericArgument</label>
+                            <SelectBox Label="" Options="@(GetTypesFor(genericArgument))" OnChange="OnControllerTypeChanged"></SelectBox>
+                        </div>
+                    }
+                }
+            </Left>
+            <Right>
+                <FormModel Form="InputForm" @ref="FormModelRef">
+                    <button class="btn btn-sm btn-primary @(FormModelRef is not null && FormModelRef.Form is not null && FormModelRef.Form.IsValid ?"" : "disabled")" @onclick="OnSaveClicked">Сохранить</button>
+                    <button class="btn btn-sm btn-primary" @onclick="OnExecuteClicked">Выполнить</button>
+                </FormModel>
+            </Right>
+        </SplitPane>
+    </CardBody>
+    <CardFooter>
+       
+            <h2>Результат выполненимя</h2>
+        <code>@(Result is not null ? Result.ToJsonOnScreen() : Result)</code>
+         
+    </CardFooter>
+</CardContainer>
+@code
+{
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        AvailableTypes = GetType().Assembly.GetTypes().Where(t => t.IsPublic && t.IsExtends(typeof(BaseEntity)) == false && t.IsInterface == false && t.IsExtends(typeof(TestingElement)) == false && t.IsExtends(typeof(DbContext)) == false).Select(t => t.GetTypeName()).ToList();
+        OnControllerActionChanged("PasswordSignInAsync");
+    }
+}
+@code
+{
+    public string ServiceProvider { get; set; } = "Контейнер приложения";
+    public void OnProviderChanged(string evt)
+    {
+        this.ServiceProvider = evt;
+    }
+    public void OnControllerTypeChanged(string evt)
+    {
+        this.ControllerType = evt;
+        this.AvailableActions = this.ControllerType.ToType().GetOwnMethodNames();
+        StateHasChanged();
+    }
+    public void OnControllerActionChanged(string evt)
+    {
+        try
+        {
+            //ControllerType.New().Call(evt, new Dictionary<string, object>());
+            this.InputForm = ControllerType.ToType().GetInputForm(ControllerAction = evt);
+        }
+        catch(Exception ex)
+        {
+            this.Error(this.Error = $"Ошибка при обновлении метода действия: {ex.ToDocument()}");
+        }
+        StateHasChanged();
+    }
+}

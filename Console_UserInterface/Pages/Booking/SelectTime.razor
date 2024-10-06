@@ -1,11 +1,65 @@
 ﻿@*
     Выбираем дату время
 *@
-@page "/booking/select-time"
+@page "/booking/select-time/{serviceDepartmentId:int}/{serviceWorkId:int}"
+@using BookingModel.ServiceDataModel;
+@inject ServiceController controller
 @code
 {
+    [Parameter]
+    public int serviceDepartmentId { get; set; }
+    [Parameter]
+    public int serviceWorkId { get; set; }
+    public List<BookingSlot> availableSlots { get; set; }
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
+        this.availableSlots = controller.GetAvailableBookingSlots(serviceDepartmentId, DateTime.Now.ToString("d"), new List<int>() { serviceWorkId });
+
+    }
+}
+
+<CardContainer>
+    <CardHeader>
+        <div class="input-group">
+            <label>Дата</label>
+            <select class="form-control" @onchange="@OnDateWorkChanged">
+                @for(int i=0; i<10; i++)
+                {
+                    <option value="@DateTime.Now.AddDays(i).ToString("d")">@DateTime.Now.AddDays(i).ToString("d")</option>
+                }
+            </select>
+
+        </div>
+    </CardHeader>
+    <CardBody>
+        <div class="d-flex flex-row flex-wrap card">
+            @foreach (var slot in availableSlots)
+            {
+                <div class="card" style="margin: 10px; padding: 4px;" onmouseleave="this.classList.remove('selected')" onmouseover="this.classList.add('selected')" @onclick='async evt => { await OnTimeSelected( $"{WorkDate}T{slot.WorkTime}"); StateHasChanged(); }'>@slot.WorkTime</div>
+            }
+        </div>
+    </CardBody>
+    <CardFooter></CardFooter>
+</CardContainer>
+@code
+{
+
+    [Parameter]
+    public EventCallback<object> OnChanged { get; set; }
+
+    public async Task OnTimeSelected(object evt)
+    {
+        await OnChanged.InvokeAsync(evt);
+    }
+    public string WorkDate { get; set; } = DateTime.Now.ToString("d");
+    public string WorkTime { get; set; } = "9";
+    public async Task OnDateWorkChanged(ChangeEventArgs evt)
+    {
+        this.WorkDate = evt.Value.ToString().Substring(0, 10);
+        this.WorkDate = evt.Value.ToString().Substring(11);
+        this.availableSlots = controller.GetAvailableBookingSlots(serviceDepartmentId, evt.Value.ToString(), new List<int>() { serviceWorkId });
+        await Task.CompletedTask;
+        StateHasChanged();
     }
 }

@@ -204,7 +204,19 @@ public static class TextFactoryExtensions
         var method = type.GetMethods().Where(m => m.Name == action).FirstOrDefault();        
         try
         {
-            ActionResult = method.Invoke(p, parameters.Values.ToArray());
+            var parr = new List<object>();
+            foreach(var name in method.GetParameters().Select(p=>p.Name))
+            {
+                if(parameters.ContainsKey(name))
+                {
+                    parr.Add(parameters[name]);
+                }
+                else
+                {
+                    throw new ArgumentException();
+                }                
+            }
+            ActionResult = method.Invoke(p, parr.ToArray());
         }
         catch (Exception ex)
         {

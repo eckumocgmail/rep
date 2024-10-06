@@ -1,7 +1,11 @@
 ﻿<ul class="list-group" style="overflow-y: auto;">
     @foreach(var item in Items)
     {
-        <li id="code_@(GetHashCode())_@(Items.IndexOf(item))" onmouseleave="this.classList.remove('active')" onmouseover="this.classList.add('active')" class="list-group-item" @onclick="evt => { OnListGroupItemClicked(item); }">
+        <li id="code_@(GetHashCode())_@(Items.IndexOf(item))" 
+            style="color: black;"
+            onmouseleave="this.classList.remove('active')" onmouseover="this.classList.add('active')"
+            class="list-group-item" @onclick="evt => { OnListGroupItemClicked(item); }">
+            @item
        </li>
     } 
 </ul>

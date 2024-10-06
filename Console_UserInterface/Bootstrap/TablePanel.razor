@@ -1,0 +1,51 @@
+﻿@page "/bootstrap/table-panel"
+@inherits BaseComponent
+@code
+{
+    
+
+    [Parameter]
+    public List<List<object>> Cells { get; set; } = new List<List<object>>() { };
+}
+<div class="panel panel-primary">
+
+
+    <!-- Default panel contents -->
+    <div class="panel-heading">Panel heading</div>
+    <div class="panel-body">
+        <p>...</p>
+    </div>
+
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">
+                    <InputCheckbox></InputCheckbox>
+                </th>
+                @foreach (var col in new List<string>() { "Ключ", "Значение" })
+                {
+                    <th scope="col">@col</th>
+                }
+
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var kv in Cells)
+            {
+                <tr>
+                    <th scope="row">
+                        <InputCheckbox></InputCheckbox>
+                    </th>
+
+                    <td scope="col">@kv.First()</td>
+                    <td scope="col">@kv.Last()</td>
+
+                </tr>
+            }
+
+
+        </tbody>
+    </table>
+
+</div>

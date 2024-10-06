@@ -1,17 +1,33 @@
-﻿using System.Reflection;
+﻿using ChartsLib;
+
+using System.Reflection;
 using System.Xml.Linq;
 
 namespace Console_UserInterface.Services
 {
+
+
+    /// <summary>
+    /// Упрощает разработку приложения
+    /// </summary>
     public class AppBuilder
     {
-
+        /// <summary>
+        /// 
+        /// </summary>
         public static Dictionary<string, Assembly> MODULES = new() 
         {
+            { "Console_AttributeModel" ,    typeof(CustomDbContext).Assembly },
+            { "Console_BookingModel" ,      typeof(ServiceDbContext).Assembly },
+            { "Console_ChartsLib" ,         typeof(ChartsService).Assembly },
             { "Console_InputApplication" ,  typeof(Console_InputApplication.Program).Assembly },
             { "Console_DataConnector" ,     typeof(Console_DataConnector.Program).Assembly },
             { "Console_UserInterface" ,     typeof(Console_UserInterface.Program).Assembly }
         };
+
+
+
+        
 
         /// <summary>
         /// Модель меню навигации по типам из пространства имён
@@ -23,7 +39,7 @@ namespace Console_UserInterface.Services
         {
             Dictionary<string, string> result = new();
             var snamespace = typeof(T).Namespace;
-            var types = typeof(T).Assembly.GetTypes().Where(t => t.Namespace == snamespace && t.GetAttributes().ContainsKey("RouteAttribute"));
+            var types = typeof(T).Assembly.GetTypes().Where(t => t.Namespace == snamespace && TypeAttributesExtensions.GetTypeAttributes(t).ContainsKey("RouteAttribute"));
             result = new Dictionary<string, string>(types.Select(type =>
             {
                 var route = type.GetAttributes()["RouteAttribute"];
@@ -47,10 +63,15 @@ namespace Console_UserInterface.Services
             }).ToList());
             return result;
         }
+
+
+        /// <summary>
+        /// Возвращает модлель навигации для страниц определённых в заданном пространстве имён
+        /// </summary> 
         public static Dictionary<string, string> CreateNavMenu(string snamespace, Dictionary<string, string> mapping = null)
         {
             Dictionary<string, string> result = new();
-            var types = AppProviderService.GetInstance().GetType().Assembly.GetTypes().Where(t => t.Namespace == snamespace && t.GetAttributes().ContainsKey("RouteAttribute"));
+            var types = AppProviderService.GetInstance().GetType().Assembly.GetTypes().Where(t => t.Namespace == snamespace && TypeAttributesExtensions.GetTypeAttributes(t).ContainsKey("RouteAttribute"));
             result = new Dictionary<string, string>(types.Select(type =>
             {
                 var route = type.GetAttributes()["RouteAttribute"];

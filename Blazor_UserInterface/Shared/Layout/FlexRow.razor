@@ -1,0 +1,22 @@
+﻿@inherits BaseComponent
+@code
+{
+    [Parameter]
+    public int? Flex { get; set; }
+
+    [Parameter]
+    public override RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public bool Wrap { get; set; } = false;
+}
+<div style="display: flex; flex-direction: row; flex-wrap: @(Wrap?"wrap":"nowrap");">
+    @ChildContent
+</div>
+@code
+{
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+    }
+}

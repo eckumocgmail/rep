@@ -14,6 +14,10 @@ public interface IUserModelsService
 
 public class UserModelsService: IUserModelsService
 {
+    public UserModelsService()
+    {
+    }
+
     public int RegistrateModel(object instance)
     {
         return instance.GetHashCode();

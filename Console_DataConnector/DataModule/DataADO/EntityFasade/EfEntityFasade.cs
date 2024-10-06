@@ -15,7 +15,10 @@ public class EfEntityFasade<TEntity> : IEfEntityFasade<TEntity> where TEntity : 
 
     public EfEntityFasade(DbContext context)
     {
-        _context = context;
+        if((_context = context) is null)
+        {
+            throw new ArgumentNullException(nameof(context));   
+        }
     }
 
     public int Create(params TEntity[] items)

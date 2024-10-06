@@ -1,0 +1,140 @@
+﻿@code
+{
+    [Parameter]
+    public string Type { get; set; }
+
+    [Parameter]
+    public object Item { get; set; }
+
+    [Parameter]
+    public object Ref { get; set; }
+
+}
+@code
+{
+    public void OnClick() { }
+}
+ 
+
+<CtxMenu>
+    <p>Right-click on me to show the context menu !!</p>
+
+    @if (Type == null)
+    {
+        <div class="alert alert-danger">Необходимо задать значение параметра Type </div>
+    }
+    else if (Type == "AlertComponent")
+    {
+        AlertComponent alert = (AlertComponent)Item;
+        <AlertComponent @ref="@Ref"
+                        Color="@(alert.Color)">
+        </AlertComponent>
+    }
+    else if (Type == "ButtonComponent")
+    {
+        ButtonComponent button = (ButtonComponent)Item;
+        <ButtonComponent @ref="@Ref"
+                         Color="@(button.Color)"
+                         Label="@(button.Label)"
+                         OnClicked="@(button.OnClicked)">
+        </ButtonComponent>
+    }
+    else if (Type == "ModalComponent")
+    {
+        ModalComponent modal = (ModalComponent)Item;
+        <ModalComponent>
+        </ModalComponent>
+    }
+    else if (Type == "DialogComponent")
+    {
+        DialogComponent dialogComponent = (DialogComponent)Item;
+        <DialogComponent>
+        </DialogComponent>
+    }
+    else if (Type == "ButtonContainer")
+    {
+        <ButtonContainer></ButtonContainer>
+    }
+    else if (Type == "CardComponent")
+    {
+        /*CardComponent card = (CardComponent)Item;
+        <CardComponent Title="@(card.Title)"
+                       Subtitle="@(card.Subtitle)"
+                       Description="@(card.Description)">
+        </CardComponent>*/
+    }
+    else if (Type == "CardContainer")
+    {
+        <CardContainer>
+        </CardContainer>
+    }
+    else if (Type == "DropDownComponent")
+    {
+        <DropDownComponent>
+        </DropDownComponent>
+    }
+    else if (Type == "DropDownContainer")
+    {
+        <DropDownContainer>
+        </DropDownContainer>
+    }
+
+
+
+    else if (Type == "GridComponent")
+    {
+        <GridComponent>
+        </GridComponent>
+    }
+
+    else if (Type == "SummaryList")
+    {
+        <SummaryList>
+        </SummaryList>
+    }
+
+  
+
+    else if (Type == "TextComponent")
+    {
+        TextComponent textComponent = (TextComponent)Item;
+        <TextComponent TextContent="@textComponent.TextContent"
+                       Color="@textComponent.Color"
+                       Align="@textComponent.Align"
+                       Background="@textComponent.Background">
+        </TextComponent>
+    }
+
+    else if (Type == "TitleComponent")
+    {
+        TitleComponent titleComponent = (TitleComponent)Item;
+
+        <TitleComponent TextContent="@titleComponent.TextContent"
+                        Badge="@titleComponent.Badge"
+                        Color="@titleComponent.Color"
+                        Align="@titleComponent.Align"
+                        Size="@titleComponent.Size"
+                        Background="@titleComponent.Background">
+        </TitleComponent>
+    }
+
+    // BootstrapPanels
+    else if (Type == "ListPanel")
+    {
+        <ListPanel>
+        </ListPanel>
+    }
+    else if (Type == "TablePanel")
+    {
+        <TablePanel>
+        </TablePanel>
+    }
+
+
+
+    else
+    {
+        <div class="alert alert-danger">Тип компонента @Type не зарегистрирован в @GetType().Name</div>
+    }
+
+</CtxMenu>

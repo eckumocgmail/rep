@@ -12,7 +12,7 @@ namespace Console_DataConnector.DataModule.DataApi
             Dictionary<string, IDictionary<string, string>>,
             IDictionary<string, IDictionary<string, string>>
     {
-        public IDictionary<string, string> GetTypeAttributes() => this.GetType().GetAttributes();
+        public IDictionary<string, string> GetTypeAttributes() => TypeAttributesExtensions.GetTypeAttributes(this.GetType());
         public IDictionary<string, IDictionary<string, string>> GetPropertiesAttributes() =>
             new Dictionary<string, IDictionary<string, string>>(
                 this.GetType().GetPropertyNames().Select(

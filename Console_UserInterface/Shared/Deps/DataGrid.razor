@@ -3,7 +3,7 @@
 @inject IServiceProvider serviceProvider
 <CardContainer>
     <CardHeader>
-        <SearchPane SearchOptions="@SearchOptions" SearchQuery="@SearchQuery" ShowLeft="@ShowLeft" SortRule="@SortRule" OnSearchSubmit="OnSearchSubmit"></SearchPane>
+        <SearchControl SearchOptions="@SearchOptions" SearchQuery="@SearchQuery"   OnSearch="OnSearchSubmit"></SearchControl>
     </CardHeader>
     <CardBody>
         <div class="d-flex flex-row flex-nowrap">
@@ -11,7 +11,7 @@
             {
                 <CheckList ListItems="typeof(DataType).GetInputProperties()" OnChanged="(evt => { DisplayColumns = evt; StateHasChanged(); })"></CheckList>
             }
-            <DataTable DataCheckable="@DataCheckable" DataType="DataType" DataItems="@DataItems" DisplayColumns="@DisplayColumns"></DataTable>
+            <DataTable @ref="@pDataTable" DataCheckable="@DataCheckable" DataType="DataType" DataItems="@AllItems" DisplayColumns="@DisplayColumns" OnChanged="@OnSelected"></DataTable>
         </div>
     </CardBody>
     <CardFooter>
@@ -20,12 +20,19 @@
 </CardContainer>
 @code
 {
+    [Parameter]
+    public EventCallback<DataType> OnChanged { get; set; }
+    public async Task OnSelected(DataType evt)
+    {
+        //await OnChanged.InvokeAsync(evt);
+        await Task.CompletedTask;
+    }
     public int PageSize = 10;
     public int PagesCount = 1;
     public int PageNumber = 1;
-
+    public DataTable<DataType> pDataTable { get; set; }
     [Parameter]
-    public bool DataCheckable { get; set; }
+    public bool DataCheckable { get; set; } = false;
 
     [Parameter]
     public List<string> DisplayColumns { get; set; }
@@ -49,10 +56,10 @@
         StateHasChanged();
     }
 
-    public void OnSearchSubmit(SearchControl search)
+    public void OnSearchSubmit(object search)
     {
-        this.SearchQuery = search.SearchQuery;
-        this.SearchOptions = search.SearchOptions;
+        //this.SearchQuery = search.SearchQuery;
+        //this.SearchOptions = search.SearchOptions;
 
         DoSearch();
         StateHasChanged();
@@ -66,7 +73,7 @@
             this.AllItems = Fasade.Search(SearchQuery);
             this.PagesCount = (AllItems.Count() - AllItems.Count() % PageSize) / PageSize;
             this.PagesCount = AllItems.Count() % PageSize > 0 ? (this.PagesCount + 1) : this.PagesCount;
-            this.DataItems = AllItems.Skip(PageSize * (PageNumber - 1)).Take(PageSize).ToList();
+            this.DataItems = AllItems.Skip(PageSize * (PageNumber - 1)).Take(PageSize).Where(item => String.IsNullOrWhiteSpace(SearchQuery)? true: SearchQuery.SplitWords().Select(w => w.ToLower()).Any(w => item.ToJsonOnScreen().SplitWords().Select(w => w.ToLower()).Contains(w))).ToList();
         }
         catch(Exception ex)
         {
@@ -78,13 +85,25 @@
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        var dbs = GetType().Assembly.GetTypes<DbContext>().Select(ptype => (DbContext)serviceProvider.GetService(ptype)).ToList<DbContext>();
-        this.DbContext = dbs.FirstOrDefault(db => {
-            var etypes = db.GetEntitiesTypes().Select(t => t.GetTypeName().Replace("DbSet<", "").Replace(">", "")).ToList();
-            var dataTypeName = typeof(DataType).GetTypeName();
-            return etypes.Contains(dataTypeName);
-        });
-        this.Fasade = new EfEntityFasade<DataType>(this.DbContext);
-        DoSearch();
+        foreach(var ass in ServiceFactory.Get().GetAssemblies())
+        {
+            var dbs = ass.GetTypes<DbContext>().Select(ptype => (DbContext)serviceProvider.GetService(ptype)).ToList<DbContext>();
+            this.DbContext = dbs.FirstOrDefault(db =>
+            {
+                if (db is not null)
+                {
+                    var etypes = db.GetEntitiesTypes().Select(t => t.GetTypeName().Replace("DbSet<", "").Replace(">", "")).ToList();
+                    var dataTypeName = typeof(DataType).GetTypeName();
+                    return etypes.Contains(dataTypeName);
+                }
+                return false;
+            });
+            if (DbContext is not null)
+            {
+                this.Fasade = new EfEntityFasade<DataType>(this.DbContext);
+                DoSearch();
+                break;
+            }
+        }
     }
 }

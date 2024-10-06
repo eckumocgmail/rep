@@ -1,0 +1,105 @@
+﻿@namespace Console_Blazor
+@inject IBusinessPageService PageService
+@inject NavigationManager Navigator
+@code
+{
+    public AppFormsModule.InputFormModel Form { get; set; }
+}
+@code
+{
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        Navigator.LocationChanged += (sender, args) =>
+        {
+            if (PageService.HasPageForLocation(args.Location))
+            {
+                Form = PageService.GetFormForLocation(args.Location);
+            }
+        };
+    }
+}
+@try
+{
+        <CascadingBlazoredModal>
+
+
+            <Router AppAssembly="@typeof(Program).Assembly" PreferExactMatches="@true">
+                <Navigating>
+                    <ProgressAnimation>
+                        <TextComponent>Подождите пожауйста</TextComponent>
+                    </ProgressAnimation>
+                </Navigating>
+                <Found Context="routeData">
+                    <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+                </Found>
+                <NotFound>
+                <LayoutView Layout="@typeof(MainLayout)">
+                        @if (Form == null)
+                        {
+                            <AlertComponent>
+                                <TextComponent>@($"404 Нет связи с ресурсом {Navigator.Uri}")</TextComponent>
+                                <NavigationLink Model="@(new NLink() {
+                                                             Label = "Создать можно здесь",
+                                                             Href = "/admin/admin-create-form"
+                                                         })"></NavigationLink>
+                            </AlertComponent>
+                        }
+                        else
+                        {
+                            <ValidationForm Model="@Form"></ValidationForm>
+                        }
+                    </LayoutView>
+                </NotFound>
+            </Router>
+
+
+
+        </CascadingBlazoredModal>
+}
+catch (Exception ex)
+{
+    <div class="alert alert-danger">@ex.Message</div>
+    <div>@ex.StackTrace</div>
+}
+
+
+@*
+@inject NavigationManager nav
+<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(App).Assembly">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                <NotAuthorized>
+                    <PageTitle>Нет доступа</PageTitle>
+                    
+                    @code{
+                        int p()
+                        {
+                            nav.NavigateTo("/user/signup");
+                            return 1;
+                        }
+                    }
+                    @p()
+                    <div class="alert alert-danger" style="margins: 20px;">
+                        Нет доступа к странице <div><NavLink href="/">выполнить авторизацию</NavLink></div>
+                    </div>
+                </NotAuthorized>
+                <Authorizing>
+                    <div>Выполняется авторизация...</div>
+                </Authorizing>
+            </AuthorizeRouteView>
+            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+        </Found>
+        <NotFound>
+           
+
+
+            <PageTitle>Not found</PageTitle>
+            
+            <LayoutView Layout="@typeof(MainLayout)">
+                <p role="alert alert-info">Страница не найдена</p>
+            </LayoutView>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>*@

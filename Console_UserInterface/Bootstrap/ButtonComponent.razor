@@ -1,0 +1,22 @@
+﻿@page "/bootstrap/button-component"
+@inherits BaseComponent
+@code
+{
+    [Parameter]
+    [InputSelect("info,success,warning,danger,primary,secondary,dark,light")]
+    public string Color { get; set; } = "primary";
+
+    [Parameter]
+    public string Label { get; set; } = "подтвердить";
+
+    [Parameter]
+    public EventCallback OnClicked { get; set; }
+}
+<button class="btn btn-@(Color) w-100"
+        @onclick="@OnButtonClicked">
+    @Label
+</button>
+@code
+{
+    public async Task OnButtonClicked() => await OnClicked.InvokeAsync();
+}

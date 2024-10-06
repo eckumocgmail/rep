@@ -1,6 +1,10 @@
 ﻿using Console_DataConnector.DataModule.DataModels.MessageModel;
+
+using Console_UserInterface.ControlAttributes;
+
 using Microsoft.EntityFrameworkCore;
 
+using System.ComponentModel.DataAnnotations;
 
 /// <summary>
 /// 
@@ -20,7 +24,7 @@ public class UserBusinessService
         return this.dbu.UserRoles_.Where(r => userRoleIds.Contains(r.Id)).ToList();
     }
 
-    public List<MessageProtocol> GetMessageProtocols(int userId)
+    public List<MessageProtocol> GetMessageProtocols([Required][Label("Пользователь")][SelectData($"{nameof(UserPerson)},{nameof(UserPerson.LastName)}")]int userId)
     {
         using (var mes = new MessageDbContext())
         {

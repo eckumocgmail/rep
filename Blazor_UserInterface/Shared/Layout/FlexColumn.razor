@@ -1,0 +1,24 @@
+﻿@inherits BaseComponent
+<div class="@(MaxWidth?"w-100":"") @(MaxHeight?"h-100":"")" style="display: flex; flex-direction: column; flex-wrap: @(Wrap?"wrap":"nowrap");">
+    @ChildContent
+</div>
+
+@code 
+{
+    [Parameter]
+    public override RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public bool Wrap { get; set; } = false;
+
+    [Parameter]
+    public bool MaxWidth { get; set; } = true;
+
+    [Parameter]
+    public bool MaxHeight { get; set; } = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+    }
+}

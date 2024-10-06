@@ -1,0 +1,19 @@
+﻿@inject NavigationManager nav
+@nav.
+@code 
+{
+    [Parameter]
+    public NLink Model { get; set; }
+}
+
+
+<a href="@(Model.Href)" style="width: max-content">
+
+    
+    <MatIcon>@(Model.Icon)</MatIcon>    
+    <span>@(Model.Label)</span>
+
+</a>
+
+
+

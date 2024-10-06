@@ -71,7 +71,7 @@ public class TypeDocumentation : FromAttributes
     public TypeDocumentation(Type type)
     {
         Init(type);
-        var attrs = type.GetAttributes();
+        var attrs = TypeAttributesExtensions.GetTypeAttributes(type);
         GetType().GetOwnPropertyNames().ToList().ForEach((name) => {
             string key = name ;
             if (attrs.ContainsKey(key))

@@ -34,19 +34,21 @@
         Update();
         StateHasChanged();
     }
-}
-
-
+} 
+<BookingMasterDialog></BookingMasterDialog>
+@*
 <CardContainer>
     <CardHeader>
         <ButtonClick OnClick="OnAddMenuItemClicked">Добавить</ButtonClick>
     </CardHeader>
     <CardBody>
-        <Console_UserInterface.Shared.Menu.MainMenu></Console_UserInterface.Shared.Menu.MainMenu>
+        <MainMenuView></MainMenuView>
         <NavLinks Links="@Links"></NavLinks>
     </CardBody>
-    <CardFooter></CardFooter>
-</CardContainer>
+    <CardFooter>
+        <CreateRouteView></CreateRouteView>
+    </CardFooter>
+</CardContainer>*@
 
 @code
 {

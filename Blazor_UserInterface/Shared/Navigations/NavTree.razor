@@ -1,0 +1,51 @@
+﻿@inherits BaseComponent
+@inject INavMenuService navMenuService
+@inject NavigationManager Navigator
+ 
+<div>
+    @foreach (var navLink in navMenuService.GetPageLinks(Navigator.Uri))
+    {
+    <NavLink class="nav-link" href="@navLink.Href">
+        <span class="oi oi-@navLink.Icon" aria-hidden="true"></span>
+        @navLink.Label
+        <a href="D:\ProjectsEnterpricce\RootApplication\RootForms\Shared\SurveyPrompt.razor">D:\ProjectsEnterpricce\RootApplication\RootForms\Shared\SurveyPrompt.razor</a>
+    </NavLink>
+    }
+</div>
+
+@code {
+      
+    
+    [Parameter]
+    public string Title { get; set; } = "Меню";
+
+    [Parameter]
+    public List<global::NavLink> Links { get; set; } = new List<global::NavLink>();
+
+    /*public global::Tree Root { get; set; }
+
+    public void Reset(global::NavLink[] evt)
+    {
+        Info("Reset");
+        Links.AddRange(evt);
+
+        Root = new global::Tree()
+        {
+            Item = new NamedObject()
+            {
+                Name = "Корень"
+            }
+        };
+        evt.Select(link => new global::NavLink()
+        {
+            Label = link.Label,
+            Icon = link.Icon,
+            Href = link.Href
+
+        }).ToList().ForEach(t =>
+        {
+            Root.Append(t);
+        });
+
+    }*/
+}

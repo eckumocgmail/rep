@@ -1,11 +1,34 @@
 ﻿@*
     Выбираем работы при записи
 *@
+@inject ServiceController sc
+
 @page "/booking/select-works"
+@using BookingModel.ServiceDataModel;
 @code
 {
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
+        this.WorkNamesList = new Dictionary<string,ServiceWork>( sc.GetWorkList().Select(w => new KeyValuePair<string, ServiceWork>(w.WorkName,w)).ToList());
+
     }
+}
+@if (DataGridRef is not null)
+{
+    <p>@DataGridRef.DataItems.ToJson()</p>
+}
+<SelectList OnSelect="@OnWorkSelected" ListItems="@WorkNamesList.Keys.ToList()"></SelectList>
+@code
+{
+    public Dictionary<string, ServiceWork> WorkNamesList { get; set; } = new();
+    public DataGrid<ServiceWork> DataGridRef { get; set; }
+    [Parameter]
+    public EventCallback<ServiceWork> OnChanged { get; set; }
+
+    public async Task OnWorkSelected(object evt)
+    {
+        await OnChanged.InvokeAsync(WorkNamesList[evt.ToString()]);
+    }
+     
 }

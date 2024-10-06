@@ -50,8 +50,8 @@ namespace Console_UserInterface.ControlAttributes
 
 
             Options = result.Values.ToList();
-            if (Options.Count() == 0)
-                throw new ArgumentException();
+            //if (Options.Count() == 0)
+            //    throw new ArgumentException();
            
         }
         public List<string> Options { get; set; }

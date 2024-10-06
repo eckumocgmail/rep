@@ -13,16 +13,34 @@ using Console_UserInterface.AppUnits.InterfaceModule;
 using Ex;
 using Console_UserInterface.ControlAttributes;
 using static Console_UserInterface.Pages.Auth.UserSignup;
+using Console_UserInterface.Shared;
+using BookingModel.ServiceServiceModel;
+using BookingModel;
 
 /// приложение
 namespace Console_UserInterface
 {
+
     /// <summary>
     /// Программирование
     /// </summary>
     public class Program
     {
-
+        public SummaryViewModel[] Items { get; set; } = new SummaryViewModel[]
+        {
+            new SummaryViewModel()
+            {
+                Title = "Заголовок",
+                Description = "Вырезка из статьи с найденым контентом, вырезка из статьи с найденым контентом, вырезка из статьи с найденым контентом, вырезка из статьи с найденым контентом, вырезка из статьи с найденым контентом, вырезка из статьи с найденым контентом. ",
+                Links = new LinkViewModel[]
+                {
+                    new LinkViewModel()
+                    {
+                        Label = "Перейти"
+                    }
+                }
+            }
+        };
         /// <summary>
         /// Тестирование
         /// </summary>
@@ -53,6 +71,9 @@ namespace Console_UserInterface
         /// </summary>
         public static void Main(string[] args)
         {
+            //CustomDbContext.Build();
+            BookingInitializer.InitData();
+            UpdateDatabases();
             /*new RoleSelectionModel()
             {
                 Role = "customer"
@@ -78,6 +99,8 @@ namespace Console_UserInterface
         private static void RegTypes()
         {
             ServiceFactory.Get().Info("регистрирую типы данных ");
+            ServiceFactory.Get().AddTypes(typeof(CustomDbContext).Assembly);
+            ServiceFactory.Get().AddTypes(typeof(ServiceDbContext).Assembly);
             ServiceFactory.Get().AddTypes(Assembly.GetExecutingAssembly());
             ServiceFactory.Get().AddTypes(Assembly.GetCallingAssembly());
             ServiceFactory.Get().AddTypes(Assembly.GetEntryAssembly());

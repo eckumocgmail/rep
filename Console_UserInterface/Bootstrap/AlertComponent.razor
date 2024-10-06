@@ -1,0 +1,10 @@
+﻿@inherits BaseComponent
+@code
+{
+    [Parameter]
+    [InputSelect("dark,light,danger,dismissable,info,heading,link,primary,secondary")]
+    public string Color { get; set; } = "primary";
+}
+<div class="alert alert-@(Color)">
+    @ChildContent
+</div>

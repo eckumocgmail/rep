@@ -1,0 +1,42 @@
+﻿@code
+{
+    [Parameter]
+    public Dictionary<string, string> navigation { get; set; } = new Dictionary<string, string>()
+    {
+        { "", "" },
+        { "", "" },
+        { "", "" },
+    };
+}
+<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">Blazor_UserInterface</a>
+        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</div>
+
+<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+    <nav class="flex-column">
+        @foreach( var kv in navigation)
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="@kv.Key">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> @kv.Value data
+                </NavLink>
+            </div>
+        }
+    </nav>
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+}

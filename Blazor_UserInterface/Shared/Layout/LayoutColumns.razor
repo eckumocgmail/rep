@@ -1,0 +1,13 @@
+﻿@inject INavMenuService NavMenuService
+@inherits BaseComponent
+@code 
+{
+    [Parameter]
+    public int ColumnsCount { get; set; }
+
+    [Parameter]
+    public override RenderFragment ChildContent { get; set; }
+}
+<div style="-moz-column-count: @ColumnsCount; /* Для Firefox */ -webkit-column-count: @ColumnsCount; /* Для Safari и Chrome */ column-count: @ColumnsCount;">
+    @ChildContent
+</div>

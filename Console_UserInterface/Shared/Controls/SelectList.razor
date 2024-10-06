@@ -1,0 +1,15 @@
+﻿<ul class="list-group"> 
+    @foreach (var item in ListItems)
+    {
+        <li style="margin: 5px;" class="list-group-item" @onclick="async evt=>{ await OnSelect.InvokeAsync(item); StateHasChanged(); }">@item</li>
+    }    
+</ul>
+
+@code 
+{
+    [Parameter]
+    public EventCallback<object> OnSelect { get; set; }
+
+    [Parameter]
+    public List<string> ListItems { get; set; }
+}

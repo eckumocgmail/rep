@@ -1,0 +1,263 @@
+﻿
+@using static Console_UserInterface.Shared.Forms.FormControl;
+
+
+@inherits BaseComponent
+@inject ILogger<FormControl> logger
+
+@code {
+    [Parameter]
+    public string Size { get; set; } = "sm";
+
+    [Parameter]
+    public global::InputFormField Model { get; set; }
+
+    [Parameter]
+    public EventCallback<InputEvent> AfterInput { get; set; }
+    public HashSet<Action> AfterInitiallized { get; set; } = new HashSet<Action>();
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        if (Model != null && Model.Type != null) Model.Type = Model.Type.ToLower();
+
+    }
+
+    private static string NoName = "NoName";
+    public override void Error(Exception ex)
+    {
+        Console.WriteLine($"[{GetType().GetName()}]:[{(Model!=null?Model.Name:NoName)}]: {ex.Message}");
+        Console.WriteLine($"[{GetType().GetName()}]:[{(Model != null ? Model.Name : NoName)}]: {ex.StackTrace}");
+    }
+
+    public override void Info(object item)
+    {
+        Console.WriteLine($"[{GetType().GetName()}]:[{(Model != null ? Model.Name : NoName)}]: {item}");
+    }
+
+    /// <summary>
+    /// Скрипт обработчика события ввода номера телефона в поле формы
+    /// </summary>    
+    public string GetInputPhoneJS()
+    {
+        return @"
+                    var evt = window.event;
+                    try {
+                        console.log(evt);
+
+                        var s = '';
+                        var v = evt.target.value;
+                        for (let i = 0; i < v.length; i++) {
+                            if ('0123456789-'.indexOf(v[i]) != -1) {
+                                s += v[i];
+                                if (s.length > 13) {
+                                    break;
+                                }
+                            }
+                        }
+                        if (s.length > 1 && s[1] != '-') s = s.substring(0, 1) + '-' + s.substring(1);
+                        if (s.length > 4 && s[5] != '-') s = s.substring(0, 5) + '-' + s.substring(5);
+                        if (s.length > 8 && s[9] != '-') s = s.substring(0, 9) + '-' + s.substring(9);
+                        v = s;
+                        if (v.endsWith('-')) v = v.substring(0, v.length - 1);
+                        this.value = v;
+
+                    } catch (e) {
+                        console.error(e);
+                    };";
+    }
+}
+
+
+@if (Model == null)
+{
+    <div class="alert alert-danger">Отсутсвует ссылка в свойстве Model</div>
+}
+else
+{
+  
+<div class="input-group input-group-@(Size) flex-column" style="width: 100%; margin-top: 12px; justify-content: flex-start; align-items: flex-start;">
+    @Model.Type
+    @if (Model.Type == "hidden")
+    {
+        <input type="hidden" value="@Model.GetHtmlInputValue()" id="@Model.GetInputId()" name="@Model.GetInputName()" />
+    }
+    else
+    {
+        @if (Model.Type != "bool" && Model.Type != "checkbox")
+        {
+            <label>@Model.Label</label>
+        }
+
+
+        @if (Model.Type == "number" || Model.Type == "email" || Model.Type.ToLower() == "text" || Model.Type == "date" || Model.Type == "datetime" || Model.Type == "password" || Model.Type == "color")
+        {
+            <input type="@Model.Type.ToLower()"
+                   value="@Model.GetHtmlInputValue()"
+                   name="@Model.GetInputName()"
+                   id="@Model.GetInputId()"
+                   style="width: 100%;"
+                   @oninput:preventDefault
+                   @oninput="@((e) => OnInputValue(Model.Name)(e))"
+                   @onfocus="@((e) => OnFocused(Model.Name)(e))"
+                   class="form-control is-@Model.State" />
+
+        }
+        else if (Model.Type == "phone")
+        {
+            <div @oninput:preventDefault
+                 @oninput="@((e) => OnInputValue(Model.Name)(e))"
+                 style="width: 100%;">
+                <input type="text"
+                       value="@Model.GetHtmlInputValue()"
+                       name="@Model.GetInputName()"
+                       style="width: 100%;"
+                       id="@Model.GetInputId()"
+                       oninput="@GetInputPhoneJS()"
+                       class="form-control is-@Model.State" />
+            </div>
+
+        }
+        else if (Model.Type == "multilinetext")
+        {
+            <textarea type="text"
+                      name="@Model.GetInputName()"
+                      style="width: 100%; resize: none; height: 128px;"
+                      id="@Model.GetInputId()"
+                      @oninput:preventDefault
+                      @oninput="@((e) => OnInputValue(Model.Name)(e))"
+                      class="form-control is-@Model.State">@Model.GetHtmlInputValue()</textarea>
+        }
+        else if (Model.Type == "icon")
+        {
+
+        }
+        else if (Model.Type == "bool" || Model.Type == "checkbox")
+        {
+
+            <div class="form-check" style="width: 25px;">
+                <input class="form-check-input"
+                       style="width: 100%; "
+                       value="@Model.GetHtmlInputValue()"
+                       @oninput:preventDefault
+                       @oninput="@((e) => OnInputValue(Model.Name)(e))"
+                       type="checkbox" checked="@Model.Value" id="@Model.GetInputId()" name="@Model.GetInputName()" />
+                <label class="form-check-label" style="padding-left: 10px; width: max-content"> @Model.Label </label>
+            </div>
+
+        }
+
+            else if (Model.Type.ToLower() == "selectcontrol" || Model.Type.ToLower() == "selectdata")
+        {
+            <select class="form-control" style="width: 100%;"
+                    name="@Model.GetInputName()"
+                    id="@Model.GetInputId()"
+                    @onchange:preventDefault
+                    @oninput="@((e) => OnInputValue(Model.Name)(e))">
+                @foreach (var option in (((Select)Model.Control).Options))
+                {
+                    @if (option.Value.ToString() == Model.Value.ToString())
+                    {
+                        <option selected value="@option.Value">@option.Key</option>
+                    }
+                    else
+                    {
+                        <option value="@option.Value">@option.Key</option>
+                    }
+
+                }
+
+            </select>
+        }
+        else if (Model.Type == "custom")
+        {
+            @code
+            {
+                [Parameter]
+                public Blazor_UserInterface.Bootstrap.ModalComponent RefModal { get; set; }
+            }
+            <ButtonContainer OnClicked="@(async ()=> { await RefModal.PopupDialog();  })">@Model.Name</ButtonContainer>
+            <ModalComponent @ref="@(RefModal)">
+                <ContentBox Model="@(Model.Control)"></ContentBox>
+            </ModalComponent>
+        }
+        else if (Model.Type == "image")
+        {
+
+            @code
+            {
+                 
+                public void OnImageClicked()
+                {
+                    Eval<string>($"document.getElementById('{("file_" + Model.Name)}').click(); ").Wait();
+                }
+                
+
+                public void OnFileLoaded( ProgressEventArgs evt )
+                {
+                    Eval<string>($" ").Wait();
+                }
+            }
+            <div>
+                   
+                <input type="hidden" name="@Model.Name" id="@Model.Name" value="@Model.Value" />
+                <input type="file" name="file_@Model.Name" id="file_@Model.Name" onchange="var reader = new FileReader(); reader.onload = function () { document.getElementsByTagName('img')[0].src=reader.result;}; reader.readAsDataURL( document.getElementsByTagName('input')[6].files[0]);" />
+
+                <img style="width: 222px; height: 222px;" id="img_@Model.Name" @onclick="@OnImageClicked" />
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-warning">Тип поля ввода @Model.Type не зарегистрирован в @GetType().Name</div>
+        }
+
+        @if (string.IsNullOrEmpty(Model.Help) == false)
+        {
+
+            <small class="form-text text-info">@Model.Help</small>
+        }
+        @foreach (var error in Model.Errors)
+        {
+            <div><small class="form-text text-danger">@error</small></div>
+        }
+    }
+</div>
+}
+
+
+
+
+
+@code
+{
+    /// <summary>
+    /// Обработчик события ввода данных в поле формы передаёт специальное сообщение родительскому компоненту
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    public Action<ChangeEventArgs> OnInputValue(string name)
+    {
+        return (changes) =>
+        {
+
+            Info(name + "=" + (changes.Value == null ? "" : changes.Value.ToString()));
+            AfterInput.InvokeAsync(new InputEvent()
+            {
+                Type = "input",
+                Property = name,
+                Value = changes.Value == null ? "" : changes.Value.ToString()
+            }).Wait();
+        };
+    }
+
+    public Action<FocusEventArgs> OnFocused(string name)
+    {
+        return (evt) =>
+        {
+            Info(name + "=" + evt.GetType().Name);
+            if (Model.State == "untouched")
+            {
+                Model.State = "invalid";
+            }
+        };
+    }
+}

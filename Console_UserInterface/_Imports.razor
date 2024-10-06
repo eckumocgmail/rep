@@ -8,10 +8,16 @@
 @using Microsoft.AspNetCore.Components.Web.Virtualization
 @using Microsoft.EntityFrameworkCore;
 @using BlazorContextMenu
+@using System.Linq
 @using Blazored.Modal
+@using Console_UserInterface.Bootstrap
 @using Blazored.Modal.Services
 @using Console_UserInterface
+@using Console_UserInterface.Pages.App
+@using Console_UserInterface.Pages.Booking
+
 @using Console_UserInterface.Shared
+@using Console_UserInterface.Shared.Menu
 @using Console_UserInterface.Shared.Controls;
 @using Console_UserInterface.Shared.Cards
 @using Console_UserInterface.Shared.Deps
@@ -36,4 +42,5 @@
 @using static Console_UserInterface.Services.Location.LocationDbContext.PageComponent
 @using pickpoint_delivery_service
 @using BlazorBootstrap;
-
+@using Console_InputApplication.ViewEvents;
+@using static Console_UserInterface.Shared.Forms.FormControl;

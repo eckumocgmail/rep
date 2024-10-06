@@ -7,7 +7,7 @@ namespace Console_UserInterface.Services
         public override void OnTest()
         {
 
-            this.Info(AppBuilder.CreateNavMenu(typeof(FormsContrustor).Namespace, new Dictionary<string, string>()
+            this.Info(AppBuilder.CreateNavMenu(typeof(FormsContrustorView).Namespace, new Dictionary<string, string>()
             {
 
             }).ToJsonOnScreen());

@@ -11,9 +11,10 @@
 
     [Parameter]
     public List<string> DisplayColumns { get; set; }  
-    
+
     protected override async Task OnInitializedAsync()
     {
+        await base.OnInitializedAsync();
         this.DisplayColumns = this.DisplayColumns is null ? typeof(DataType).GetInputProperties().Take(5).ToList() : this.DisplayColumns;
     }
 
@@ -24,7 +25,14 @@
 
     public List<string> GetColumnsLabels(params string[] properties)
     {
-        return properties.Select(property => typeof(DataType).GetPropertyLabel(property)).ToList();
+        return properties is null? new List<string>(): properties.Select(property => typeof(DataType).GetPropertyLabel(property)).ToList();
+    }
+    [Parameter]
+    public EventCallback<DataType> OnChanged { get; set; }
+    public async Task OnItemSelected( DataType item )
+    {
+        await OnChanged.InvokeAsync(item);
+        StateHasChanged();
     }
 }
 @if(DataItems is null || DataItems.Count()==0)
@@ -33,33 +41,57 @@
 }
 else
 {
-    <table class="table table-bordered table-borderless">
-        <thead>
-            <tr>
-                @if(DataCheckable)
+    @DataItems.Count()
+    <table>
+        @foreach (DataType Item in DataItems)
+        {
+            <tr @onclick="async evt => { await OnItemSelected(Item); StateHasChanged(); }" @onclick:preventDefault @onclick:stopPropagation>
+                @if (DisplayColumns is not null)
                 {
-                    <th style="width: 50px;"></th>
-                }
-                @foreach (string DisplayColumn in GetColumnsLabels(DisplayColumns.ToArray()))
-                {
-                    <td>@DisplayColumn</td>
-                }
-            </tr>
-        </thead>
-        <tbody>
-            @foreach(DataType Item in DataItems)
-            {
-                <tr>
-                    @if (DataCheckable)
-                    {
-                        <td style="width: 50px;"><CheckBox Checked="@CheckedItems.Contains(Item)" OnChange="(evt => { if(CheckedItems.Contains(Item))CheckedItems.Remove(Item); else CheckedItems.Add(Item); StateHasChanged(); })"></CheckBox></td>
-                    }
-                    @foreach(string DisplayColumn in DisplayColumns)
+                    @foreach (string DisplayColumn in DisplayColumns)
                     {
                         <td>@Item.GetValue(DisplayColumn)</td>
                     }
-                </tr>
-            }
-        </tbody>
+                }
+            </tr>
+        }
     </table>
+    @*<div >
+        <div>
+            <div>
+                @if(DataCheckable)
+                {
+                    <span style="width: 50px;"></span>
+                }
+                @if(DisplayColumns is not null)
+                {
+                    @foreach (string DisplayColumn in GetColumnsLabels(DisplayColumns.ToArray()))
+                    {
+                        <span>@DisplayColumn</span>
+                    }
+                }
+                
+            </div>
+        </div>
+        <div>
+            @foreach(DataType Item in DataItems)
+            {
+                <div @onclick="async evt => { await OnItemSelected(Item); StateHasChanged(); }" @onclick:preventDefault @onclick:stopPropagation>
+
+                    @if (false)
+                    {
+                        <div style="width: 50px;"><CheckBox Checked="@CheckedItems.Contains(Item)" OnChange="(evt => { if(CheckedItems.Contains(Item))CheckedItems.Remove(Item); else CheckedItems.Add(Item); StateHasChanged(); })"></CheckBox></div>
+                    }
+                    @if (DisplayColumns is not null)
+                    {
+                        @foreach (string DisplayColumn in DisplayColumns)
+                        {
+                            <span>@Item.GetValue(DisplayColumn)</span>
+                        }
+                    }
+                   
+                </div>
+            }
+        </div>
+    </div>*@
 }

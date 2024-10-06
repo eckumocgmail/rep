@@ -1,0 +1,136 @@
+﻿@page "/bootstrap/bootstrap-home"
+@inherits BaseComponent
+@code
+{
+    public InputFormModel Input { get; set; }
+    public bool Debug { get; set; }
+    private object Item = null;
+
+}
+@code
+{
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        Item = "ButtonComponent".ToType().New();
+        Input = new InputFormModel(Item);
+    }
+}
+@code
+{
+    protected Action OnSelectComponentCallback( Type component)
+    {
+        return () => {
+            Item = component.New();
+            Input = new InputFormModel(Item);
+        };
+    }
+}
+
+<h3>Компоненты Bootstrap</h3>
+<InlinePane>
+    <Left>
+
+        <FlexColumn MaxWidth="false">
+
+           @* <ForEach TItem="Type"
+                     Items="@(StartupApplication
+                                .SharedBootstrapComponents
+                              
+                                .Where(t => t.Name.StartsWith("Bootstrap") == false)
+                                .ToArray())"
+                     Context="component">
+                <div style="flex: 1;"
+                     class="btn @(Item!=null && component.Name==Item.GetType().Name ? "btn-primary":"")"
+                     @onclick="@(OnSelectComponentCallback(component))">
+                    @component.Name
+                </div>
+
+            </ForEach>*@
+        </FlexColumn>
+
+    </Left>
+    <ChildContent>
+        <div class="w-100" style="padding: 40px;">
+            @if (Item != null)
+            {
+                @if (Debug)
+                {
+                    <div class="text-black-50 text-success">@Item.ToJsonOnScreen()</div>
+                }
+                <BootstrapMulticast Type="@Item.GetType().Name" Item="@(Item)"></BootstrapMulticast>
+            }
+        </div>
+
+    </ChildContent>
+    <Right>
+        <FlexColumn MaxWidth="false">
+            <div style="width: 128px; height: 100%;">
+                @if (Input != null)
+                {
+                    @if (Debug)
+                    {
+                        <div class="text-black-50 text-success">@Item.ToJsonOnScreen()</div>
+                    }
+
+
+                    <ValidationForm Model="@(Input)" 
+                                    OnChangedCallback="@((item)=> { Item = item;  StateHasChanged();  })"></ValidationForm>
+                }
+            </div>
+        </FlexColumn>
+
+
+    </Right>
+</InlinePane>
+@*<div class="container">
+        <div class="row">
+            <div class="col-4 front-pane">
+                <ul >
+                    <ForEach TItem="Type"
+                             Items="@(StartupApplication
+                                      .SharedBootstrapComponents
+                                      .Where(t => t.IsComponent())
+                                      .Where(t => t.Name.StartsWith("Bootstrap") == false)
+                                      .ToArray())"
+                             Context="component">
+                        <li class="btn w-100"
+                            @onclick="@(()=> {
+
+                                            Item = component.New();
+                                            Input = new InputFormModel(Item);
+                                        })">
+                            @component.Name
+                        </li>
+
+                    </ForEach>
+                </ul>
+            </div>
+            <div class="col-4 front-pane">
+                @if (Item != null)
+                {
+                    @if (Debug)
+                    {
+                        <div class="text-black-50 text-success">@Item.ToJsonOnScreen()</div>
+                    }
+                    <BootstrapMulticast Type="@Item.GetType().Name" Item="@(Item)"></BootstrapMulticast>
+                }
+            </div>
+            <div class="col-4 front-pane">
+                @if (Input != null)
+                {
+                    @if (Debug)
+                    {
+                        <div class="text-black-50 text-success">@Item.ToJsonOnScreen()</div>
+                    }
+
+
+                    <ValidationForm Model="@(Input)" OnChangedCallback="@((item)=> { Item = item;  StateHasChanged();  })"></ValidationForm>
+                }
+
+            </div>
+        </div>
+    </div>
+
+
+*@

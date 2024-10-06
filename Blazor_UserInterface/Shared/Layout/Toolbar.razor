@@ -1,0 +1,12 @@
+﻿@inherits BaseComponent
+@code 
+{
+    [Parameter]
+    public IEnumerable<NLink> Links { get; set; }
+
+    [Parameter]
+    public override RenderFragment ChildContent { get; set; }
+}
+<FlexRow Wrap="true">
+    @ChildContent
+</FlexRow>

@@ -17,7 +17,7 @@
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
 	</ItemGroup>
 	<ItemGroup>
-	  <ProjectReference Include="..\CustomAttributesModule\CustomAttributesModule.csproj" />
+	  <ProjectReference Include="..\Console_AttrubteModel\Console_AttributeModel.csproj" />
 	</ItemGroup>
 
 </Project>

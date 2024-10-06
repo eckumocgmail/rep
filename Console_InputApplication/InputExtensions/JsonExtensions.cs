@@ -328,6 +328,16 @@ public static class JsonExtensions
     /// <summary>
     /// Десериализация из Json
     /// </summary>
+    public static object FromJson(this string target, Type ptype)
+    {
+        var result = ptype.New();
+        var data = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(target);
+        foreach(var kv in data)
+        {
+            result.SetValue(kv.Key, kv.Value);
+        }
+        return result;
+    }
     public static TModel FromJson<TModel>(this string target)
     {
         try

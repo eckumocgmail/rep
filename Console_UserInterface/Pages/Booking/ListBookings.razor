@@ -2,6 +2,8 @@
     Список забронированных услуг
 *@
 @page "/booking/list-bookings"
+@using Console_Blazor.Controllers;
+
 @inject ServiceController sc
 @code 
 {
@@ -9,16 +11,21 @@
     {
         await base.OnInitializedAsync();
         WorkNames = sc.GetWorkList().Select( wrk => wrk.WorkName ).ToList();
+
     }
 }
 <CardContainer>
     <CardHeader>
-        <SearchControl></SearchControl>
-        <TextComponent FontSize="@(20)">Выбранные услуги</TextComponent>
+         
+        <SearchControl SearchQuery="@SearchQuery" SearchOptions="@SearchOptions" OnSearch="@OnSearch"></SearchControl>
+        <TextComponent FontSize="@(20)" Color="black">Выбранные услуги</TextComponent>
+        <ToolsBar>
+            <ButtonClick>добавить</ButtonClick>
+        </ToolsBar>
         <ListGroup Items="@SelectedWorks" OnListGroupItemClickedCallback="item => { WorkNames.Add(item); SelectedWorks.Remove(item); StateHasChanged(); }">
         </ListGroup>
     </CardHeader>
-    <CardBody>
+    <CardBody>           
         <TextComponent FontSize="@(20)">Доступные услуги</TextComponent>
         <ListGroup Items="@WorkNames" OnListGroupItemClickedCallback="item => { WorkNames.Remove(item); SelectedWorks.Add(item); StateHasChanged(); }">
         </ListGroup>
@@ -28,5 +35,29 @@
 {
     [Parameter]
     public List<string> WorkNames { get; set; }
-    public List<string> SelectedWorks { get; set; } = new();    
+    public List<string> SelectedWorks { get; set; } = new();
+
+    /// <summary>
+    /// Заполнитель пустого поля
+    /// </summary>
+    [Parameter]
+    public string Placeholder { get; set; } = "Поиск";
+
+
+    /// <summary>
+    /// Текст в строке поиска
+    /// </summary>
+    [Parameter]
+    public string SearchQuery { get; set; } = "";
+
+    /// <summary>
+    /// Значения для автоподстановки
+    /// </summary>
+    [Parameter]
+    public List<string> SearchOptions { get; set; } = new();
+
+    public void OnSearch(object evt)
+    {
+        
+    }
 }

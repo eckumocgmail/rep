@@ -79,7 +79,7 @@
 {
     public async Task OnSearchSubmit()
     {
-        await this.OnInput.InvokeAsync(this.SearchQuery);
+        await this.OnSearch.InvokeAsync(this);
     }
 
     public async Task OnSearchInput( ChangeEventArgs evt)

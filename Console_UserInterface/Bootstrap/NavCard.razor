@@ -1,0 +1,40 @@
+﻿@inherits LayoutComponentBase
+@code
+{
+    [Parameter]
+    public Dictionary<int, string> Keys { get; set; } = new Dictionary<int, string>();
+
+    [Parameter]
+    [InputOrder(4)]
+    [Label("Ссылки")]
+    [InputStructureCollection("LinkViewModel")]
+    public List<NavLinkViewModel> Links { get; set; } = new List<NavLinkViewModel>()
+    {
+        new NavLinkViewModel()
+        {
+            Label="Перейти"
+        }
+    };
+}
+<div class="card text-center">
+    <div class="card-header">
+        <ul class="nav nav-pills card-header-pills">
+            @if (Links != null)
+            {
+                @foreach (var link in Links)
+                {
+                    <li class="nav-item">
+                        <a class="nav-link @(link.IsActive?"active":"")" 
+                           href="@(link.Href)">
+                            @(link.Label)
+                        </a>
+                    </li>
+                }
+            }
+ 
+        </ul>
+    </div>
+    <div class="card-body">
+        @Body
+    </div>
+</div>

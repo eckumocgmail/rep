@@ -1,0 +1,50 @@
+﻿@page "/bootstrap/modal-component"
+@inherits Console_UserInterface.Shared.BaseComponent
+@inject IJSRuntime JSR
+@code
+{
+    [Parameter]
+    [InputSelect("info,success,warning,danger,primary,secondary,dark,light")]
+    public string Color { get; set; } = "primary";
+
+    [Parameter]
+    public string Label { get; set; } = "подтвердить";
+
+}
+
+<button  
+        @onclick="@(()=> { OnClicked(); })">
+    @Label
+</button>
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">New message</h4>
+            </div>
+            <div class="modal-body">
+                @ChildContent
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Send message</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code
+{
+    public void OnClicked()
+    {
+        Console.WriteLine(123);
+    }
+
+    public async Task PopupDialog()
+    {
+        JSR.InvokeVoidAsync("$('#exampleModal').modal('toggle')");
+        System.Threading.Thread.Sleep(10000);
+        
+    }
+}

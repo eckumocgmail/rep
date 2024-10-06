@@ -19,7 +19,7 @@ internal class Utils
 
     internal static Dictionary<string, string> ForType(Type type)
     {
-        return type.GetAttributes();
+        return TypeAttributesExtensions.GetTypeAttributes(type);
     }
 
     internal static string LabelFor(Type type, string name)

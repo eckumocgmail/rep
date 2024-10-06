@@ -11,6 +11,8 @@ namespace Console_UserInterface.AppUnits.InterfaceModule
         {
             services.AddTransient<AppBuilder>();
             services.AddTransient<HelpService>();
+            services.AddTransient<ComponentRegistry>();
+            services.AddTransient<IUserModelsService, UserModelsService>();
             
             services.AddNavMenu();
             services.AddBlazoredModal();

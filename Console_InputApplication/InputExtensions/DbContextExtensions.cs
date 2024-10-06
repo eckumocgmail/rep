@@ -39,6 +39,8 @@ public static class DbContextExtensions
     /// <returns> множество наименований сущностей </returns>
     public static HashSet<Type> GetEntitiesTypes(this object dbContext)
     {
+        if(dbContext is null)
+            throw new ArgumentNullException(nameof(dbContext));
         Type type = dbContext.GetType();
         HashSet<Type> entities = new HashSet<Type>();
         foreach (MethodInfo info in type.GetMethods())

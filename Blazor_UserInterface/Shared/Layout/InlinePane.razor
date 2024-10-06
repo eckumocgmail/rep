@@ -1,0 +1,17 @@
+﻿@inherits BaseComponent
+@code
+{
+    [Parameter]
+    public override RenderFragment ChildContent { get; set; }
+    [Parameter]
+    public RenderFragment Left { get; set; }
+    [Parameter]
+    public RenderFragment Right { get; set; }
+}
+<div style="display: flex; flex-direction: row; flex-wrap: nowrap; width: 100%;">
+    @Left
+     
+    @ChildContent
+    
+    @Right
+</div>

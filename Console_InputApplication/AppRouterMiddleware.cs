@@ -16,10 +16,11 @@ public class AppRouterMiddleware: TypeNode<AppRouterMiddleware>, IMiddleware
     {
     }
     
-    public void AddControllerAction( [SelectType]string controller, string action, [InputSelect("Basic,Bearer,KeyCloak,GateKeeper")]string authorization="no")
+    public void AddControllerAction( [SelectType]string controller, string action, [InputSelect("Basic,Bearer,KeyCloak,GateKeeper")]string authorization="no", string provider="Контей")
     {
         var route = $"/api/{controller}/{action}";
         var ctrl = controller.ToType();
+        object target = null;
         var method = controller.ToType().GetMethod(action);
         if (ctrl is null)
         {
@@ -31,7 +32,17 @@ public class AppRouterMiddleware: TypeNode<AppRouterMiddleware>, IMiddleware
         }
         try
         {
-            ctrl.New();
+            switch(provider)
+            {               
+                case "Контейнер приложения": target=AppProviderService.GetInstance().GetService(ctrl); break;
+                case "Файловая система":
+                    var fctrl = new FileController(ctrl.GetTypeName());
+
+                    target= fctrl.ReadText().FromJson(ctrl); break;
+                case "Конструктор по-умолчанию": target = ctrl.New(); break;
+                default: throw new ArgumentException("provider");
+            }
+            
         }
         catch(Exception) 
         {

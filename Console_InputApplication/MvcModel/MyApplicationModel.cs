@@ -51,7 +51,7 @@ public class MyApplicationModel
 
 
 
-        return type.GetAttributes();
+        return TypeAttributesExtensions.GetTypeAttributes(type);
     }
 
     private string PathForController(Type controllerType)

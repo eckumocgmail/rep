@@ -70,7 +70,7 @@ public static class AttributesInfoExtensions
     }
 
     [Label("Получить атрибуты к свойству")]
-    public static Dictionary<string, string> GetPropertyAttributes( this Type ptype, string property)
+    public static Dictionary<string, string> _GetPropertyAttributes( this Type ptype, string property)
     {
         var res = new Dictionary<string, string>();
         var pproperty = ptype.GetProperties().First(p => p.Name == property);
@@ -118,7 +118,7 @@ public static class AttributesInfoExtensions
         return res;
     }
 
-    public static Dictionary<string, string> GetMethodAttributes(
+    /*public static Dictionary<string, string> GetMethodAttributes(
         this Type ptype, string method)
 
     {
@@ -131,7 +131,7 @@ public static class AttributesInfoExtensions
             res[TypeExtensions2.GetTypeName(kv.AttributeType)] = kv.ConstructorArguments.Count() > 0 ? kv.ConstructorArguments.First().ToString() : "";
         }
         return res;
-    }
+    }*/
 
     [Label("Получить значение атрибута к свойству")]
     public static string GetPropertyAttribute<TAttribute>(this Type ptype, string property, string defaults = null) where TAttribute : Attribute
