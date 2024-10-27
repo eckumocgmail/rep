@@ -1,4 +1,7 @@
-﻿@page "/user/home/{Id:int}"
+﻿@page "/user/home"
+@page "/user/home/{Id:int}"
+<PageTitle>Личный кабинет</PageTitle>
+
 @attribute [Authorize(Roles = "webuser")]
 @inject NavigationManager nav
 @inject DeliveryDbContext db
@@ -36,4 +39,9 @@
     {
         nav.NavigateTo($"/user/profile/cars/{id}");
     }
+}
+@if (true)
+{
+
+
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using Microsoft.AspNetCore.Components;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 using Newtonsoft.Json;
@@ -35,7 +36,7 @@ public class ControlAttribute : BaseInputAttribute
 }
 
 
-public class InputFormField
+public class InputFormField 
 {
     [JsonIgnore]
     [NotInput()]
@@ -238,13 +239,22 @@ public enum FormFieldType
 public class FormFieldModel : InputFormField
 {
     public List<MyValidation> Validations { get; set; } = new();
-    public string Name { get; set; }
-    public string Value { get; set; }
-    public string State { get; set; }
-    public string Label { get; set; }
-    public string Help { get; set; }
 
+    [Parameter]
+    public string State { get; set; }
+
+    [Parameter]
+    public string Name { get; set; }
+    [Parameter]
+    public string Value { get; set; }
+    [Parameter]
+    public string Label { get; set; }
+    [Parameter]
+    public string Help { get; set; }
+    [Parameter]
     public string Type { get; set; }
+
+
     public Action<string> OnInput { get; set; } = (str) => { };
 
     public string GetInputId() => $"id_{GetHashCode()}";

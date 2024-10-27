@@ -1,0 +1,56 @@
+﻿@*
+    Принимает ссылку на объект и формирует панель управления 
+инструментов с кнопками для методов действия.
+*@
+@inherits BaseComponent
+@inject IInputService input
+@code
+{
+    [Parameter]
+    [NotNullNotEmpty]
+    public object ServiceRef { get; set; }
+}
+<ToolsBar>
+    @foreach(var kv in ActionsMap)
+    {
+        <ButtonClick OnClick="(evt => { ToDo(kv.Key);  })">@kv.Value</ButtonClick>
+    }
+</ToolsBar>
+@code 
+{
+    public void ToDo(string name)
+    {
+        input.CreateExecuteDialog<Dictionary<string,object>>(
+            ServiceRef.GetTypeName(), name,
+            (input) => { },
+            (input) => { },
+            (err) => { }
+        );
+        StateHasChanged();
+    }
+
+    public Dictionary<string, string> ActionsMap { get; set; } = new();
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+    }
+
+    private void Clear()
+    {
+        ActionsMap.Clear();
+    }
+    private void Update()
+    {
+        Clear();
+        if (ServiceRef is not null)
+        {
+            foreach (var method in ServiceRef.GetType().GetOwnMethodNames())
+            {
+
+                ActionsMap[method] = ServiceRef.GetType().GetMethodLabel(method);
+
+            }
+        }
+        StateHasChanged();
+    }
+}

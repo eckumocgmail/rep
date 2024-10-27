@@ -19,6 +19,7 @@ using System.Reflection;
 [Label("Модель формы ввода")]
 public class InputFormModel
 {
+    [NotInput]
     public string Json { get; set; }
 
     [Label("Заголовок формы")]
@@ -74,7 +75,9 @@ public class InputFormModel
     [NotInput]
     [UpdateWhenChanged(false)]    
     public bool IsValid { get; set; } = false;
-    public List<string> Properties { get; }
+
+    [InputPrimitiveCollection()]
+    public List<string> Properties { get; } = new();
 
     public InputFormModel() : base()
     {
@@ -84,6 +87,7 @@ public class InputFormModel
         Error = "";
         Container = "group";
         Size = "normal";
+ 
         //IsValid = this.Errors.Where(kv => kv.Value.Count() > 0).Count() == 0;
     }
     public InputFormModel(object item) : this()
@@ -425,6 +429,10 @@ public class InputFormModel
 
     private string? GetInputType(Type type, Dictionary<string, string> attrs)
     {
+        var types = attrs.Keys.Where(key => key.ToType().IsExtends(typeof(BaseInputAttribute))).Select(k => ((BaseInputAttribute)k.ToType().New()).DataType.ToString()).ToHashSet();
+        return types.FirstOrDefault();
+
+        /*
         if (attrs.ContainsKey("Key") || attrs.ContainsKey("KeyAttribute"))
         {
             return "hidden";
@@ -448,7 +456,7 @@ public class InputFormModel
 
             result = null;
         }
-             
+             */
         if (type.IsDateTime())
         {
             return "date";
@@ -702,6 +710,8 @@ public class InputFormModel
         return errors;
 
     }
+
+
     public Dictionary<string, List<string>> Validate()
     {
 

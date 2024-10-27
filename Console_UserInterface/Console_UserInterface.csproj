@@ -57,11 +57,12 @@
     <ProjectReference Include="..\Console_ChartsLib\Console_ChartsLib.csproj" />
     <ProjectReference Include="..\Console_DataConnector\Console_DataConnector.csproj" />
     <ProjectReference Include="..\Console_InputApplication\Console_InputApplication.csproj" />
+    <ProjectReference Include="..\Console_StatisticsModel\Console_StatisticsModel.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="AppUnits\InterfaceModule\InterfaceModel\" />
     <Folder Include="AppUnits\InterfaceModule\InterfaceApi\" />
-    <Folder Include="Services\Models\" />
+    <Folder Include="App\Models\" />
   </ItemGroup>
   <ItemGroup>
     <None Update="Help\Articles\Customer.html">

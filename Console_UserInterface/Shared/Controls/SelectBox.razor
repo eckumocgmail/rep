@@ -10,9 +10,10 @@
         }
     }
 }
-<div class="input-group">
+ 
+<div class="input-group d-flex flex-column" style="width: 480px;">
     <label>@Label</label>
-    <select class="form-control" @onchange="(evt => { OnChange.InvokeAsync( evt.Value.ToString()); StateHasChanged(); } )" value="@Value">
+    <select class="form-control" style="width: 100%;" @onchange="(evt => { OnChange.InvokeAsync( evt.Value.ToString()); StateHasChanged(); } )" value="@Value">
         @if(Options is not null)
         {
             @foreach (var option in Options)
@@ -20,7 +21,7 @@
                 <option>@option</option>
             }
         }
-    </select>
+    </select>    
 </div>
 @code
 {

@@ -10,7 +10,7 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
-public interface IdataTableService
+public interface IDataTableService
 {
     public IEnumerable<string> GetColumnsNames(DataTable dataTable);
     public IDictionary<string, string> GetColumnsCaptions(DataTable dataTable);
@@ -22,7 +22,7 @@ public interface IdataTableService
     public JArray GetJArray(DataTable dataTable);
     public IEnumerable<dynamic> GetResultSet(DataTable dataTable, Type entity);
 }
-public class DataTableService: MyValidatableObject,IdataTableService
+public class DataTableService: MyValidatableObject,IDataTableService
 { 
     public IEnumerable<string> GetColumnsNames(DataTable dataTable)
     {
@@ -223,10 +223,8 @@ public class DataTableService: MyValidatableObject,IdataTableService
             }
         }
         else
-        {
-           
-            var properties = type.GetOwnPropertyNames();
-            
+        {           
+            var properties = type.GetOwnPropertyNames();            
             var columns = GetColumnsNames(dataTable);
             foreach (DataRow row in dataTable.Rows)
             {
@@ -251,18 +249,10 @@ public class DataTableService: MyValidatableObject,IdataTableService
                         this.Error("Ошибка при разборе свойства " + name, ex);
                         this.Error(ex);
                     }
-
                 }
-
-
-
                 if (next is MyValidatableObject)
                     ((MyValidatableObject)next).EnsureIsValide();
                 result.Add((TRecord)next);
-
-
-
-
             }
         }
         return result.ToArray();

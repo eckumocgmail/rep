@@ -507,6 +507,27 @@ public static class StackTraceExtensions
         } while (p != null);
         return result;
     }
+    
+    public static List<ExceptionInfo> ToMessages(this Exception target)
+    {
+        var results = new List<ExceptionInfo>();
+        Exception p = target;
+        do
+        {
+            var result = new ExceptionInfo();
+            foreach (var next in GetStack(p.StackTrace))
+            {
+                result.Add(next);
+            };
+            result.Add(new CallInfo()
+            {
+                TextMessage = p.Message
+            });
+            p = p.InnerException;
+            results.Add(result);
+        } while (p != null);
+        return results;
+    }
     public static string ToTextDocument(this Exception target)
     {
         var result = new ExceptionInfo();

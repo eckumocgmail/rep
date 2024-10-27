@@ -1,0 +1,35 @@
+﻿@inherits ComponentBase
+@typeparam BodyComponentType
+@code
+{
+    [Parameter]
+    public string Title { get; set; }
+    [Parameter]
+    public Dictionary<string, object> Parameters { get; set; } = new();
+
+    [Parameter]
+    public Action<object> OnCompleted { get; set; }
+    [Parameter]
+    public Action<object> OnCanceled { get; set; }
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+    public SharedComponent SharedComponentRef { get; set; }
+    public DynamicComponent DynamicComponentRef { get; set; }
+}
+<CardContainer>
+    <CardHeader>
+        <div>@Title</div>
+        <!--<SharedComponent @ref="SharedComponentRef" Type="@typeof(BodyComponentType).GetTypeName()" Model="@((BodyComponentType)typeof(BodyComponentType).New())"></SharedComponent>-->
+    </CardHeader>
+    
+    <CardBody>
+        @OnCompleted
+        @OnCanceled
+        <DynamicComponent @ref="DynamicComponentRef" Type="typeof(BodyComponentType)" Parameters="@Parameters"></DynamicComponent>
+        @ChildContent
+    </CardBody>
+    <CardFooter>
+        <ButtonClick OnClick="async evt => OnCompleted(DynamicComponentRef.Instance)">submit</ButtonClick>
+        <ButtonClick OnClick="async evt => OnCanceled(DynamicComponentRef.Instance)">cancel</ButtonClick>
+    </CardFooter>
+</CardContainer>

@@ -6,7 +6,9 @@ using System;
 using Console_InputApplication;
 
 using static InputConsole;
-
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 public static class ObjectValidationExtensions
 {
@@ -135,21 +137,23 @@ public static class ObjectValidationExtensions
     public static List<string> Validate(this object target, string key)
     {
 
-        List<string> errors = new List<string>();
+        object value = GetValue(target, key);
         var attributes = target.GetType().GetPropertyAttributes(key);
-
-        foreach (var data in target.GetType().GetProperty(key).GetCustomAttributesData())
+        return target.Validate(key,value,attributes);
+        
+    }
+    public static List<string> Validate(this object target, string key, object value, Dictionary<string,string> attributes)
+    {
+        List<string> errors = new List<string>();
+        foreach (var kv in attributes)
         {
-            if (data.AttributeType.GetInterfaces().Contains(typeof(MyValidation)))
+            if (kv.Key.ToType().IsImplements(typeof(MyValidation)))
             {
                 List<object> args = new List<object>();
-                foreach (var a in data.ConstructorArguments)
-                {
-                    args.Add(a.Value);
-                }
+                
                 MyValidation validation =
-                    data.AttributeType.Create<MyValidation>( args.ToArray());
-                object value = GetValue(target, key);
+                    kv.Key.ToType().Create<MyValidation>(new object[] { kv.Value });
+                
                 string validationResult =
                     validation.Validate(target, key, value);
                 if (validationResult != null)
@@ -160,7 +164,6 @@ public static class ObjectValidationExtensions
         }
         return errors;
     }
-
    
 
 
@@ -202,6 +205,10 @@ public static class ObjectValidationExtensions
     /// <returns></returns>
     public static object GetValue(this object target, string name)
     {
+        if (target is null)
+            return null;
+        if (name is null)
+            throw new ArgumentNullException("target");
         PropertyInfo propertyInfo = target.GetType().GetProperty(name);
         FieldInfo fieldInfo = target.GetType().GetField(name);
         return
@@ -274,6 +281,7 @@ public static class ObjectValidationExtensions
     {
         //p.Info("Приступаю к валидации: " + p.GetType().GetProperties().Select(p => p.Name).ToJsonOnScreen());
         object target = p;
+        var attrs = p.GetType().GetAttributes();
 
         Dictionary<string, List<string>> result = new Dictionary<string, List<string>>();
         foreach (var property in target.GetType().GetProperties())
@@ -282,7 +290,7 @@ public static class ObjectValidationExtensions
 
             //p.Info($"Валидация свойства: {key}");
             if (IsPrimitive(property.PropertyType))
-            {
+            {                
                 List<string> errors = p.Validate(key);
                 if (errors.Count > 0)
                 {

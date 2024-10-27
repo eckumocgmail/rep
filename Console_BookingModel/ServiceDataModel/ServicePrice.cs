@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace BookingModel.ServiceDataModel
@@ -15,6 +16,9 @@ namespace BookingModel.ServiceDataModel
   
         [Required]
         public int ServiceDepartmentId { get; set; }
+
+        [Newtonsoft.Json.JsonIgnore]
+        [JsonIgnore]
         public ServiceDepartment ServiceDepartment { get; set; }
 
         [Required]

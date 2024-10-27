@@ -28,7 +28,7 @@ namespace Console_DataConnector.DataModule.DataADO
                     "INNER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE KCU " +
                     " ON KCU.CONSTRAINT_NAME = RC.UNIQUE_CONSTRAINT_NAME " +
                 "ORDER BY CCU.TABLE_NAME\n";
-        private IdataTableService DataTableService = new DataTableService();
+        private IDataTableService DataTableService = new DataTableService();
         public IEnumerable<string> GetTables() => GetTables(ToString());
         public SqlServerADODataSource(string server, string database) : base(server, database)
         {

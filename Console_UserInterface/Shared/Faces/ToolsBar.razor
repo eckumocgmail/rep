@@ -1,5 +1,6 @@
-﻿@using static MainMenuBuilder;
-<div class="card w-100">
+﻿@inherits ComponentBase
+@using static MainMenuBuilder;
+<div class="card w-100 d-flex flex-row flex-wrap">
     <MenuItemView Model="Model"></MenuItemView>
     @ChildContent
 </div>
@@ -11,4 +12,7 @@
 
     [Parameter]
     public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public string Title { get; set; }
 }

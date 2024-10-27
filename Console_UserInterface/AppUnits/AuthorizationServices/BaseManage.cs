@@ -1,13 +1,12 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+/// <summary>
+/// Методы управления данными
+/// </summary>
+[Route("/api/[controller]/[action]")]
 public class BaseManager<TItem>  where TItem: BaseEntity
 {
- 
-
     private DbSet<TItem> _dbSet;
     private DbContext _context;
 
@@ -18,7 +17,8 @@ public class BaseManager<TItem>  where TItem: BaseEntity
     }
 
 
-    private bool ItemExists(int id)
+    [HttpGet()]
+    public bool ItemExists(int id)
     {
         return this._dbSet.Any(e => e.Id == id);
     }

@@ -18,6 +18,8 @@ using System.Threading.Tasks;
 /// </summary>
 public class ServiceFactory 
 {
+    public List<Type> GetDbContexts() => 
+        Assemblies.SelectMany(assembly => assembly.GetTypes().Where(ptype => ptype.IsExtendsFrom(typeof(DbContext)))).ToList();
     public List<Assembly> GetAssemblies() => this.Assemblies.ToList();
     public List<string> GetAssembliesNames() => 
         this.Assemblies.Select(a =>

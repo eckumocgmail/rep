@@ -191,4 +191,9 @@ public abstract class ProgramBase : IUserControl
     {
         return Control.SingleSelect(title, options, ref args);
     }
+
+    public Task<IEnumerable<string>> CheckListAsync(string title, IEnumerable<string> options, ref string[] args)
+    {
+        throw new NotImplementedException();
+    }
 }

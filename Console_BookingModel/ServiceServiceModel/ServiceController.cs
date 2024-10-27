@@ -1,32 +1,69 @@
 ﻿using BookingModel.ServiceDataModel;
 using BookingModel.ServiceServiceModel;
-
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-using static System.Runtime.InteropServices.JavaScript.JSType;
-
+[ApiController]
 public class ServiceController: BookingSlotsFactory
 {
     private readonly ServiceDbContext serviceDbContext;
 
-    public ServiceController() : this(new ServiceDbContext()) { }
+    public static ServiceController Create() => new ServiceController(new ServiceDbContext());
+
     public ServiceController(ServiceDbContext serviceDbContext): base(serviceDbContext)
     {
         this.serviceDbContext = serviceDbContext;
     }
-    public List<BookingSlot> GetBookings(int serviceDepartmentId, string date)
+
+
+    [HttpGet()]
+    [Route("/api/services/model")]
+    public List<CityGroup> GetModel()
     {
-        return GetOrCreateBookingSlots(serviceDepartmentId, date).Where(p => p.ServicePrice.ServiceDepartmentId == serviceDepartmentId && p.WorkDate == date ).ToList();
+        var controller = this;
+        var cities = controller.GetCities();
+        foreach (var city in cities)
+        {
+            foreach (var dep in city.ServiceDepartments)
+            {
+                dep.PriceList = controller.GetPriceList(dep.Id).Select(price => { price.ServiceDepartment = null; return price; }).ToList();
+            }
+        }
+        return cities;
     }
 
-    public int CreateBooking(int serviceDepartmentId, string date, double time, List<int> works, int clientId)
+
+    [HttpGet()]
+    [Route("/api/services/bookings/{phone}")]
+    public List<BookingSlot> GetBookingsByPhone([FromRoute]string phone)
+    {
+        return serviceDbContext.BookingSlots.Include(s => s.Customer).Where(p => p.Customer.Phone == phone ).ToList();
+    }
+
+
+    [HttpGet()]
+    [Route("/api/services/{serviceDepartmentId}/bookings/{date}")]
+    public List<BookingSlot> GetBookings([FromRoute] int serviceDepartmentId, [FromRoute] string date)
+    {
+        return GetOrCreateBookingSlots(serviceDepartmentId, date).Where(p => p.ServicePrice.ServiceDepartmentId == serviceDepartmentId && p.WorkDate == date).ToList();
+    }
+
+
+    [HttpDelete()]
+    [Route("/api/bookings/{bookingId}")]
+    public int CancelBooking(int bookingId)
+    {
+        var slot = this.serviceDbContext.BookingSlots.FirstOrDefault(item => item.Id == bookingId);
+        slot.CustomerId = null;
+        slot.CustomerId = null;
+        return serviceDbContext.SaveChanges();
+    }
+
+
+    [HttpPost()]
+    [Route("/api/services/{serviceDepartmentId}/bookings/{date}/{time}/{clientId}")]
+    public int CreateBooking([FromRoute] int serviceDepartmentId, [FromRoute] string date, [FromRoute] string time, [FromQuery]List<int> works, int clientId)
     {
         var slot = GetOrCreateBookingSlots(serviceDepartmentId, date, works).FirstOrDefault(p => p.ServicePrice.ServiceDepartmentId == serviceDepartmentId && p.WorkDate==date && p.WorkTime == $"{time}:00.000Z" );
         if (slot == null)
@@ -38,20 +75,32 @@ public class ServiceController: BookingSlotsFactory
         slot.CustomerId = clientId;
         slot.ServicePrices = GetPriceList(serviceDepartmentId).Where(price => price.ServiceWorkId == clientId).ToList();
         serviceDbContext.Update(slot);
-        return serviceDbContext.SaveChanges();
+        serviceDbContext.SaveChanges();
+        return slot.Id;
     }
 
-    public InputFormModel GetAdditionalParams(ServiceWork work)
+    [NonAction]
+    //[HttpGet()]
+    //[Route("/api/services/works/{id}/params/form")]
+    public InputFormModel GetAdditionalParamsForm([FromRoute]int id)
     {
+        ServiceWork work = serviceDbContext.ServiceWorks.Find(id);
         var model = new InputFormModel(System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(work.JsonParams));
-
-        return model;
-        
+        return model;        
     }
+
+
+    [HttpGet()]
+    [Route("/api/services/works/{id}/params")]
+    public Dictionary<string, object> GetAdditionalParams([FromRoute] int id)
+    {
+        ServiceWork work = serviceDbContext.ServiceWorks.Find(id);
+        return System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(work.JsonParams);
+    }
+
 
     private object CreateFormControl(string key, object value)
-    {
-        
+    {        
         switch (value.GetType().Name)
         {
             case nameof(System.Int32): return new InputControl(InputTypes.Number);
@@ -63,17 +112,26 @@ public class ServiceController: BookingSlotsFactory
        }        
     }
 
-    public ServicePrice GetServicePrice(int id)
+
+    [HttpGet()]
+    [Route("/api/services/prices/{id}")]
+    public ServicePrice GetServicePrice([FromRoute()]int id)
     {
         return this.serviceDbContext.ServicePrices.Include(p => p.ServiceWork).Include(p => p.ServiceDepartment).FirstOrDefault(p => p.Id==id);
     }
 
+
+    [HttpGet()]
+    [Route("/api/services")]
     public List<ServiceDepartment> GetServiceDepartments()
     {
         return this.serviceDbContext.ServiceDepartments.ToList();
     }
 
-    public int CreateServiceDepartment([Required][StringLength(40)] string ServiceName, [Required][StringLength(255)] string ServiceDescription, [Required] [StringLength(80)] string WorkingHours, [Required][StringLength(11)] string ServicePhone)
+
+    [HttpPost()]
+    [Route("/api/services")]
+    public int CreateServiceDepartment(int cityId, [Required][StringLength(40)] string ServiceName, [Required][StringLength(255)] string ServiceDescription, [Required] [StringLength(80)] string WorkingHours, [Required][StringLength(11)] string ServicePhone)
     {
         ServiceDepartment p = null;
         this.serviceDbContext.ServiceDepartments.Add(p = new()
@@ -82,12 +140,16 @@ public class ServiceController: BookingSlotsFactory
             ServiceName = ServiceName,
             ServicePhone = ServicePhone,
             WorkingHours = WorkingHours,
+            CityGroupId = cityId
         });
         this.serviceDbContext.SaveChanges();
         return p.Id;
     }
 
-    public int SetPriceList(int serviceDepartmentId, Dictionary<int, double> workPrices)
+
+    [HttpPatch()]
+    [Route("/api/services/{serviceDepartmentId}")]
+    public int SetPriceList([FromRoute]int serviceDepartmentId, [FromQuery] Dictionary<int, double> workPrices)
     {
         GetPriceList(serviceDepartmentId).ForEach(item => serviceDbContext.Remove<ServicePrice>(item));
         serviceDbContext.SaveChanges();
@@ -104,22 +166,44 @@ public class ServiceController: BookingSlotsFactory
         return workPrices.Count();
     }
 
-    public List<ServicePrice> GetPriceList(int serviceDepartmentId)
+
+    [HttpGet()]
+    [Route("/api/services/{serviceDepartmentId}/prices")]
+    public List<ServicePrice> GetPriceList([FromRoute]int serviceDepartmentId)
     {
         return serviceDbContext.ServicePrices.Include(s => s.ServiceDepartment).Include(s => s.ServiceWork).Where(price => price.ServiceDepartmentId == serviceDepartmentId).ToList();
     }
 
+
+    [HttpGet()]
+    [Route("/api/services/{serviceDepartmentId}/works")]
     public List<ServiceWork> GetWorkList(int serviceDepartmentId)
     {
-        return serviceDbContext.ServicePrices.Where(price => price.ServiceDepartmentId == serviceDepartmentId).Select(p => p.ServiceWork).ToList();
+        var works = serviceDbContext.ServicePrices.Include(s => s.ServiceWork).Where(price => price.ServiceDepartmentId == serviceDepartmentId).Select(p => p.ServiceWork).ToList();
+        return works;
     }
+
+
+    [HttpGet()]
+    [Route("/api/services/works")]
     public List<ServiceWork> GetWorkList( )
     {
         return serviceDbContext.ServiceWorks.ToList();
     }
 
+
+    [HttpGet()]
+    [Route("/api/services/customers")]
     public List<CustomerInfo> GetCustomers()
     {
         return serviceDbContext.CustomerInfos.ToList();
+    }
+
+
+    [HttpGet()]
+    [Route("/api/services/cities")]
+    public List<CityGroup> GetCities()
+    {
+        return serviceDbContext.CityGroups.Include(city => city.ServiceDepartments).ToList();
     }
 }

@@ -1,47 +1,134 @@
-﻿@page "/fetchdata"
+﻿
+@page "/fetchdata"
 @using Console_BookingUI.Data
 @inject WeatherForecastService ForecastService
+@inject ExcelDataReader excel
 
-<PageTitle>Weather forecast</PageTitle>
+<PageTitle>Загрузка данных</PageTitle>
 
-<h1>Weather forecast</h1>
-
-<p>This component demonstrates fetching data from a service.</p>
-
-@if (forecasts == null)
+<h1>Загрузка данных</h1>
+@code
 {
-    <p><em>Loading...</em></p>
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        this.UpdateTable();
+    }
+}
+<p>Введите путьк Excel файлу для загрузки</p>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<form class="card" style="padding: 10px; border: 2px solid black;">
+    <div class="mb-3">
+        <label>Файл</label>
+        <input class="form-control form-control-sm" value="@SearchQuery" style="width: 100%;" type="search" @oninput='@(evt => OnInput("search", evt) )' />        
+        <div class="d-flex flex-row flex-wrap">
+            <input style="width: 150px;" class="form-control form-control-sm" type="number" value="@SheetNumber" @oninput='@(evt => OnInput("sheet", evt) )' />
+            <input style="width: 150px;" class="form-control form-control-sm" type="number" value="@HeaderRow" @oninput='@(evt => OnInput("header", evt) )' />
+        </div>
+    </div>
+    <div>
+        <button >далее</button>
+    </div>
+</form>
+@code
+{
+    public bool SuccessCompleted { get; set; } = true;
+    public bool FileLoaded { get; set; } = false;
+    public int SheetNumber { get; set; } = -1;
+    public int HeaderRow { get; set; } = 0;
+    public string SearchQuery { get; set; } = @"D:\System-Config\MyExpirience\Console_BlazorApp\Console_BookingModel\Resources\works.xlsx";
+    public string ErrorMessage { get; set; } = "";
+    public Dictionary<string, Tuple<List<string>, IEnumerable<IEnumerable<string>>>> DataModel { get; set; }
+    public void OnInputSheet(ChangeEventArgs evt)
+    {
+        this.SheetNumber = int.Parse(evt.Value.ToString());
+        this.UpdateTable();
+    }
+    public void OnInputHeader(ChangeEventArgs evt)
+    {
+        this.HeaderRow = int.Parse(evt.Value.ToString());
+        this.UpdateTable();
+    }
+    public void OnInputSearch(ChangeEventArgs evt)
+    {
+        this.FileLoaded = false;
+        this.SearchQuery = evt.Value.ToString();
+        this.UpdateTable();    
+    }
+    public void UpdateTable()
+    {
+        if (System.IO.File.Exists(SearchQuery))
+        {
+            try
+            {
+                DataModel = excel.ReadXlsFileAsList(SearchQuery, @SheetNumber, @HeaderRow);
+                FileLoaded = true;
+                SuccessCompleted = true;
+            }
+            catch (Exception ex)
+            {
+                SuccessCompleted = false;
+                this.ErrorMessage = ex.Message;
+            }
+        }
+    }
+    public void OnInput(string name, ChangeEventArgs evt)
+    {
+        switch(name)
+        {
+            case "search": OnInputSearch(evt); break;
+            case "header": OnInputHeader(evt); break;
+            case "sheet": OnInputSheet(evt); break;
+            default: throw new Exception();
+        }
+        
+        StateHasChanged();
+
+    }
+}
+@if (!System.IO.File.Exists(SearchQuery))
+{
+    <p><em>Файл не выбран</em></p>
 }
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Temp. (C)</th>
-                <th>Temp. (F)</th>
-                <th>Summary</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var forecast in forecasts)
-            {
-                <tr>
-                    <td>@forecast.Date.ToShortDateString()</td>
-                    <td>@forecast.TemperatureC</td>
-                    <td>@forecast.TemperatureF</td>
-                    <td>@forecast.Summary</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
-
-@code {
-    private WeatherForecast[]? forecasts;
-
-    protected override async Task OnInitializedAsync()
+    @if(SuccessCompleted)
     {
-        forecasts = await ForecastService.GetForecastAsync(DateOnly.FromDateTime(DateTime.Now));
+        @if (FileLoaded)
+        {
+            @foreach(var kv in DataModel)
+            {
+                <h2>@kv.Key</h2>
+                <table class="table table-bordered table-dark" style="width: 640px;">
+                    <thead>
+                        <tr>
+                            @foreach (var label in kv.Value.Item1)
+                            {
+                                <th>@label</th>
+                            }                             
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var datarow in kv.Value.Item2)
+                        {
+                            <tr>
+                                @foreach (var datacell in datarow)
+                                {
+                                    <th>@datacell</th>
+                                }
+                            </tr>                            
+                        }                        
+                    </tbody>
+                </table>
+            }
+        }
+        else
+        {
+            <div class="alert alert-info">Подождите...</div>
+        }
     }
+    else
+    {
+        <div class="alert alert-error">@ErrorMessage</div>
+    }    
 }

@@ -1,0 +1,13 @@
+﻿@* Меню, элементы поступают из постоянной памяти используя INavMenuService *@
+@page "/developer/pages-nav-links"
+@inject INavMenuService navMenuService
+<div>
+    @foreach (var navLink in navMenuService.GetPageLinks())
+    {
+        <NavLink class="nav-link" href="@navLink.Href">
+            <span class="oi oi-@navLink.Icon" aria-hidden="true"></span>
+            @navLink.Label
+        </NavLink>
+    }
+</div>
+

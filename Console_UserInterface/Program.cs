@@ -6,16 +6,17 @@ using pickpoint_delivery_service;
 using Console_UserInterface.AppUnits.AuthorizationBlazor;
 using System.Reflection;
 using Console_DataConnector.DataModule.DataADO.ADOWebApiService;
-using Console_UserInterface.AppUnits;
 using Console_UserInterface.Services;
 using Blazored.Modal;
 using Console_UserInterface.AppUnits.InterfaceModule;
-using Ex;
-using Console_UserInterface.ControlAttributes;
-using static Console_UserInterface.Pages.Auth.UserSignup;
 using Console_UserInterface.Shared;
-using BookingModel.ServiceServiceModel;
+using System.Data.OleDb;
+using System.Data;
 using BookingModel;
+using Console_UserInterface.Services.Services;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Http;
 
 /// приложение
 namespace Console_UserInterface
@@ -41,6 +42,8 @@ namespace Console_UserInterface
                 }
             }
         };
+
+
         /// <summary>
         /// Тестирование
         /// </summary>
@@ -64,26 +67,40 @@ namespace Console_UserInterface
                 field.ToJsonOnScreen().WriteToConsole();
             }
         }
-
+        
 
         /// <summary>
         /// Точка входа
         /// </summary>
         public static void Main(string[] args)
         {
+            RegTypes();
+           
+
+             
+
+
+
+            var account = new UserAccount();
+            var model = new InputFormModel(account);
+            args.Info(model.Validate().ToJsonOnScreen());
+
+
+
             //CustomDbContext.Build();
-            BookingInitializer.InitData();
-            UpdateDatabases();
+            //BookingInitializer.InitData();
+            //UpdateDatabases();
             /*new RoleSelectionModel()
             {
                 Role = "customer"
-            }.Validate().ToJsonOnScreen().WriteToConsole();*/
-            Console_DataConnector.Program.Main(args);
-            new SelectDataAttribute($"{nameof(UserRole)}.{nameof(UserRole.Code)}").Options.ToJsonOnScreen().WriteToConsole();
-            RegTypes();
-            args.Info(Assembly.GetExecutingAssembly().GetName().Name);
+            }.Validate().
+            ToJsonOnScreen().WriteToConsole();*/
+            //Console_DataConnector.Program.Main(args);
+            //new SelectDataAttribute($"{nameof(UserRole)}.{nameof(UserRole.Code)}").Options.ToJsonOnScreen().WriteToConsole();
+           
+            //args.Info(Assembly.GetExecutingAssembly().GetName().Name);
                       
-            UpdateDatabases();
+            //UpdateDatabases();
             var builder = WebApplication.CreateBuilder(args);
             ConfigureServices(builder);
             Configure(builder); 
@@ -99,6 +116,9 @@ namespace Console_UserInterface
         private static void RegTypes()
         {
             ServiceFactory.Get().Info("регистрирую типы данных ");
+            
+            ServiceFactory.Get().AddTypes(typeof(ParameterAttribute).Assembly);
+            ServiceFactory.Get().AddTypes(typeof(JsonPropertyAttribute).Assembly);
             ServiceFactory.Get().AddTypes(typeof(CustomDbContext).Assembly);
             ServiceFactory.Get().AddTypes(typeof(ServiceDbContext).Assembly);
             ServiceFactory.Get().AddTypes(Assembly.GetExecutingAssembly());
@@ -109,11 +129,15 @@ namespace Console_UserInterface
             ServiceFactory.Get().AddTypes(Assembly.GetEntryAssembly().Modules.Select(mod => mod.Assembly));
             ServiceFactory.Get().AddTypes(typeof(Program).Assembly.Modules.Select(mod => mod.Assembly));
             ServiceFactory.Get().AddTypes(typeof(Program).Assembly);
+            ServiceFactory.Get().AddTypes(typeof(KeyAttribute).Assembly);
             ServiceFactory.Get().AddTypes(typeof(System.Object).Assembly);
             ServiceFactory.Get().AddTypes(typeof(string).Assembly);
             ServiceFactory.Get().AddTypes(typeof(JsonPropertyAttribute).Assembly);
             ServiceFactory.Get().AddTypes(typeof(Newtonsoft.Json.JsonArrayAttribute).Assembly);
             ServiceFactory.Get().AddTypes(typeof(System.Data.SqlClient.SqlClientPermission).Assembly);
+
+
+            ServiceFactory.Get().GetDbContexts().Select(ctx => ctx.Name).ToJsonOnScreen().WriteToConsole();
         }
 
 
@@ -121,6 +145,20 @@ namespace Console_UserInterface
         public static void Configure(WebApplicationBuilder builder)
         {
             var app = builder.Build();
+            app.Use(async(http, next) => { 
+                try
+                {
+                    await next.Invoke();
+                }
+                catch(Exception ex)
+                {
+                    foreach(var message in ex.ToMessages())
+                    {
+                        await http.Response.WriteAsync($"{message}");
+                    }
+                    
+                }
+            });
             app.UseSession();
             app.UseDeveloperExceptionPage();
             app.UseHttpsRedirection();
@@ -130,9 +168,8 @@ namespace Console_UserInterface
             app.MapControllers();
 
             app.UseMiddleware<AppRouterMiddleware>();
-            ApiOdbc.UseOdbc(app);
-            ApiCall.UseApi(app)
-                ;
+            //ApiOdbc.UseOdbc(app);
+            ApiCall.UseApi(app);
             app.MapBlazorHub();
             app.MapFallbackToPage("/_Host");
             app.Run();
@@ -144,7 +181,7 @@ namespace Console_UserInterface
             builder.Services.AddBlazorBootstrap();
             builder.Services.AddBlazoredModal();
             builder.Services.AddTransient(typeof(IServiceCollection), sp => builder.Services);
-
+            
             // Add services to the container.
             builder.Services.AddRazorPages();
             builder.Services.AddControllers();
@@ -170,6 +207,7 @@ namespace Console_UserInterface
             AuthorizationModule.ConfigureServices(builder.Services);
             ModuleUser.ConfigureServices(builder.Configuration, builder.Services);
             ModuleService.ConfigureServices(builder.Configuration, builder.Services);
+            BusinessAnaliticsModule.ConfigureServices(builder.Services, builder.Configuration);
             DeliveryDbContext.ConfigureDeliveryServices(builder.Services, builder.Configuration);
             //DeliveryDbContext.CreateDeliveryData(builder.Services, builder.Configuration);
             DbContextUserInitializer.CreateUserData(builder.Services, builder.Configuration);

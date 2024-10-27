@@ -1,18 +1,9 @@
-﻿
-using Microsoft.Extensions.DependencyInjection;
-
-
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-
 namespace Console_DataConnector.DataModule.DataCommon.DatabaseMetadata
 {
-
-
-
     /// <summary>
     /// Класс определяет свойства сущности
     /// </summary>
@@ -24,14 +15,8 @@ namespace Console_DataConnector.DataModule.DataCommon.DatabaseMetadata
         [Display(Name = "Единственное число")]
         public string name { get; set; } = "";
 
-
-
         [Display(Name = "Схема")]
         public string schema { get; set; } = "dbo";
-
-
-   
-
 
         [Display(Name = "Множественное число")]
         public string multicount_name { get; set; } = "";

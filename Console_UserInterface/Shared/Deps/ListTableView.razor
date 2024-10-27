@@ -1,0 +1,21 @@
+﻿@code
+{
+    [Parameter] public string Title { get; set; }
+    [Parameter]
+    public List<List<object>> Model { get; set; }
+}
+@if (Model is not null)
+{
+    <caption>@Title</caption>
+    <table class="table table-bordered table-hover table-dark">
+        @foreach (var list in Model)
+        {
+            <tr>
+                @foreach (var item in list)
+                {
+                    <td>@item</td>
+                }
+            </tr>
+        }
+    </table>
+}

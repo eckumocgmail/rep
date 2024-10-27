@@ -199,6 +199,8 @@ public class ProgramDialog: ProgramBase
         options["Назад"] = () => { };
         return options[SingleSelect(title, options.Keys.ToList(), ref args)];
     }
+ 
+
     public static string SingleSelect(string title, IEnumerable<string> options, ref string[] args)
     {
         Console.Title = title;
@@ -224,7 +226,7 @@ public class ProgramDialog: ProgramBase
                         {
                             throw new ArgumentException($"Аргумент { args[0]} задан неверно");
                         }
-                        Info($"Введено: {readed}");
+                        WriteLine($"Введено: {readed}");
 
 
                         args = argsOut;

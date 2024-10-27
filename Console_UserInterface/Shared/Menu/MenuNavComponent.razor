@@ -1,0 +1,100 @@
+﻿@* Меню навигации связанное с событиями навигации, и меню обновляется относительно маршрутов приложения *@
+@inject NavigationManager navigator
+@inherits SharedComponent
+@code 
+{
+    [Parameter]
+    public bool Inline { get; set; }
+
+    /// <summary>
+    /// Модель ссылки
+    /// </summary>
+    public interface BaseLink
+    {
+        public string Icon { get; set; }
+        public string Label { get; set; }
+        public string Tooltip { get; set; }
+    }
+
+
+    public class ActionLink : BaseLink, IComparable
+    {
+        public string Icon { get; set; }
+        public string Tooltip { get; set; }
+        public string Label { get; set; } = "";
+        public bool IsActive { get; set; }
+        public Action<EventArgs> OnMessage { get; set; }
+
+        public int CompareTo(object obj)
+        {
+            return 1;
+        }
+
+        public override string ToString()
+        {
+            return Label;
+        }
+    }
+    public class NavLink : ViewNode, BaseLink
+{
+    public string Href { get; set; }
+    public string Icon { get; set; }
+    public string Tooltip { get; set; }
+    public string Label { get; set; }
+    public bool IsActive { get; set; } = false;
+
+    public ActionLink toActionLink(Func<object, NavigationManager> GetNavigationManager)
+    {
+        return new ActionLink()
+        {
+            Icon = this.Icon,
+            Label = this.Label,
+            OnMessage = (evt) => {
+                GetNavigationManager(this).NavigateTo(Href);
+            }
+        };
+    }
+}
+
+    [CascadingParameter]
+    private IEnumerable<ActionLink> actionLinks { get; set; }
+    private IEnumerable<ActionLink> GetNavigationLinks(string uri)
+    {
+        return null;
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        navigator.LocationChanged += (sender, changes) => UpdateNavLinks(changes);
+        actionLinks = GetNavigationLinks(navigator.Uri);
+        var list = actionLinks is not null ? actionLinks.ToList(): new();
+        list.Sort( );
+        actionLinks = list.ToArray();
+        StateHasChanged();
+    }
+}
+@if (actionLinks != null)
+{
+    <div style="width: 100%;">
+        @foreach (var link in actionLinks)
+        {
+            <div align="left"
+                 class="text-left btn" @onclick="@(evt=>{  })">
+                <span class="oi oi-home"></span> @link.Label
+            </div>
+        }
+    </div>
+}
+@functions
+{
+    public void UpdateNavLinks(LocationChangedEventArgs changes)
+    {
+        string uri = changes.Location;
+        Console.WriteLine(uri);
+        var actionLinks = GetNavigationLinks(uri);
+        var list = actionLinks is null? new List<ActionLink>(): actionLinks.ToList();
+        list.Sort( );
+        actionLinks = list.ToArray();
+        StateHasChanged();
+    }
+}

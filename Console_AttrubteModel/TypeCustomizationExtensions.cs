@@ -29,9 +29,11 @@ public static class TypeCustomizationExtensions
     /// </summary>
     public static Dictionary<string, string> GetAttributes(this Type type)
     {
+        
         using (var dp = new CustomService())
         {
-            return dp.GetAttributes(type);
+            var res = dp.GetAttributes(type);
+            return res;
         }        
     }
 
@@ -41,8 +43,9 @@ public static class TypeCustomizationExtensions
     public static Dictionary<string, Dictionary<string, string>> @GetMembersAttributes_(this Type type)
     {
         using (var dp = new CustomService())
-        {
-            return dp.GetMembersAttributes(type.Name);
+        {            
+            var res = dp.GetMembersAttributes(type.Name);
+            return res;
         }
     }
 
@@ -53,7 +56,8 @@ public static class TypeCustomizationExtensions
     {
         using (var dp = new CustomService())
         {
-            return dp.GetMethodAttributes(type.Name, method);
+            var res = dp.GetMethodAttributes(type.Name, method);
+            return res;
         }
     }
 
@@ -64,7 +68,8 @@ public static class TypeCustomizationExtensions
     {
         using (var dp = new CustomService())
         {
-            return dp.GetParameterAttributes(type.Name, method, parameter);
+            var res = dp.GetParameterAttributes(type.Name, method, parameter);
+            return res;
         }
     }
 
@@ -75,7 +80,8 @@ public static class TypeCustomizationExtensions
     {
         using (var dp = new CustomService())
         {
-            return dp.GetPropertyAttributes(type.Name, property);
+            var res = dp.GetPropertyAttributes(type.Name, property);
+            return res;
         }
     }
 

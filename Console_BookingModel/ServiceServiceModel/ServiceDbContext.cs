@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 
 public class ServiceDbContext : DbContext
 {
+    public DbSet<CityGroup> CityGroups { get; set; }
     public DbSet<ServiceDepartment> ServiceDepartments { get; set; }
     public DbSet<ServiceWork> ServiceWorks { get; set; }
     public DbSet<ServicePrice> ServicePrices { get; set; }

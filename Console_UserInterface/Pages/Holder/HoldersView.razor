@@ -1,6 +1,8 @@
 ﻿@using pickpoint_delivery_service;
 @using Console_BlazorApp.AppUnits.DeliveryModel;
 @page "/holder/holders"
+<PageTitle>Склады для хранения</PageTitle>
+
 @attribute [Label("Точка выдачи. Поиск товаров.")]
 @attribute [Authorize(Roles = "webuser")]
 @inject pickpoint_delivery_service.DeliveryDbContext db

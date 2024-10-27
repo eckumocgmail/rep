@@ -1,16 +1,21 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+using System.ComponentModel;
+
 /// <summary>
 /// Модуль тестирования
 /// </summary>
+[Description("Модуль тестирования")]
 public class CustomAttributesUnit
 {
     public static void Test()
     {
         CustomDbContext.Build();
 
-        var ptype = typeof(ViewBuilder);
+        var ptype = typeof(CustomAttributesUnit);
         var a1 = ptype.GetAttributes();
+        if (a1.Count() == 0)
+            throw new Exception("НЕе удалось получить аттрибуты класса");
         ptype.AddAttribute("Label", "Тест");
         var a2 = ptype.GetAttributes();
         if (a2.ContainsKey("Label")==false)

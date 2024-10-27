@@ -144,7 +144,8 @@ else
         this.Info("OnPropertyChanged()");
         try
         {
-            Dictionary<string, List<string>> message = ValidateOnInput(Form.Item, evt);
+            Dictionary<string, List<string>> message = this.Form.Item.Validate();
+            //ValidateOnInput(Form.Item, evt);
             Form.IsValid = message.Where(kv => kv.Value.Count() > 0).Count() == 0;
             SetErrors(Form, message);
             Form.FormFields.ForEach(item =>

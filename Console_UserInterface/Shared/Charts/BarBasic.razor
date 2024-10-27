@@ -2,8 +2,42 @@
 @using Highcharts.Models.HighchartLineBasic;
 @inject IJSRuntime js
 @inherits BaseComponent
+@* 
+    example:
+    @code
+    {
+        public string Title { get; set; } = "Заголовок";
+        public string OX { get; set; } = "Ось X";
+        public string OY { get; set; } = "Ось Y";
+        public Dictionary<string, List<float?>> DictionaryModel { get; set; } = new()
+        {
+            // {"производительность", new List<float?>(){ 1f,2f,3f } }
+        };
+    }
+    <BarBasic Title="@Title" OX="@OX" OY="@OY" Model="@DictionaryModel"></BarBasic>
+
+*@
 @code
 {
+    [Parameter]
+    [NotNullNotEmpty]
+    public string Title { get; set; } = "Заголовок";
+
+    [Parameter]
+    [NotNullNotEmpty]
+    public string OX { get; set; } = "Ось X";
+
+    [Parameter]
+    [NotNullNotEmpty]
+    public string OY { get; set; } = "Ось Y";
+
+    [Parameter]
+    [NotNullNotEmpty]
+    public Dictionary<string, List<float?>> Model { get; set; } = new()
+    { 
+        {"производительность", new List<float?>(){ 1f,2f,3f } }
+    };
+
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
@@ -14,8 +48,18 @@
         await base.OnAfterRenderAsync(firstRender);
         if(firstRender)
         {
-            await js.InvokeAsync<int>("createChart", $"container_{GetHashCode()}", new HighchartBarBasic());
+            await js.InvokeAsync<int>("createChart", $"container_{GetHashCode()}", CreateChartModel());
         }
+    }
+    private HighchartBarBasic CreateChartModel()
+    {
+        HighchartBarBasic result = new();
+        result.Title.Text = this.Title;
+        result.XAxis.Title.Text = this.OX;
+        result.XAxis.Categories = Model.Keys.ToList();
+        result.YAxis.Title.Text = this.OY;
+        result.Series = Model.Select(kv => new HighchartBarBasicSeriesItem() { Name = kv.Key, Data = kv.Value }).ToList();
+        return result;
     }
 }
 <div id="container_@GetHashCode()"></div>

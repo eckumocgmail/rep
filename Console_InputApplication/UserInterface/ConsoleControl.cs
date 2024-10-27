@@ -117,4 +117,8 @@ public class ConsoleControl : IUserControl
     public int InputPositiveNumber(string title, Func<object, List<string>> validate, ref string[] args)
     => InputConsole.InputPositiveNumber(title, validate, ref args);
 
+    public Task<IEnumerable<string>> CheckListAsync(string title, IEnumerable<string> options, ref string[] args)
+    {
+        throw new NotImplementedException();
+    }
 }

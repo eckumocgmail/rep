@@ -1,0 +1,51 @@
+﻿@page "/"
+<PageTitle>Главная страница</PageTitle>
+<CardContainer>
+    <CardHeader>
+        <AuthorizeView Roles="customer">
+            <Console_UserInterface.Pages.Customer.CustomerMenu></Console_UserInterface.Pages.Customer.CustomerMenu>
+        </AuthorizeView>
+        <AuthorizeView Roles="holder">
+            <Console_UserInterface.Pages.Holder.HolderMenu></Console_UserInterface.Pages.Holder.HolderMenu>
+        </AuthorizeView>
+        <AuthorizeView Roles="transport">
+            <Console_UserInterface.Pages.Transport.TransportMenu></Console_UserInterface.Pages.Transport.TransportMenu>
+        </AuthorizeView>
+        <AuthorizeView Roles="customer">
+            <Console_UserInterface.Pages.Developer.DeveloperMenu></Console_UserInterface.Pages.Developer.DeveloperMenu>
+        </AuthorizeView>
+        
+    </CardHeader>
+    <CardBody>
+        <AuthorizeView Roles="customer">
+            <Console_UserInterface.Pages.Customer.CustomerHome></Console_UserInterface.Pages.Customer.CustomerHome>
+        </AuthorizeView>
+        <AuthorizeView Roles="holder">
+            <Console_UserInterface.Pages.Holder.HolderHome></Console_UserInterface.Pages.Holder.HolderHome>
+        </AuthorizeView>
+        <AuthorizeView Roles="transport">
+            <Console_UserInterface.Pages.Transport.TransportHome></Console_UserInterface.Pages.Transport.TransportHome>
+        </AuthorizeView>
+        <AuthorizeView Roles="customer">
+            <Console_UserInterface.Pages.Developer.DeveloperHome></Console_UserInterface.Pages.Developer.DeveloperHome>
+        </AuthorizeView>
+        
+    </CardBody>
+    <CardFooter>
+        <AuthorizeView Roles="customer">
+            customer
+        </AuthorizeView>
+        <AuthorizeView Roles="holder">
+            holder
+        </AuthorizeView>
+        <AuthorizeView Roles="transport">
+            transport
+        </AuthorizeView>
+        <AuthorizeView Roles="customer">
+            customer
+        </AuthorizeView>
+        
+    </CardFooter>
+</CardContainer>
+
+    <Index></Index>

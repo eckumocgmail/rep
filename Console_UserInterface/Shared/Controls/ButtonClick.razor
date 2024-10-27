@@ -1,11 +1,14 @@
 ﻿@inherits BaseComponent
 @code
 {
+
+    [Parameter]
+    public string Width { get; set; }
     [Parameter]
     public EventCallback OnClick { get; set; }
     [Parameter]
     public override RenderFragment ChildContent { get; set; }
 }
-<button class="btn btn-sm btn-primary" @onclick="async evt => await OnClick.InvokeAsync()">
+<button class="btn btn-sm btn-primary" style="margin: 5px; min-width: 75px; @(Width is not null? $"width: {Width};": "")" @onclick="async evt => await OnClick.InvokeAsync()">
     @ChildContent
 </button>

@@ -6,6 +6,7 @@ using System;
 [Label("Примитивные интерфейс ввода")]
 public interface IUserControl
 {
+    Task<IEnumerable<string>> CheckListAsync(string title, IEnumerable<string> options, ref string[] args);
     IEnumerable<string> CheckList(string title, IEnumerable<string> options, ref string[] args);
     bool ConfirmContinue(string title);
     TModel Input<TModel>(string title, Func<object, List<string>> validate, ref string[] args);

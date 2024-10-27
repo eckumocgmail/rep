@@ -1,7 +1,4 @@
-﻿
-
-
-@inherits BaseComponent
+﻿@inherits BaseComponent
 @inject ILogger<FormControl> logger
 
 @code {
@@ -75,7 +72,7 @@ else
 {
   
 <div class="input-group input-group-@(Size) flex-column" style="width: 100%; margin-top: 12px; justify-content: flex-start; align-items: flex-start;">
-    @Model.Type
+    
     @if (Model.Type == "hidden")
     {
         <input type="hidden" value="@Model.GetHtmlInputValue()" id="@Model.GetInputId()" name="@Model.GetInputName()" />
@@ -88,7 +85,7 @@ else
         }
 
 
-        @if (Model.Type == "number" || Model.Type == "email" || Model.Type.ToLower() == "text" || Model.Type == "date" || Model.Type == "datetime" || Model.Type == "password" || Model.Type == "color")
+        @if (Model.Type == "number" || Model.Type == "email" || Model.Type.ToLower() == "rustext" || Model.Type.ToLower() == "engtext" || Model.Type.ToLower() == "text" || Model.Type == "date" || Model.Type == "datetime" || Model.Type == "password" || Model.Type == "color")
         {
             <input type="@Model.Type.ToLower()"
                    value="@Model.GetHtmlInputValue()"
@@ -128,7 +125,15 @@ else
         }
         else if (Model.Type == "icon")
         {
-
+            @inject OpenIconsService icons
+            <select class="form-control">
+                @foreach(var icon in icons.Icons)
+                {
+                    <option>
+                        <Icon>@icon</Icon>
+                    </option>                    
+                }
+            </select>
         }
         else if (Model.Type == "bool" || Model.Type == "checkbox")
         {
@@ -145,26 +150,31 @@ else
 
         }
 
-            else if (Model.Type.ToLower() == "selectcontrol" || Model.Type.ToLower() == "selectdata")
+        else if (Model.Type.ToLower() == "select" || Model.Type.ToLower() == "selectcontrol" || Model.Type.ToLower() == "selectdata")
         {
             <select class="form-control" style="width: 100%;"
                     name="@Model.GetInputName()"
                     id="@Model.GetInputId()"
                     @onchange:preventDefault
                     @oninput="@((e) => OnInputValue(Model.Name)(e))">
-                @foreach (var option in (dynamic)Model.Control.GetValue("Options"))
+                @if (Model is not null && Model.Control is not null)
                 {
-                    @if (option.Value is not null && option.Value.ToString() == Model.Value.ToString())
+                    @foreach (var option in (dynamic)Model.Control.GetValue("Options"))
                     {
-                        <option selected value="@option.Value">@option.Key</option>
+                        @if(option is string)
+                        {
+                            <option selected value="@option">@option</option>
+                        } 
+                        else if (option.Value is not null && option.Value.ToString() == Model.Value.ToString())
+                        {
+                            <option selected value="@option.Value">@option.Key</option>
+                        }
+                        else
+                        {
+                            <option value="@option.Value">@option.Key</option>
+                        }
                     }
-                    else
-                    {
-                        <option value="@option.Value">@option.Key</option>
-                    }
-
                 }
-
             </select>
         }
         else if (Model.Type == "custom")

@@ -1,4 +1,5 @@
 ﻿@using System.Reflection;
+@using static StackTraceExtensions;
 @inject AppRouterMiddleware router
 @inject IServiceCollection services
 @inject IServiceProvider provider
@@ -28,7 +29,7 @@
     public object Result { get; set; } = new object();
     public string Error { get; set; }
 }
-
+@inject IServiceProvider provider
 @code
 {
     public void OnSaveClicked()
@@ -52,8 +53,26 @@
         {
             var service = provider.GetService(ControllerType.ToType());
             this.Warn($"Тип {ControllerType} не зарегистрирован в куонтейнере");
-            if (service is null)
-                service = AppProviderService.GetInstance().GetService(ControllerType.ToType());
+            switch (this.ServiceProvider)
+            {
+                case "Контейнер приложения":
+                    service = provider.GetService(ControllerType.ToType());
+                    break;
+                case "Файловая система":
+                    service = ControllerType.New();
+                    if( System.IO.File.Exists(ControllerType+".json"))
+                    {
+                        throw new Exception();
+                    }
+                    break;
+                case "Конструктор по-умолчанию":
+                    service = ControllerType.New();
+                    break;
+                default: 
+                    service = AppProviderService.GetInstance().GetService(ControllerType.ToType());
+                    break;
+            }
+            
             this.Result = service.Call(ControllerAction, arguments);
             this.Error = "";
         } 
@@ -112,6 +131,8 @@
         <div>Регистрация контроллера</div>
         @if (String.IsNullOrWhiteSpace(Error)==false)
         {
+
+
             <p class="alert alert-danger">
                 @Error
             </p>
@@ -190,6 +211,8 @@
         this.AvailableActions = this.ControllerType.ToType().GetOwnMethodNames();
         StateHasChanged();
     }
+    public List<ExceptionInfo> ErrorMessages { get; set; }
+
     public void OnControllerActionChanged(string evt)
     {
         try
@@ -200,6 +223,9 @@
         catch(Exception ex)
         {
             this.Error(this.Error = $"Ошибка при обновлении метода действия: {ex.ToDocument()}");
+
+
+            this.ErrorMessages = ex.ToMessages();
         }
         StateHasChanged();
     }

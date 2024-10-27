@@ -21,13 +21,13 @@ public interface IActiveObject
     [InputUrl]
     string URL { get; set; }
 
-    [Label("ИП адрес клиента")]
-    [InputTcpIp4Address]
-    string Ip4 { get; set; }
+    //[Label("ИП адрес клиента")]
+    //[InputTcpIp4Address]
+    //string Ip4 { get; set; }
 
-    [Label("Браузер пользователя")]
-    [InputEngWord]
-    string UserAgent { get; set; }
+    //[Label("Браузер пользователя")]
+    //[InputEngWord]
+    //string UserAgent { get; set; }
 
     [Label("Актуализация состояния")]
     Task DoCheck(object context, string key);

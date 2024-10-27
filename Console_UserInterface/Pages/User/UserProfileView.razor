@@ -1,4 +1,6 @@
 ﻿@page "/user/profile"
+<PageTitle>Профиль пользователя</PageTitle>
+
 @attribute [Authorize(Roles = "webuser")]
 @inject DeliveryDbContext db
 @inject NavigationManager nav

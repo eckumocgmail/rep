@@ -1,17 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
-using Microsoft.AspNetCore.Components.Routing;
 using static NavMenuService;
 
+
+/// <summary>
+/// Предоставляет данные в модель компонента меню навигации
+/// </summary>
 public class NavMenuService : INavMenuService
 {
     private readonly ILogger<NavMenuService> _logger;
     private readonly NavMenuDbContext _context;
+
     public NavMenuService(ILogger<NavMenuService> logger, NavMenuDbContext context)
     {
         _logger = logger;
@@ -25,16 +24,27 @@ public class NavMenuService : INavMenuService
             }
         }
     }
-    public NavLinkNavLink[] GetNavLinks()
-    {
-        return _context.NavLinks.ToArray();
-    }
+
+
+    public NavLinkNavLink[] GetNavLinks() => _context.NavLinks.ToArray();
+    public IEnumerable<NavLinkNavLink> GetPageLinks() => _context.NavLinks.ToList();
+    public IEnumerable<NavLinkNavLink> GetPageLinks(string uri)
+        => _context.NavLinks.Where(link => link.Href.StartsWith(uri)).ToList();
+
+
+    /// <summary>
+    /// Модель ссылки
+    /// </summary>
     public class NavLinkNavLink: BaseEntity
     {
         public string Icon { get; internal set; }
         public string Label { get; internal set; }
         public string Href { get; internal set; }
     }
+
+    /// <summary>
+    /// Создаст запись в базе и вернёт связанный объект
+    /// </summary>
     public NavLinkNavLink CreateNavLink()
     {
         var result = new NavLinkNavLink() { Icon = "oi-home", Label = "Домашняя", Href = "/" };
@@ -43,6 +53,10 @@ public class NavMenuService : INavMenuService
         return result;
     }
 
+
+    /// <summary>
+    /// Создаст запись в базе и верёнт связанный объект
+    /// </summary>
     public NavLinkNavLink CreateNavLink(string icon, string label, string href)
     {
         var result = new NavLinkNavLink() { Icon = icon, Label = label, Href = href };
@@ -51,16 +65,30 @@ public class NavMenuService : INavMenuService
         return result;
     }
 
+
+    /// <summary>
+    /// Обновление данных
+    /// </summary>   
     public void UpdateNavLink(NavLinkNavLink link)
     {
         _context.Update(link);
         _context.SaveChanges();
     }
+
+
+    /// <summary>
+    /// Удаление данных
+    /// </summary> 
     public void RemoveNavLink(NavLinkNavLink link)
     {
         _context.NavLinks.Remove(link);
         _context.SaveChanges();
     }
+
+
+    // <summary>
+    /// Удаление данных по ид
+    /// </summary> 
     public void RemoveNavLink(int id)
     {
         _context.NavLinks.Remove(_context.NavLinks.Find(id));
@@ -69,6 +97,11 @@ public class NavMenuService : INavMenuService
 
 
 
+    /// <summary>
+    /// Получение ссылок по маршрутизируемым представления относительно текущего адреса
+    /// </summary>
+    /// <param name="uri">текущий адрес</param>
+    /// <returns>Ссылки</returns>
     public NavLinkNavLink[] GetLinks(string uri)
     {
         _logger.LogInformation(uri);
@@ -89,31 +122,31 @@ public class NavMenuService : INavMenuService
             {
                 navList.Add(new NavLinkNavLink() { Icon = "home", Label = page.GetName(), Href = attrs["Route"] });
             }
-
         };
         return navList.ToArray();
     }
 
+
+    /// <summary>
+    /// Тестовый данные
+    /// </summary>   
     public NavLinkNavLink[] GetDefaultNavLinks()
     {
         return new NavLinkNavLink[] {
-            new NavLinkNavLink(){ Icon="home", Label="Домашняя", Href="/" },
-            new NavLinkNavLink(){ Icon="plus", Label="Версии", Href="/counter" },
-            new NavLinkNavLink(){ Icon="list-rich", Label="Редактор форм", Href="/input-forms" },
-            new NavLinkNavLink(){ Icon="person", Label="Редактор меню", Href="/nav-menu" }
-
+            new NavLinkNavLink(){ Icon="home",      Label="Домашняя",       Href="/" },
+            new NavLinkNavLink(){ Icon="plus",      Label="Версии",         Href="/counter" },
+            new NavLinkNavLink(){ Icon="list-rich", Label="Редактор форм",  Href="/input-forms" },
+            new NavLinkNavLink(){ Icon="person",    Label="Редактор меню",  Href="/nav-menu" }
         };
     }
 
-    public IEnumerable<NavLinkNavLink> GetPageLinks() => _context.NavLinks.ToList();
-
-    public IEnumerable<NavLinkNavLink> GetPageLinks(string uri)
-    {
-        return _context.NavLinks.Where(link => link.Href.StartsWith(uri) ).ToList();
-    }
 
 }
 
+
+/// <summary>
+/// Предоставляет модели ссылок
+/// </summary>
 public interface INavMenuService
 {
     IEnumerable<NavLinkNavLink> GetPageLinks(string uri);
@@ -121,9 +154,12 @@ public interface INavMenuService
     void UpdateNavLink(NavLinkNavLink link);
     void RemoveNavLink(int id);
     NavLinkNavLink CreateNavLink(string icon, string label, string href);
-
-
 }
+
+
+/// <summary>
+/// Контекст данных
+/// </summary>
 public class NavMenuDbContext : DbContext
 {
     public DbSet<NavLinkNavLink> NavLinks { get; set; }
@@ -139,6 +175,10 @@ public class NavMenuDbContext : DbContext
         }
     }
 }
+
+/// <summary>
+/// Расширение упрощает регистрацию зависимостей в приложении
+/// </summary>
 public static class NavMenuServiceExtension
 {
     public static IServiceCollection AddNavMenu(this IServiceCollection services)

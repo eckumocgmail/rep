@@ -6,6 +6,20 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Reflection;
+
+
+public class Form : ViewItem
+{
+    public InputFormModel Model { get; set; }
+    public Form( )
+    {
+        this.Model = new InputFormModel(this);
+    }
+    public Form(InputFormModel Model)
+    {
+        this.Model = Model;
+    }
+}
 /*
 
 [InputIcon("apps")]

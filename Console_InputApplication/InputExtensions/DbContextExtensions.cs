@@ -19,14 +19,17 @@ public static class DbContextExtensions
     
     public static Type GetDbContextWithEntity(this object target)
     {
+        if (target is Type)
+            throw new ArgumentException("Метод GetDbContextWithEntity нужно использовать на ссылки на объект" );
         foreach(var pdbtype in ServiceFactory.Get().GetTypesExtended<DbContext>())
         {
             using (var pdb = (DbContext)pdbtype.New())
             {
+                pdb.GetEntitiesTypes().Select(t => t.GetTypeName()).ToJsonOnScreen().WriteToConsole();
+
                 var pentity = pdb.GetEntitiesTypes().FirstOrDefault(e => e.GetTypeName() == target.GetType().GetTypeName());
-                if (pentity == null)
-                    throw new Exception("не найден контекст данных для " + target.GetType().GetTypeName());
-                else return pdbtype;
+                if (pentity != null)
+                    return pdbtype;
             }            
         }
         throw new Exception("не найден контекст данных для " + target.GetType().GetTypeName());

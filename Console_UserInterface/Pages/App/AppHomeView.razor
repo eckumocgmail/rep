@@ -1,0 +1,75 @@
+﻿@page "/app/app-home"
+@code
+{
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        this.NavMenuModel = AppBuilder.CreateNavMenu(GetType().Namespace, new());
+        var table = new Table();
+        table.Columns = new() { "name", "value" };
+        this.ContentView = table;
+        this.NavMenuOptions.Add("Компонент 1");
+    }
+
+    [NotNullNotEmpty]
+    public List<string> NavMenuOptions { get; set; } = new();
+
+    [NotNullNotEmpty]
+    public ViewItem ContentView { get; set; }
+
+    public void OnMenuItemSelected(object item)
+    {
+
+    }
+
+    public Dictionary<string, string> NavMenuModel { get; set; }
+
+    public string StatusText { get; set; } = "Оиждание пользователя";
+    public void OnOkButtonClicked()
+    {
+
+    }
+    public void OnMenuSelected(string item)
+    {
+        this.ContentView = new Form(new InputFormModel(item.ToType().New()));
+        this.Info(this.ContentView);
+    }
+    public void OnCancelButtonClicked()
+    {
+
+    }
+    
+}
+<CardContainer>
+    <CardHeader>
+        <NavMap Title="Переходы" Model="@NavMenuModel" Vertical="@false" OnSelected="@OnMenuSelected"></NavMap>
+    </CardHeader>
+    <CardBody>
+        <SplitPane>
+            <Left>
+                <SelectList Title="Выберите" ListItems="@NavMenuOptions" OnSelect="OnMenuItemSelected"></SelectList>
+            </Left>
+            <Right>
+                @if (ContentView is null)
+                {
+                    <ButtonClick>Добавить компонент</ButtonClick>
+                }
+                else
+                {
+                    <ContentBox Model="@ContentView"></ContentBox>
+                }
+                
+            </Right>
+        </SplitPane>
+    </CardBody>
+    <CardFooter>
+        <ToolsBar>
+            <ButtonClick OnClick="@OnOkButtonClicked">Ok</ButtonClick>
+            <ButtonClick OnClick="@OnCancelButtonClicked">Cancel</ButtonClick>
+        </ToolsBar>
+        <StatusBar StatusName="@StatusText"></StatusBar>
+    </CardFooter>
+</CardContainer>
+@code{
+    
+}

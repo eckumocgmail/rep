@@ -17,7 +17,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbExecutorService
     public class SqlServerExecutor : SqlServerDbConnector, ISqlExecutor
 
     {
-        protected readonly IdataTableService DataTableService = new DataTableService();
+        protected readonly IDataTableService DataTableService = new DataTableService();
 
         public SqlServerExecutor(): base()
         {

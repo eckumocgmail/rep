@@ -65,10 +65,10 @@
     <CardHeader>
         <MenuItemView Model="MenuItems"></MenuItemView>
         <ToolsBar Model="ToolItems"></ToolsBar>
-        <SearchPane OnSearchSubmit="((SearchPane evt) => { 
+        <SearchControl OnSearch="((evt) => { 
             this.PageInstance = location.Navigate(evt.SearchQuery);
         })">
-        </SearchPane>
+        </SearchControl>
     </CardHeader>
     <CardBody>
         @if (PageInstance is not null)

@@ -176,5 +176,10 @@
         {
             throw new NotImplementedException();
         }
+
+        public Task<IEnumerable<string>> CheckListAsync(string title, IEnumerable<string> options, ref string[] args)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

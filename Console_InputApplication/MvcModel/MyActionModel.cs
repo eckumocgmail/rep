@@ -13,9 +13,9 @@ using Newtonsoft.Json.Linq;
 /// </summary>
 public static class MyActionModelExtensions
 {
-    public static IEnumerable<string> GetOwnParameters(this MethodInfo p)             
+    public static IEnumerable<string> GetOwnParameters(this MethodInfo p)
         => p.GetParameters().Select(p => TypeExtensions2.GetTypeName(p.ParameterType));
-    
+
     public static IEnumerable<string> GetMethodParameters(this Type p, string name)
         => p.GetOwnMethod(name).GetParameters().Select(p => p.Name );
 

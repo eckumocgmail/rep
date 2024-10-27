@@ -1,6 +1,8 @@
 ﻿@page "/user/group/{GroupId:int}"
 @inject SigninUser signin
 @inject UserGroupsService groupsService
+<PageTitle>Группа @GroupId</PageTitle>
+
 <SearchListCard TItem="UserGroupMessage" Items="Messages">
     <CardHeader>
         <h3>Сообщения в группе</h3>

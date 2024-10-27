@@ -17,11 +17,11 @@ public class BaseValidationAttribute: ValidationAttribute, MyValidation
 
     public virtual string ValidateValue(object value) => throw new NotImplementedException();
 
-    public virtual string Validate(object model, string property, object value) => throw new NotImplementedException();
+    public virtual string Validate(object model, string property, object value) => throw new NotImplementedException(GetType().GetTypeName());
     public virtual string GetMessage(object model, string property, object value) => throw new NotImplementedException();
     protected  override ValidationResult IsValid(object value, ValidationContext validationContext)
     {            
-        string result = this.Validate(validationContext.ObjectInstance, validationContext.MemberName, value);
+        string result = this.Validate(validationContext is null? null: validationContext.ObjectInstance, validationContext is null ? null : validationContext.MemberName, value);
         if (result == null)
         {
             return ValidationResult.Success;

@@ -2,7 +2,6 @@
 {
     void Dispose();
     Dictionary<string, string> GetAttributes(string typeName);
-    Dictionary<string, string> GetAttributes(Type type);
     Dictionary<string, Dictionary<string, string>> GetMembersAttributes(string typeName);
     Dictionary<string, string> GetMethodAttributes(string typeName, string method);
     Dictionary<string, string> GetParameterAttributes(string typeName, string method, string parameter);
@@ -18,6 +17,7 @@ public class CustomService : CustomDataProvider, ICustomService
 {
     private readonly CustomDbContext customAttributesDbContext;
     private readonly TypeHelper typeHelper = new TypeHelper();
+    private readonly bool cachingAttributes = true;
 
     public CustomService() : this(new CustomDbContext())
     {
@@ -28,10 +28,13 @@ public class CustomService : CustomDataProvider, ICustomService
         this.customAttributesDbContext = customAttributesDbContext;
     }
 
+    public bool HasType(Type type) => GetTypes().Contains(typeHelper.GetTypeName(type));
+
 
     // = type.GetAttributes()
     public Dictionary<string, string> GetAttributes(Type type)
     {
+        if(!HasType(type)) ToType(type);
         return GetAttributes(typeHelper.GetTypeName(type));
     }
 

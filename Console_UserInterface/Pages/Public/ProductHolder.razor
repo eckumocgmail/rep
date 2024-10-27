@@ -1,6 +1,6 @@
 ﻿@page "/public/holder-products/{Id:int}"
 @attribute [Authorize(Roles = "webuser")]
-
+<PageTitle>Склад товаров @Id</PageTitle>
 @using Console_BlazorApp.AppUnits.DeliveryModel;
 @using Microsoft.AspNetCore.Mvc;
 @using Console_BlazorApp.AppUnits.DeliveryApi;

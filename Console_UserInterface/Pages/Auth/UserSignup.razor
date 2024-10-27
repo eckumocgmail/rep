@@ -80,6 +80,11 @@
         [NotNullNotEmpty]
         [SelectData($"{nameof(UserRole)}.{nameof(UserRole.Code)}")]
         public string Role { get;set; }
+
+        public RoleSelectionModel()
+        {
+            Role = "";
+        }
     }
 }
 <PageTitle>ЕвроАвто/Регистрация</PageTitle>

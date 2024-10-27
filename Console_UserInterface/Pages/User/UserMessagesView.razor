@@ -1,4 +1,6 @@
 ﻿@page "/user/messages"
+<PageTitle>Личные сообщения</PageTitle>
+
 @attribute [Authorize(Roles = "webuser")]
 @inject DbContextUser usersDb
 @inject IUserMessagesService userMessages
@@ -54,13 +56,13 @@
                         @switch (view)
                         {
                             case "message":
-                                <MessageCard></MessageCard>
+                                <MessageCardView></MessageCardView>
                                 break;
                             case "outbox":
-                                <MessagesList Messages="@outbox"></MessagesList>
+                                <MessagesListView Messages="@outbox"></MessagesListView>
                                 break;
                             case "inbox":
-                                <MessagesList Messages="@inbox"></MessagesList>                      
+                                <MessagesListView Messages="@inbox"></MessagesListView>                      
                                 break;
                             case "new_message":
                                 <CreateMessage OnSend="(evt => { OnSendMessage(evt); StateHasChanged();  })"></CreateMessage>

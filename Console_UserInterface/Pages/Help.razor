@@ -1,12 +1,11 @@
 ﻿@page "/help"
-@using ApplicationCommon.CommonResources;
 @inherits BaseComponent
 @inject IServiceProvider provider
 @inject HelpService help
 @code
 {
-    public Dictionary<string, string> Articles { get;set; }
     public string Current { get; set; }
+    public Dictionary<string, string> Articles { get;set; }    
     public global::TypeNode<string> Contents { get; set; }
 }
 @code
@@ -21,17 +20,19 @@
 }
 @code
 {
+    public List<string> NavMenuItems { get; set; } = new();
     public InputFormModel ContentModel { get; set; } = new InputFormModel();
 }
+<PageTitle>Справочная информация</PageTitle>
 <CardContainer>
     <CardHeader>
-        <TextComponent>Спарвочная информация/@Current</TextComponent>
+        @*<TextComponent Align="left" Color="dark">Спарвочная информация/@Current</TextComponent>*@
         <SearchControl SearchOptions="@SearchOptions" SearchQuery="@SearchQuery" Placeholder="@Placeholder" OnInput="OnInputSearch" OnSearch="OnSearchSubmited"></SearchControl>
     </CardHeader>
     <CardBody>
         <SplitPane LeftSize="1" RightSize="2">
             <Left>
-                <ListGroup Items="@(Contents.GetChildren().Select(ch => ch.NodeName).ToList())" OnListGroupItemClickedCallback="evt=> { Current=evt; StateHasChanged(); }"></ListGroup>
+                <ListGroup Items="@(NavMenuItems/*Contents.GetChildren().Select(ch => ch.NodeName).ToList()*/)" OnListGroupItemClickedCallback="evt=> { Current=evt; StateHasChanged(); }"></ListGroup>
             </Left>
             <Right>
                  

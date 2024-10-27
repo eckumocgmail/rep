@@ -13,6 +13,7 @@ namespace Console_BookingUI
 
             // Add services to the container.
             builder.Services.AddRazorPages();
+            builder.Services.AddTransient<ExcelDataReader>();
             builder.Services.AddServerSideBlazor();
             builder.Services.AddSingleton<WeatherForecastService>();
 

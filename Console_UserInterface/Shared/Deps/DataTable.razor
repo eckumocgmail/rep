@@ -1,5 +1,6 @@
 ﻿@typeparam DataType
 @using Console_InputApplication
+@inject IInputService input
 @code 
 {
     [Parameter]
@@ -34,64 +35,75 @@
         await OnChanged.InvokeAsync(item);
         StateHasChanged();
     }
-}
+    public void OnSettingsClicked()
+    {
+        
+
+
+    }
+    public void OnMaxSizeClicked() { }
+    public void OnDefaultSizeClicked() { }
+} 
+
+
+<ContextMenu Id="myMenu">
+    <Item OnClick="OnSettingsClicked">Свойства</Item>
+    <Seperator />
+    <Item>
+        Вид
+        <SubMenu>
+            <Item OnClick="@OnMaxSizeClicked">Максимальный размер</Item>
+            <Item OnClick="@OnDefaultSizeClicked">Обычный размер</Item>
+        </SubMenu>
+    </Item>
+</ContextMenu>
+
+<ContextMenuTrigger MenuId="myMenu">
+     
+<style>
+    .brigth-on-holver:hover{
+        background-color: black;
+        color: white;
+    }
+</style>
+
 @if(DataItems is null || DataItems.Count()==0)
 {
     <div class="alert alert-info">Нет данных</div>
 }
 else
-{
-    @DataItems.Count()
-    <table>
-        @foreach (DataType Item in DataItems)
+{    
+    <table class="table table-bordered table-hover table-dark">              
+        <tr class="brigth-on-holver">
+            @if(DataCheckable)
+            {
+                <td style="width: 50px;"></td>
+            }
+            @if(DisplayColumns is not null)
+            {
+                @foreach (string DisplayColumn in GetColumnsLabels(DisplayColumns.ToArray()))
+                {
+                    <td>@DisplayColumn</td>
+                }
+            }
+                
+        </tr>
+        @foreach(DataType Item in DataItems)
         {
             <tr @onclick="async evt => { await OnItemSelected(Item); StateHasChanged(); }" @onclick:preventDefault @onclick:stopPropagation>
+                @if (false)
+                {
+                    <td style="width: 50px;"><Checkbox Checked="@CheckedItems.Contains(Item)" OnChange="(evt => { if(CheckedItems.Contains(Item))CheckedItems.Remove(Item); else CheckedItems.Add(Item); StateHasChanged(); })"></Checkbox></td>
+                }
                 @if (DisplayColumns is not null)
                 {
                     @foreach (string DisplayColumn in DisplayColumns)
                     {
                         <td>@Item.GetValue(DisplayColumn)</td>
                     }
-                }
+                }                   
             </tr>
         }
     </table>
-    @*<div >
-        <div>
-            <div>
-                @if(DataCheckable)
-                {
-                    <span style="width: 50px;"></span>
-                }
-                @if(DisplayColumns is not null)
-                {
-                    @foreach (string DisplayColumn in GetColumnsLabels(DisplayColumns.ToArray()))
-                    {
-                        <span>@DisplayColumn</span>
-                    }
-                }
-                
-            </div>
-        </div>
-        <div>
-            @foreach(DataType Item in DataItems)
-            {
-                <div @onclick="async evt => { await OnItemSelected(Item); StateHasChanged(); }" @onclick:preventDefault @onclick:stopPropagation>
-
-                    @if (false)
-                    {
-                        <div style="width: 50px;"><CheckBox Checked="@CheckedItems.Contains(Item)" OnChange="(evt => { if(CheckedItems.Contains(Item))CheckedItems.Remove(Item); else CheckedItems.Add(Item); StateHasChanged(); })"></CheckBox></div>
-                    }
-                    @if (DisplayColumns is not null)
-                    {
-                        @foreach (string DisplayColumn in DisplayColumns)
-                        {
-                            <span>@Item.GetValue(DisplayColumn)</span>
-                        }
-                    }
-                   
-                </div>
-            }
-        </div>
-    </div>*@
 }
+</ContextMenuTrigger>

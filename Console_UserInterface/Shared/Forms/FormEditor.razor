@@ -176,6 +176,9 @@ else
     {       
         TextDataSetter.SetValue(model, evt.Property, evt.Value);
         this.Form.FormFields.First(f => f.Name == evt.Property).Value = evt.Value;
+
+        this.Info(model.Validate().ToJsonOnScreen());
+
         return model.Validate();
     }
     public async Task OnPropertyChanged(InputEvent evt)

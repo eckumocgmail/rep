@@ -1,5 +1,6 @@
 ﻿@inherits LayoutComponentBase
 @inject SigninUser signin
+<link rel="stylesheet" href="/css/colors/@(signin.IsSignin()? signin.Verify().Settings.ColorTheme: "light").css" />
 <style>
     .dark a
     {
@@ -13,11 +14,7 @@
     </div>
 
     <main class="@( signin.IsSignin()? signin.Verify().Settings.ColorTheme: "light" )">
-        @if(signin.IsSignin())
-        {
-            <p>@signin.Verify().Settings.ColorTheme</p>
-        }
-        
+                
         <div style="position: fixed;" class="card">
             <UpdateLocation></UpdateLocation>
             <GeoPositionUpdater></GeoPositionUpdater>
@@ -37,7 +34,7 @@
 {
     Dictionary<string, string> links = new Dictionary<string, string>()
     {
-        { "Заказы","/user/orders" },
+        //{ "Заказы","/user/orders" },
         { "Выход","/user/signout" },
     };
 }

@@ -16,6 +16,7 @@ namespace BookingModel.ServiceDataModel
      
         public int? CustomerId { get; set; }
         public int ServicePriceId { get; set; }
+        [Newtonsoft.Json.JsonIgnore]
         [JsonIgnore]
         public ServicePrice ServicePrice { get; set; }
         [JsonIgnore]
@@ -23,6 +24,8 @@ namespace BookingModel.ServiceDataModel
 
         [JsonIgnore]
         [NotMapped]
+        [Newtonsoft.Json.JsonIgnore]
+   
         public List<ServicePrice> ServicePrices { get; set; } = new();
 
         

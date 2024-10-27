@@ -1,5 +1,4 @@
-﻿
-using Blazored.Modal;
+﻿using Blazored.Modal;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -14,6 +13,9 @@ public interface IInputModalService
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
     public Task<T> Create<T>() where T : class;
+    public Task<T> Create<T>(T model) where T : class;
+    public Task<T> Show<T>(T item=null) where T : class;
+    public Task<T> Show<T>(Dictionary<string,object> item=null) where T : class;
     public IModalReference Create(Type type);
 
     /// <summary>

@@ -1,27 +1,21 @@
-﻿
-
-using Microsoft.EntityFrameworkCore;
-using NetCoreConstructorAngular.Data.DataAttributes;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
+﻿using Microsoft.EntityFrameworkCore;
 using System.Reflection;
-
 
 /// <summary>
 /// Проверка уникальности значения атрибута сущности
 /// </summary>
 public class UniqValueAttribute : BaseValidationAttribute, MyValidation
 {
-    protected string _error;    
+    protected string _error;
+    private string _dbContextTypeName;
 
     /// <summary>
     /// Конструктор
     /// </summary>
     /// <param name="ErrorMessage">сообщение после отрицательной проверки</param>    
-    public UniqValueAttribute(string ErrorMessage=null){
-        _error = ErrorMessage;        
+    public UniqValueAttribute(string dbContextTypeName = null, string ErrorMessage =null){
+        _error = ErrorMessage;
+        _dbContextTypeName = dbContextTypeName;
     }
 
  
@@ -38,62 +32,62 @@ public class UniqValueAttribute : BaseValidationAttribute, MyValidation
         throw new Exception("Коллекция сущностей "+dbset +" не найдена");
     }
 
-    public string Validate(object model, string property, object value)
+    public override string Validate(object model, string property, object value)
     {
-        /*foreach (Type t in AssemblyReader.GetDbContexts(Assembly.GetCallingAssembly()))
+        var typeName = model.GetType().GetTypeName();
+        var _dbContextType = model.GetDbContextWithEntity();
+
+        if (_dbContextType is null)
+            throw new NullReferenceException($"{GetType().GetTypeName()} не удалось определить контекст данных");
+        if(_dbContextType is not null)
         {
-          
-            using (DbContext db = ((DbContext)ReflectionService.CreateWithDefaultConstructor<DbContext>(t)))
+            _dbContextTypeName = _dbContextType.GetTypeName();
+        }
+        if (_dbContextTypeName is null)
+            throw new NullReferenceException($"{GetType().GetTypeName()} содержит ссылку на null  в свойстве _dbContextTypeName");
+        _dbContextTypeName = _dbContextType.GetTypeName();
+
+        using (var db = _dbContextTypeName.New<DbContext>())
+        {
+            var dbset = db.GetDbSet(model.GetType().GetTypeName());
+            int id = (int)new ReflectionService().GetValue(model, "Id");
+            bool isUniq = true;
+            foreach (var record in ((IEnumerable<dynamic>)dbset))
             {
-                object dbsetObj = null;
-                try
+                if (record.Id != id)
                 {
-                    dbsetObj = db.GetDbSet( model.GetType().Name);
-                }catch(Exception ex)
-                {
-                    continue;
-                }
-                int id = (int)new ReflectionService().GetValue(model, "Id");
-                bool isUniq = true;
-                foreach (var record in ((IEnumerable<dynamic>)dbsetObj))
-                {
-                    if (record.Id != id)
+                    object recordPropertyValue = new ReflectionService().GetValue(record, property);
+                    if (value == null)
                     {
-                        object recordPropertyValue = new ReflectionService().GetValue(record, property);
-                        if (value == null)
+                        if (recordPropertyValue == null)
                         {
-                            if (recordPropertyValue == null)
+                            isUniq = false;
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        if (recordPropertyValue == null)
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            if (recordPropertyValue.ToString() == value.ToString())
                             {
                                 isUniq = false;
                                 break;
                             }
                         }
-                        else
-                        {
-                            if (recordPropertyValue == null)
-                            {
-                                continue;
-                            }
-                            else
-                            {
-                                if (recordPropertyValue.ToString() == value.ToString())
-                                {
-                                    isUniq = false;
-                                    break;
-                                }
-                            }
-                        }
                     }
                 }
-
-                //bool result = (from i in ((IEnumerable<dynamic>)dbsetObj)
-                //where new ReflectionService().GetValue(model, property) == value && i.Id != id
-                //select i).Count() == 0;
-                return isUniq ? null : GetMessage(model,property,value);
             }
-        }*/
-        return null;
-        
+
+            //bool result = (from i in ((IEnumerable<dynamic>)dbsetObj)
+            //where new ReflectionService().GetValue(model, property) == value && i.Id != id
+            //select i).Count() == 0;
+            return isUniq ? null : GetMessage(model, property, value);
+        }        
     }
 
     public string GetMessage(object model, string property, object value)

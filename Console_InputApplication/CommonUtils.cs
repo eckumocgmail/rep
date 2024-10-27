@@ -27,6 +27,7 @@ public static class Typing
      }*/
     public static string GetName2(this Type propertyType)
     {
+        
         string name = propertyType.Name.IndexOf("`") == -1 ? propertyType.Name : propertyType.Name.Substring(0, propertyType.Name.IndexOf("`"));
         if (propertyType.GenericTypeArguments != null && propertyType.GenericTypeArguments.Length > 0)
         {

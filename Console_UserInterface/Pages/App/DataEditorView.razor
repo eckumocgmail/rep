@@ -33,7 +33,8 @@
 <CardContainer>
     <CardHeader>Выберите контекст данных</CardHeader>
     <CardBody>
-        <CheckList ListItems="@(GetType().Assembly.GetTypes<DbContext>().Select(t => t.GetTypeName()).ToList())" OnChanged="(evt => { DbContextTypes=evt; StateHasChanged(); })"></CheckList>               
+        @ServiceFactory.Get().GetDbContexts().Select(t => t.GetTypeName()).ToList().ToJsonOnScreen())
+        <CheckList ListItems="@(ServiceFactory.Get().GetDbContexts().Select(t => t.GetTypeName()).ToList())" OnChanged="(evt => { DbContextTypes=evt; StateHasChanged(); })"></CheckList>               
     </CardBody>
 </CardContainer>
 

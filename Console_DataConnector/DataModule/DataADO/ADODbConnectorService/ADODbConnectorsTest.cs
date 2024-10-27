@@ -11,8 +11,8 @@ namespace Console_DataConnector.DataModule.DataADO.ADODbConnectorService
         {
             ADODbConnectorsTest test = new ADODbConnectorsTest();
             test.SqlServerDbConnector_Test();
-            //test.MySqlDbConnector_Test();
-            //test.PostgresDbConnector_Test();
+            test.MySqlDbConnector_Test();
+            test.PostgresDbConnector_Test();
         }
 
         private void PostgresDbConnector_Test()

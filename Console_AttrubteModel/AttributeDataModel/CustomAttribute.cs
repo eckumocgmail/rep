@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
- 
+
 /// <summary>
 /// Модель данных аттрибута типа
 /// </summary>
+[Description("Нстроиваемый аттрибут")]
 public class CustomAttribute
 {
     public int Id { get; set; }

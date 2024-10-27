@@ -1,7 +1,17 @@
-﻿using BookingModel.ServiceServiceModel;
+﻿using BookingModel.ServiceDataModel;
+using BookingModel.ServiceServiceModel;
+
+using Console_BookingUI.Data;
+
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+
+using OfficeOpenXml;
 
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.OleDb;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,17 +28,283 @@ namespace BookingModel
                 context.Database.EnsureDeleted();
                 context.Database.EnsureCreated();
                 var initiallizer = new BookingInitializer();
+                
                 var results = initiallizer.Init(context);
                 Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(results, System.Text.Json.JsonSerializerOptions.Default));
-            }
-             
+            }            
         }
+        public static IEnumerable<string> GetColumnsNames(DataTable dataTable)
+        {
+            List<string> columnNames = new List<string>();
+
+            foreach (DataColumn column in dataTable.Columns)
+            {
+                columnNames.Add(column.ColumnName);
+            }
+            return columnNames.ToArray();
+        }
+        public static IEnumerable<IDictionary<string, string>> GetTextData(DataTable dataTable, int startRow=-1)
+        {
+            int nRow = 0;
+            var result = new List<IDictionary<string, string>>();
+            foreach (DataRow row in dataTable.Rows)
+            {
+                if (startRow != -1 && nRow < startRow)
+                {
+                    nRow++;
+                    continue;
+                } 
+                IDictionary<string, string> data = new Dictionary<string, string>();
+                foreach (DataColumn column in dataTable.Columns)
+                {
+                    object value = row[column.ColumnName];
+                    data[column.ColumnName] = value == null ? "NULL" : value.ToString();
+                }
+                result.Add(data);
+                nRow++;
+            }
+            return result.ToArray();
+        }
+
+        public static Dictionary<string, Tuple<List<string>, IEnumerable<IEnumerable<string>>>> ReadXlsFileAsList(string filename, int sheetNumber = -1, int columnsInRow = 0)
+        {
+            string ConnectionString = String.Format("Provider=Microsoft.ACE.OLEDB.12.0;Extended Properties=\"Excel 8.0;HDR=No;IMEX=1\"; Data Source={0}", filename);
+            DataSet ds = new DataSet("EXCEL");
+
+            Dictionary<string, Tuple<List<string>, IEnumerable<IEnumerable<string>>>> result = new();
+            OleDbConnection cn = new OleDbConnection(ConnectionString);
+            cn.Open();
+
+            var schema = cn.GetOleDbSchemaTable(OleDbSchemaGuid.Tables, null);
+            var columns = GetColumnsNames(schema).ToList();
+            var data = GetTextData(schema);
+            var tables = data.Select(item => item["TABLE_NAME"]);
+
+            cn.Info(columns.ToJsonOnScreen());
+            cn.Info(data.ToJsonOnScreen());
+            if (sheetNumber == -1)
+            {
+                var dataset = new DataSet();
+                foreach (var table in tables)
+                {
+                    string select = String.Format("SELECT * FROM [{0}]", table);
+                    OleDbDataAdapter ad = new OleDbDataAdapter(select, cn);
+                    ad.Fill(ds);
+                    DataTable tb = ds.Tables[0];
+
+                    columns = GetColumnsNames(tb).ToList();
+                    var datalist = GetTextDataList(tb);
+                    if (columnsInRow != 0)
+                    {
+                        columns = datalist[columnsInRow].ToList();
+                        while (columnsInRow >= 0)
+                        {
+                            datalist.RemoveAt(columnsInRow);
+                            columnsInRow--;
+                        }
+                    }
+                    result[table] = new(columns, datalist);
+
+                }
+            }
+            else
+            {
+                var table = tables.ToList()[sheetNumber];
+                string select = String.Format("SELECT * FROM [{0}]", table);
+                OleDbDataAdapter ad = new OleDbDataAdapter(select, cn);
+                ad.Fill(ds);
+                DataTable tb = ds.Tables[0];
+
+                columns = GetColumnsNames(tb).ToList();
+                var datalist = GetTextDataList(tb);
+                if (columnsInRow != 0)
+                {
+                    columns = datalist[columnsInRow].ToList();
+                    while (columnsInRow >= 0)
+                    {
+                        datalist.RemoveAt(columnsInRow);
+                        columnsInRow--;
+                    }
+                }
+                result[table] = new(columns, datalist);
+            }
+            return result;
+        }
+
+        public static List<IEnumerable<string>> GetTextDataList(DataTable dataTable, int startRow = -1)
+        {
+            int nRow = 0;
+            var result = new List<IEnumerable<string>>();
+            foreach (DataRow row in dataTable.Rows)
+            {
+                if (startRow != -1 && nRow < startRow)
+                {
+                    nRow++;
+                    continue;
+                }
+                List<string> data = new List<string>();
+                foreach (DataColumn column in dataTable.Columns)
+                {
+                    object value = row[column.ColumnName];
+                    data.Add(value is not null ? value.ToString() : null);
+                }
+                result.Add(data);
+                nRow++;
+            }
+            return result;
+        }
+
+        
+        /// <summary>
+        /// Считываем список работ из файла 
+        /// </summary>
+        /// <returns>Словарь работа-адреса где делают</returns>
+        public static Dictionary<string, List<string>> ReadWorks()
+        {
+            Dictionary<string, List<string>> res = new();
+
+            string filename = @"D:\System-Config\MyExpirience\Console_BlazorApp\Console_BookingModel\Resources\works.xlsx";
+            
+            var data = new ExcelDataReader().ReadXlsFileAsList(filename, 2, 1);
+            var tuple = data.First().Value;
+            var columns = tuple.Item1;
+            columns.RemoveAt(3);
+            columns.RemoveAt(2);
+            columns.RemoveAt(1);
+            columns.RemoveAt(0);
+
+            var labels = tuple.Item1.ToList();
+            var datarows = tuple.Item2.ToList();   
+            foreach(var datarow in datarows)
+            {
+                var datalist = datarow.ToList();
+
+                for (int i = 4; i < datarows.Count()-1; i++)
+                {
+                    try
+                    {
+                        var id = datalist[0];
+                        var work_id = datalist[1];
+                        var n = datalist[2];
+                        var name = datalist[3];
+                        var can_do = datalist[i];
+                        var service = columns[i - 4];
+
+                        if (res.ContainsKey(name) == false)
+                            res[name] = new();
+                        if (can_do.Trim().IndexOf("1") != -1)
+                        {
+                            res[name].Add(service);
+                        }
+                    }
+                    catch(Exception ex) 
+                    {
+                        ex.Error($"Ошибка при обработки сторки {i} в наборе из файла: {ex.Message}");
+                    }
+                }
+            }
+            
+            return res;
+        }
+
+        public static Dictionary<string, Tuple<List<string>, IEnumerable<IDictionary<string, string>>>> ReadServices()
+        {
+            string filename = @"D:\System-Config\MyExpirience\Console_BlazorApp\Console_BookingModel\Resources\services.xlsx";
+            return ReadXlsFile(filename);
+        }
+
+        //string filename = @"D:\System-Config\MyExpirience\Console_BlazorApp\Console_BookingModel\Resources\works.xlsx";
+        public static Dictionary<string, Tuple<List<string>, IEnumerable<IDictionary<string, string>>>> ReadXlsFile(string filenameXlsx, int indexExcelTab, int indexHeaderRow = -1)
+        {
+            string ConnectionString = String.Format("Provider=Microsoft.ACE.OLEDB.12.0;Extended Properties=\"Excel 8.0;HDR=No;IMEX=1\"; Data Source={0}", filenameXlsx); 
+            DataSet ds = new DataSet("EXCEL");
+
+            Dictionary<string, Tuple<List<string>, IEnumerable<IDictionary<string, string>>>> result = new();
+            OleDbConnection cn = new OleDbConnection(ConnectionString);
+            cn.Open();
+
+            var schema = cn.GetOleDbSchemaTable(OleDbSchemaGuid.Tables, null);
+            var columns = GetColumnsNames(schema).ToList();
+            var data = GetTextData(schema);
+            var tables = data.Select(item => item["TABLE_NAME"]);
+
+            cn.Info(columns.ToJsonOnScreen());
+            cn.Info(data.ToJsonOnScreen());
+
+            
+            var table= tables.ToList()[indexExcelTab];
+            
+            string select = String.Format("SELECT * FROM [{0}]", table);
+            OleDbDataAdapter ad = new OleDbDataAdapter(select, cn);
+            ad.Fill(ds);
+            DataTable tb = ds.Tables[0];
+
+            
+            data = GetTextData(tb);
+            if (indexHeaderRow == -1)
+            {
+                columns = GetColumnsNames(tb).ToList();
+            }
+            else
+            {
+                var datalist = data.ToList();
+                if (datalist.Count() <= indexHeaderRow)
+                {
+                    throw new ArgumentException("indexHeaderRow", $"Индекс шапки таблица должен быть меньше {datalist.Count()}");
+                }
+                var row = datalist[indexHeaderRow];
+                columns = new();
+                foreach (string column in GetColumnsNames(tb))
+                {
+                    columns.Add($"{row[column]}");
+                }
+            }
+
+            result[table] = new(columns, data);
+
+            
+            return result;
+        }
+        public static Dictionary<string, Tuple<List<string>, IEnumerable<IDictionary<string, string>>>> ReadXlsFile(string filename)
+        {
+            string ConnectionString = String.Format("Provider=Microsoft.ACE.OLEDB.12.0;Extended Properties=\"Excel 8.0;HDR=No;IMEX=1\"; Data Source={0}", filename); 
+            DataSet ds = new DataSet("EXCEL");
+
+            Dictionary<string, Tuple<List<string>, IEnumerable<IDictionary<string, string>>>> result = new();
+            OleDbConnection cn = new OleDbConnection(ConnectionString);
+            cn.Open();
+
+            var schema = cn.GetOleDbSchemaTable(OleDbSchemaGuid.Tables, null);
+            var columns = GetColumnsNames(schema).ToList();
+            var data = GetTextData(schema);
+            var tables = data.Select(item => item["TABLE_NAME"]);
+
+            cn.Info(columns.ToJsonOnScreen());
+            cn.Info(data.ToJsonOnScreen());
+
+            var dataset = new DataSet();
+            foreach (var table in tables)
+            {
+                string select = String.Format("SELECT * FROM [{0}]", table);
+                OleDbDataAdapter ad = new OleDbDataAdapter(select, cn);
+                ad.Fill(ds);
+                DataTable tb = ds.Tables[0];
+
+                columns = GetColumnsNames(tb).ToList();
+                data = GetTextData(tb);
+                result[table] = new(columns, data);
+                
+            }            
+            return result;             
+        }
+
         public IDictionary<string, int> Init(ServiceDbContext context)
         {
 
             Dictionary<string, int> result = new Dictionary<string, int>();
             Console.WriteLine("InitServiceDepartments");
-            result["ServiceDepartments"] = InitServiceDepartments(context);
+            
+            result["ServiceDepartments"] = InitProdactionServiceDepartments(context);
             Console.WriteLine("ServiceWorks");
             result["ServiceWorks"] = InitServiceWorks(context);
             Console.WriteLine("ServicePrices");
@@ -46,7 +322,7 @@ namespace BookingModel
                 return 0;
             context.CustomerInfos.Add(new ServiceDataModel.CustomerInfo()
             {
-                 
+                 Phone ="79210903572"
             });
             return context.SaveChanges();
             
@@ -73,8 +349,12 @@ namespace BookingModel
             int result = 0; 
             var controller = new ServiceController(context);
             var dates = new List<DateTime>() { DateTime.Now, DateTime.Now.AddDays(1), DateTime.Now.AddDays(2), DateTime.Now.AddDays(3) };
-            foreach(var deparment in controller.GetServiceDepartments())
+            int n = 0;
+            var deps = controller.GetServiceDepartments();
+            foreach (var deparment in deps.ToList())
             {
+                n++;
+                Console.WriteLine($"{n}/{deps.Count()} {deparment.ServiceDescription}");
                 foreach(var date in dates)
                 {
                     result += controller.GetOrCreateBookingSlots(deparment.Id, date.ToString("d")).Count();
@@ -87,31 +367,96 @@ namespace BookingModel
         {
             if (context.ServiceWorks.Count() > 0)
                 return 0;
-            context.ServiceWorks.Add(new ServiceDataModel.ServiceWork()
-            {
-                WorkTime = 1,
-                WorkName = "Мойка",
-                JsonParams = System.Text.Json.JsonSerializer.Serialize(new Dictionary<string, object>() {
-                    { "исп. пену", true },
-                    { "чистка салона", true }
-                })
-            }); 
-            context.ServiceWorks.Add(new ServiceDataModel.ServiceWork()
-            {
-                WorkTime = 1,
-                WorkName = "Шиномонтаж",
-                JsonParams = System.Text.Json.JsonSerializer.Serialize(new Dictionary<string, object>() {
-                    { "размер колёс", true },
-                    { "балансировка", true },
-                    { "палировка диска", true }
-                })
 
-            });
+            Dictionary<string, List<string>> dataset = ReadWorks();
+           
+            foreach (var kv in dataset)
+            {
+                string workName = kv.Key;
+                ServiceDataModel.ServiceWork work = null;
+                context.ServiceWorks.Add(work = new ServiceDataModel.ServiceWork()
+                {
+                    WorkTime = 1,
+                    WorkName = workName,
+                    JsonParams = System.Text.Json.JsonSerializer.Serialize(new Dictionary<string, object>() {
+                       // { "исп. пену", true },
+                       // { "чистка салона", true }
+                    })
+                });
+                /* context.ServiceWorks.Add(new ServiceDataModel.ServiceWork()
+                {
+                    WorkTime = 1,
+                    WorkName = "Шиномонтаж",
+                    JsonParams = System.Text.Json.JsonSerializer.Serialize(new Dictionary<string, object>() {
+                        { "размер колёс", true },
+                        { "балансировка", true },
+                        { "палировка диска", true }
+                    })
+
+                }); */
+                context.SaveChanges();
+                foreach (var serviceName in kv.Value)
+                {
+                    var department = context.ServiceDepartments.FirstOrDefault(dep => dep.ServiceDescription == serviceName);                    
+                    if (department is null)
+                        throw new Exception("Не удалось идентифицировать: "+ serviceName+"\n"+ context.ServiceDepartments.ToList().ToJsonOnScreen());
+                    context.ServicePrices.Add(new() { 
+                        ServiceDepartmentId = department.Id,
+                        WorkPrice = 1000,                  
+                        ServiceWorkId = work.Id
+                    });
+                    context.SaveChanges();
+                }
+
+
+
+                
+                //Console.WriteLine();
+                //Console.ReadLine();
+            } 
             return context.SaveChanges();
         }
+        
+        private static int InitProdactionServiceDepartments(ServiceDbContext context)
+        {
+            Dictionary<string, Tuple<List<string>, IEnumerable<IDictionary<string, string>>>> result = ReadServices();
+            var tuple = result.First().Value;
+            IEnumerable<IDictionary<string, string>> records = tuple.Item2;
+            var list = records.ToList();
+            var dict = list.First();
+            CityGroup city = null;
+            context.CityGroups.Add(city=new()
+            {
+                CityName = "Санкт-Петербург"
+            });
 
+            context.ServiceDepartments.ToList().ForEach(p=> context.ServiceDepartments.Remove(p));
+            context.SaveChanges();
+
+
+            for (int i = 1; i < list.Count(); i++)
+            {
+                dict = list[i];
+                var values = dict.Values.ToList();
+                var id = values[0];
+                var location = values[1];
+                var nch = values[2];
+                var val = values[3];
+                //Console.WriteLine($"{id} {nch} {val} {location}");
+                var controller = new ServiceController(context);
+                controller.CreateServiceDepartment(city.Id, $"Поздразделение {id}", location, "Пн-Пт 9.00-21.00, Сб-Вос 08.00-22.00", "8127031515");
+            }
+
+
+            return list.Count();
+        }
         private int InitServiceDepartments(ServiceDbContext context)
         {
+            CityGroup city = null;
+            context.CityGroups.Add(city = new()
+            {
+                CityName = "Санкт-Петербург"
+            });
             if (context.ServiceDepartments.Count() > 0)
                 return 0;
             List<string> locations = new List<string>()
@@ -1315,7 +1660,7 @@ namespace BookingModel
             var controller = new ServiceController(context);            
             foreach(var location in locations.Take(10))
             {
-                controller.CreateServiceDepartment("Автосервис", location, "Пн-Пт 9.00-21.00, Сб-Вос 08.00-22.00", "8127031515");
+                controller.CreateServiceDepartment(city.Id, "Автосервис", location, "Пн-Пт 9.00-21.00, Сб-Вос 08.00-22.00", "8127031515");
             }
             return locations.Count();
         }

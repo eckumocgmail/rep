@@ -30,7 +30,7 @@
             <div> Время: @Model.WorkTime </div>
             <div> Стоймость работ: @GetServicePrice(Model.ServicePriceId).WorkPrice </div>
             <div class="card">
-                <FormModel Form="@controller.GetAdditionalParams(GetServicePrice(Model.ServicePriceId).ServiceWork)"></FormModel>
+                <FormModel Form="@controller.GetAdditionalParamsForm(GetServicePrice(Model.ServicePriceId).ServiceWorkId)"></FormModel>
                 @*foreach (var par in @)
                 {
                     <div>@par.Key @par.Value</div>

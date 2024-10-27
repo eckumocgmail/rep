@@ -1,35 +1,39 @@
 ﻿@using Microsoft.EntityFrameworkCore;
 @inject DbContextUser dbu
+<PageTitle>Просмотр сообщений</PageTitle>
 
-<DataTable DataType="UserMessage" DataItems="Messages"></DataTable>
-<table>
-    @if (Messages is null || Messages.Count() == 0)
-    {
-        <tr><td>Нет сообщений</td></tr>
-    }
-    else
-    {
-        <thead>
+ 
+@if (Messages is null || Messages.Count() == 0)
+{
+    <tr><td>Нет сообщений</td></tr>
+}
+else
+{
+
+    @*<thead>
+        <tr>
+            <th>#</th>
+            <th>Отправитель</th>
+            <th>Тема/Сообщение</th>
+            <th>Получено</th>                
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(UserMessage Message in Messages)
+        {
             <tr>
-                <th>#</th>
-                <th>Отправитель</th>
-                <th>Тема/Сообщение</th>
-                <th>Получено</th>                
+                <th></th>
+                <th>@(Message.ToUserId)</th>
+                <th>@Message.Subject / @Message.Text </th>
+                <th>@Message.Created.ToString("d")</th>
             </tr>
-        </thead>
-        <tbody>
-            @foreach(UserMessage Message in Messages)
-            {
-                <tr>
-                    <th></th>
-                    <th>@(Message.ToUserId)</th>
-                    <th>@Message.Subject / @Message.Text </th>
-                    <th>@Message.Created.ToString("d")</th>
-                </tr>
-            }
-        </tbody>
-    }
-</table>
+        }
+    </tbody>*@
+    <p>@Messages.ToJsonOnScreen()</p>
+    <DataTable DataType="UserMessage" DataItems="Messages"></DataTable>
+    <DataTable DataType="UserMessage" DataItems="Messages"></DataTable>
+}
+ 
 
 
 @code 

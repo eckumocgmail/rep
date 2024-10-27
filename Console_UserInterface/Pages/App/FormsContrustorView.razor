@@ -5,14 +5,15 @@
         <h3>Конструктор форм</h3>
         <SelectBox Label="Тип поля ввода" Options="Attrs.GetInputTypes()"></SelectBox>
         <SelectBox Label="Тип элемента управления" Options="Attrs.GetControlTypes()"></SelectBox>
+        <CreateRouteView></CreateRouteView>
     </CardHeader>
     <CardBody>
         
         <CheckList ListItems="@(typeof(InputFormModel).GetInputProperties())" OnChanged="(evt => { SelectedFields = evt; StateHasChanged(); })"></CheckList>
         <FormEditor Model="(new InputFormModel(new UserAccount()))" Properties="@(SelectedFields)"></FormEditor>
-        @*<TreeNode Name="Приложение"></TreeNode>
+        <TreeNode Name="Приложение"></TreeNode>
         <FormModel Form="@Model"></FormModel>
-        *@
+        
 
     </CardBody>
     <CardFooter>
@@ -24,8 +25,10 @@
 {
     public List<string> SelectedFields { get; set; } = new List<string>() { "Title", "Description" };
     public InputFormField Field { get; set; } = new InputFormField(typeof(UserPerson), nameof(UserPerson.Tel));
-    //public InputFormModel Model { get; set; } = new InputFormModel(new InputFormField());
+    public InputFormModel Model { get; set; } = new InputFormModel(new InputFormField());
 
 }
+
+
 
 

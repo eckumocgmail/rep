@@ -1,0 +1,30 @@
+﻿@inherits BaseComponent
+@if(IsReady)
+{
+
+    <FormControl Model="@Model" AfterInput="((InputEvent evt) => { OnChanged.InvokeAsync(evt.Value.ToString()); StateHasChanged(); } )"></FormControl>
+}
+@code 
+{
+    bool IsReady = false;
+    [Parameter]
+    public string Value { get; set; } = DateTime.Now.ToString("yyyy-MM-dd");
+
+    [Parameter]
+    public string Label { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnChanged { get; set; }
+
+    public InputFormField Model { get; set; }  = new();
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        Model.Type = "date";
+        Model.Value = this.Value;
+        Model.Label = this.Label;
+        Model.Help = "";
+        this.IsReady = true;
+
+    }
+}

@@ -1,0 +1,13 @@
+﻿@inherits BaseComponent
+<input type="text" class="form-control" value="@Value" @oninput="OnInput" />
+@code 
+{
+    [Parameter]
+    [NotNullNotEmpty]
+    public string Value { get; set; }
+
+    public void OnInput(ChangeEventArgs evt)
+    {
+        this.Value = evt.Value.ToString();
+    }
+}

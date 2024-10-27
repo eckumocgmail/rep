@@ -307,7 +307,7 @@ public class InputConsole: ProgramDialog
             }
             else
             {
-                AppProviderService.GetInstance().Info(arg);
+                AppProviderService.GetInstance().WriteLine(arg);
             }
 
         }

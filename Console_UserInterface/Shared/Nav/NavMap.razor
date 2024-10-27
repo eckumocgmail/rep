@@ -7,56 +7,47 @@
 @code
 {
     [Parameter]
+    public string Title { get; set; } = "";
+
+    [Parameter]
+    public string Selected { get; set; } 
+
+    [Parameter]
+    public bool Vertical { get; set; } = true;
+
+    [Parameter]
     public Dictionary<string,string> Model { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-       
     }
-}
-<div class="page">
-    <div class="sidebar">
- 
 
-        <div class="navbar-dark" @onclick="ToggleNavMenu">
-            <nav class="flex-column">
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                        <span class="oi oi-home" aria-hidden="true"></span> Главная
-                    </NavLink>
-                </div>
-                @if (Model is null)
-                {
-                    <p>Не установлено свойство Model</p>
-                }
-                else
-                {
-                    foreach (var kv in Model)
-                    {
-                        <div class="nav-item px-3">
-                            <NavLink class="nav-link" href="@kv.Value">
-                                <span class="oi oi-browser" aria-hidden="true"></span> @kv.Key
-                            </NavLink>
-                        </div>
-                    }
-                }
-                
-
-            </nav>
-        </div>
-    </div>
- 
-</div>
-
-
-@code {
-    private bool collapseNavMenu = true;
-
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
-    private void ToggleNavMenu()
+    public async Task OnItemClicked(KeyValuePair<string, string> kv)
     {
-        collapseNavMenu = !collapseNavMenu;
+        await this.OnSelected.InvokeAsync(this.Selected = kv.Key);
+        StateHasChanged();
     }
+
+    [Parameter]
+    [NotNullNotEmpty]
+    public EventCallback<string> OnSelected { get; set; }
 }
+<div>
+    <TextComponent FontSize="20">@Title @Selected</TextComponent>
+    <nav class="@(Vertical? "flex-column": "flex-row")">
+        @if (Model is null)
+        {
+            <p>Не установлено свойство Model</p>
+        }
+        else
+        {
+            foreach (var kv in Model)
+            {
+                <span @onclick="evt => OnItemClicked(kv)" class="btn @(Selected == kv.Key? "btn-primary": "")" href="@kv.Value" style="margin: 5px; min-width: 200px;" @onclick:preventDefault @onclick:stopPropagation>
+                    <span class="oi oi-browser" aria-hidden="true"></span> @kv.Key
+                </span>
+            }
+        }
+    </nav>
+</div>

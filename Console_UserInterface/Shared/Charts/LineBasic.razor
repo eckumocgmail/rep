@@ -1,4 +1,25 @@
-﻿@using Highcharts.Models.HighchartLineBasic;
+﻿@* 
+    Линейная диаграмма.
+    Зависит от ChartsLib и highcharts.
+
+    Пример:
+    @code
+    {
+        public string LineBasicTitle { get; set; }
+        public string LineBasicSubtitle { get; set; }
+        public string LineBasicYAxis { get; set; }
+        public string LineBasicSeriesName { get; set; }
+        public List<float?> LineBasicSeriesData { get; set; } = new();
+    }
+    <LineBasic 
+        Title="@LineBasicTitle" 
+        Subtitle="@LineBasicSubtitle" 
+        YAxis="@LineBasicYAxis" 
+        SeriesName="@LineBasicSeriesName" 
+        SeriesData="@LineBasicSeriesData">
+    </LineBasic>
+*@
+@using Highcharts.Models.HighchartLineBasic;
 @inject IJSRuntime js
 @inherits BaseComponent
 @code 
@@ -13,7 +34,6 @@
     public string SeriesName { get; set; }
     [Parameter]
     public List<float?> SeriesData { get; set; }
-
 }
 @code
 {
@@ -29,28 +49,33 @@
         await base.OnAfterRenderAsync(firstRender);
         if(firstRender)
         {
-            await js.InvokeAsync<int>("createChart", $"container_{GetHashCode()}", 
+            await UpdateView();
+        }
+    }
+
+    public async Task UpdateView()
+    {
+        await js.InvokeAsync<int>("createChart", $"container_{GetHashCode()}",
             new HighchartLineBasic()
-            {
-                Title = new HighchartLineBasicTitle() { Text = Title },
-                Subtitle = new HighchartLineBasicSubtitle() { Text = Subtitle },
-                YAxis = new HighchartLineBasicYAxis()
                 {
-                    Title = new HighchartLineBasicYAxisTitle()
+                    Title = new HighchartLineBasicTitle() { Text = Title },
+                    Subtitle = new HighchartLineBasicSubtitle() { Text = Subtitle },
+                    YAxis = new HighchartLineBasicYAxis()
                     {
-                        Text = YAxis
-                    }
-                },
-                Series = new() 
-                { 
+                        Title = new HighchartLineBasicYAxisTitle()
+                        {
+                            Text = YAxis
+                        }
+                    },
+                    Series = new()
+                    {
                     new HighchartLineBasicSeriesItem()
                     {
-                        Name=SeriesName, 
+                        Name=SeriesName,
                         Data = SeriesData
-                    }  
-                }
-            } );
-        }
+                    }
+                    }
+                });
     }
 }
 <div id="container_@GetHashCode()"></div>

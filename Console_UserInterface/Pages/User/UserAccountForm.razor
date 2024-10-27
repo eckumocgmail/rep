@@ -1,6 +1,7 @@
 ﻿@page "/user/account"
 @attribute [Authorize(Roles = "webuser")]
 @inject DeliveryDbContext db
+<PageTitle>Карточка позльзователя</PageTitle>
 <div class="card" style="width: 100%;">
     <CardContainer width="100%">               
         <CardBody>

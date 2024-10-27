@@ -17,7 +17,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Console_UserInterface", "Co
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Console_BookingUI", "Console_BookingUI\Console_BookingUI.csproj", "{FA4661F2-9B1F-4918-A573-5B4242F2DEF8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Console_CommonData", "Console_CommonData\Console_CommonData.csproj", "{9C30E425-5A70-4DC8-BC1A-DF7CC46E7D19}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Console_CommonData", "Console_CommonData\Console_CommonData.csproj", "{9C30E425-5A70-4DC8-BC1A-DF7CC46E7D19}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Console_RestConnector", "Console_RestConnector\Console_RestConnector.csproj", "{C3B2C22E-29BB-4269-A2F4-4628BBA504CF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Console_EmailApplication", "..\..\ProjectsConsole\Console_EmailApplication\Console_EmailApplication.csproj", "{5E9D63BB-6BF4-4578-BEA1-024850B79D18}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Console_StatisticsModel", "Console_StatisticsModel\Console_StatisticsModel.csproj", "{183DA53E-A20F-4FEC-A30F-584B3DC6D824}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,6 +63,18 @@ Global
 		{9C30E425-5A70-4DC8-BC1A-DF7CC46E7D19}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9C30E425-5A70-4DC8-BC1A-DF7CC46E7D19}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9C30E425-5A70-4DC8-BC1A-DF7CC46E7D19}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3B2C22E-29BB-4269-A2F4-4628BBA504CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3B2C22E-29BB-4269-A2F4-4628BBA504CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3B2C22E-29BB-4269-A2F4-4628BBA504CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3B2C22E-29BB-4269-A2F4-4628BBA504CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E9D63BB-6BF4-4578-BEA1-024850B79D18}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E9D63BB-6BF4-4578-BEA1-024850B79D18}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E9D63BB-6BF4-4578-BEA1-024850B79D18}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E9D63BB-6BF4-4578-BEA1-024850B79D18}.Release|Any CPU.Build.0 = Release|Any CPU
+		{183DA53E-A20F-4FEC-A30F-584B3DC6D824}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{183DA53E-A20F-4FEC-A30F-584B3DC6D824}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{183DA53E-A20F-4FEC-A30F-584B3DC6D824}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{183DA53E-A20F-4FEC-A30F-584B3DC6D824}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

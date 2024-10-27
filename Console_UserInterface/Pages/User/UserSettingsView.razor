@@ -1,4 +1,6 @@
 ﻿@page "/user/settings"
+<PageTitle>Пользовательские настройки</PageTitle>
+
 @inject SigninUser signin
 @inject DbContextUser dbu
 @attribute [Authorize(Roles = "webuser")]
@@ -16,6 +18,7 @@
         }
     }
 }
+<link rel="stylesheet" href="/css/colors/@(signin.IsSignin()? signin.Verify().Settings.ColorTheme: "light").css" />
 <div class="card">
     <div class="card-header">
         <h4>Настройки</h4>
@@ -23,8 +26,8 @@
     <div class="card-body">
         @if (Settings is not null)
         {
-            <CheckBox Checked="@(Settings.EnableNotifications)" Label="@("Уведомления вколючены")" OnChange="(evt => { Settings.EnableNotifications = evt; })"></CheckBox>
-            <CheckBox Checked="@(Settings.SendNews)" Label="@("Присылать новости на почту")" OnChange="(evt => { Settings.SendNews = evt; })"></CheckBox>
+            <Checkbox Checked="@(Settings.EnableNotifications)" Label="@("Уведомления вколючены")" OnChange="(evt => { Settings.EnableNotifications = evt; })"></Checkbox>
+            <Checkbox Checked="@(Settings.SendNews)" Label="@("Присылать новости на почту")" OnChange="(evt => { Settings.SendNews = evt; })"></Checkbox>
             <SelectBox Value="@(Settings.ColorTheme)" Options="@(new List<string>{ "dark", "light" })" OnChange="(evt => { Settings.ColorTheme = evt; StateHasChanged(); })"></SelectBox>
         }        
     </div>

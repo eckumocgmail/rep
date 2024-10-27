@@ -1,84 +1,165 @@
-﻿@page "/"
-@using static NavMenuService;
-@inherits BaseComponent
-@inject IServiceProvider provider
+﻿@inherits BaseComponent
 @inject NavigationManager nav
-@inject INavMenuService navMenuService
-@inject IInputModalService input
+@inject IInputService input
+@inject BusinessAnaliticsService businessAnaliticsService
 @code
 {
-    public IEnumerable<NavLinkNavLink> Links { get; set; }
+    [NotInput]
+    [NotNullNotEmpty]
+    public Tuple<string, string> DataRange { get; set; } = new("2024-01-01", "2024-01-01");
 
+    [NotInput]
+    [NotNullNotEmpty]
+    public string SelectedChartType { get; set; } = "BarBasic";
 
-    /// <summary>
-    /// 
-    /// </summary>
+    [NotInput]
+    [NotNullNotEmpty]
+    public string SelectedIndicator { get; set; } = "Производительность";
+
+    [NotInput]
+    [NotNullNotEmpty]
+    public List<string> ChartTypesSelectList { get; set; } = new List<string>() { "Table", "PieChart", "BarBasic", "LineBasic", "AreaChart" };
+
+    [NotInput]
+    [NotNullNotEmpty]
+    public List<string> IndicatorsSelectList { get; set; } = new List<string>() { "Эффективность" };
+
+    public Dictionary<string, List<float?>> SeriesData { get; set; } = new();
+    public List<List<object>> SeriesList { get; set; } = new();
+
+    public int datasetId { get; set; }
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        Update();
+        this.EditorModel = new InputFormModel(this);
+        var datasets = businessAnaliticsService.GetDatasets();
+        var dataset = datasets.FirstOrDefault();
+        if (dataset is null)
+            throw new Exception("Нет данных по dataset");
+        this.datasetId = dataset.Id;
+        IndicatorsSelectList = businessAnaliticsService.GetIndicators().Select(ind => ind.Name).ToList();
+        UpdateView();
     }
 
-    public void Update()
-    {
-        Links = navMenuService.GetPageLinks();
-    }
+    bool Success = false;
 
-    /// <summary>
-    /// /
-    /// </summary>
-    public async Task OnAddMenuItemClicked(object? evt)
+
+    public void UpdateView()
     {
-        NavLinkNavLink link = await input.Create<NavLinkNavLink>();
-        navMenuService.CreateNavLink(link.Icon, link.Label, link.Href);
-        Update();
+        try
+        {
+            this.ValidationErrors = this.Validate();
+            if (this.ValidationErrors.Where(kv => kv.Value.Count() > 0).Count() > 0 )
+            {
+                throw new ValidationException(this.ValidationErrors.ToJsonOnScreen());
+            }
+            Success = true;
+            if (String.IsNullOrWhiteSpace(SelectedIndicator))
+            {
+                Success = false;
+                ValidationErrors["SelectedIndicator"] = new() { "Не установлен SelectedIndicator" };
+            }
+            else
+            {
+                var indicator = businessAnaliticsService.GetIndicatorByName(SelectedIndicator);
+                IEnumerable<BusinessData> dataset = 
+                    businessAnaliticsService.GetIndicatorValues(indicator.Id, datasetId, DataRange.Item1, 1);
+
+                SeriesData = businessAnaliticsService.GetLineSeriesData(businessAnaliticsService.GetResources().First().Id, datasetId, DataRange.Item1, 1);
+
+                SeriesList.Clear();
+                foreach(var kv in SeriesData)
+                {
+                    var list = new List<object>();
+                    list.Add(kv.Key);
+                    list.AddRange(kv.Value.Select(p => (object)p));
+                    SeriesList.Add(list);
+                }
+
+            }
+
+        }
+        catch(Exception ex)
+        {
+            Success = false;
+            this.Error($"Ошибка при выполнении метода UpdateView(): {ex.ToDocument()}");
+        }
         StateHasChanged();
     }
-} 
-<BookingMasterDialog></BookingMasterDialog>
-@*
-<CardContainer>
-    <CardHeader>
-        <ButtonClick OnClick="OnAddMenuItemClicked">Добавить</ButtonClick>
-    </CardHeader>
-    <CardBody>
-        <MainMenuView></MainMenuView>
-        <NavLinks Links="@Links"></NavLinks>
-    </CardBody>
-    <CardFooter>
-        <CreateRouteView></CreateRouteView>
-    </CardFooter>
-</CardContainer>*@
 
+    public void OnChartTypeChanged(object evt)
+    {
+        SelectedChartType = evt.ToString();
+        this.UpdateView();
+        StateHasChanged();
+    }
+    public void OnIndicatorSelected(object indicator)
+    {        
+        SelectedIndicator = indicator.ToString();
+        StateHasChanged();
+    }
+    public void OnDateRangeChanged(Tuple<string, string> evt)
+    {
+        DataRange = evt;
+        StateHasChanged();
+    }
+}
 @code
 {
-    public string Placeholder { get; set; } = "Поиск";
-    public string SearchQuery { get; set; } = "";
-    public List<string> SearchOptions { get; set; } = new();
-    public EventCallback<string> OnInput { get; set; }
-    public EventCallback<string> OnSearch { get; set; }
-
-    public void OnSearchSubmited()
+    public InputFormModel EditorModel { get; set; }
+    public string Title { get; set; } = "Заголовок";
+    public string OX { get; set; } = "Ось X";
+    public string OY { get; set; } = "Ось Y";
+    public Dictionary<string, List<float?>> DictionaryModel { get; set; } = new()
     {
+        // {"производительность", new List<float?>(){ 1f,2f,3f } }
+    };
+}
 
-    }
+<PageTitle>Главная страница</PageTitle>
+<CardContainer>
+    <CardHeader>
+        <ToolsBar>
+            <SelectBox Options="@ChartTypesSelectList" OnChange="@(evt => OnChartTypeChanged(evt))"></SelectBox>
+            <SelectBox Options="@IndicatorsSelectList" OnChange="@(indicator => OnIndicatorSelected(indicator) )"></SelectBox>
+            <DateRangeControl OnChanged="(evt => { OnDateRangeChanged(DataRange = evt); StateHasChanged(); })"></DateRangeControl>
+            <ButtonClick OnClick="(evt => { UpdateView(); })" Width="100%">Update</ButtonClick>
+        </ToolsBar>
+        @if (!Success)
+        {
+            <ValidationErrorsView Model="@ValidationErrors" Name="@GetType().GetTypeName()"></ValidationErrorsView>
+        }
+    </CardHeader>
+    <CardBody>
+                                        
+        @switch(SelectedChartType)
+        {
+            case "Table":
 
-    public void OnInputSearch()
-    {
+                <ListTableView Title="@Title" Model="@SeriesList"></ListTableView>
+                
+                break;
+            case "AreaChart":
+                <AreaChart ></AreaChart>
+                break;
+            case "BarBasic":
+                <BarBasic Title="@Title" OX="@OX" OY="@OY" Model="@SeriesData"></BarBasic>
+                break;
+            case "LineBasic":
+                <LineBasic></LineBasic>
+                break;
+            case "PieChart":
+                <BlazorBootstrap.PieChart ></BlazorBootstrap.PieChart>
+                break;                 
+            default:
+                <AlertComponent Color="danger">@SelectedChartType не поддерживается</AlertComponent>
+            break;
+        }
+        <EditForm Model="@EditorModel"></EditForm>
+             
+    </CardBody>
+    <CardFooter>
+        
+    </CardFooter>
+</CardContainer>
 
-    }
-
-
-    public string StatusName { get; set; }
-    public int CurrentValue { get; set; }
-
-    public void ProgressStart()
-    {
-    }
-    public void Progress()
-    {
-    }
-    public void ProgressEnd()
-    {
-    }
-} 

@@ -1,0 +1,15 @@
+﻿<div class="d-flex flex-row flex-nowrap w-100 card" style="max-width: 480px; padding: 5px;">
+    <DateInputControl Label="Начало" OnChanged="(evt => { BeginDate = evt; OnChanged.InvokeAsync(new Tuple<string, string>(BeginDate, EndDate)).Wait(); StateHasChanged(); })"></DateInputControl>
+    <DateInputControl Label="Конец" OnChanged="(evt => { EndDate = evt; OnChanged.InvokeAsync(new Tuple<string, string>(BeginDate, EndDate)).Wait(); StateHasChanged(); })"></DateInputControl>
+</div>
+@code
+{
+    [Parameter]
+    public string BeginDate { get; set; } = DateTime.Now.ToString("yyyy-MM-dd");
+
+    [Parameter]
+    public string EndDate { get; set; } = DateTime.Now.ToString("yyyy-MM-dd");
+
+    [Parameter]
+    public EventCallback<Tuple<string,string>> OnChanged { get; set; }
+}

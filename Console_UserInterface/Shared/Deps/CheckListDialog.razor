@@ -1,0 +1,61 @@
+﻿@page "/shared/checklist/{title}/{options}/{key}"
+@inject IInputService input
+@code
+{
+    public void OnCompleteButtonClicked()
+    {
+        input.CompleteDialog(CheckedItems, key);
+        StateHasChanged();
+    }
+    public void OnCancelButtonClicked()
+    {
+
+    }
+}
+<CardContainer>
+    <CardHeader>
+        <TextComponent FontSize="20">@title</TextComponent>
+    </CardHeader>
+    <CardBody>
+        <ul class="list-group">
+            @foreach (var item in ListItems)
+            {
+                <li class="list-group-item">
+                    <Checkbox Checked="@CheckedItems.Contains(item)"
+                              OnChange="(evt => { if(CheckedItems.Contains(item)){ CheckedItems.Remove(item); } else {CheckedItems.Add(item);}    StateHasChanged(); })"
+                              Label="@item" />
+                </li>
+            }
+
+        </ul>
+    </CardBody>
+    <CardFooter>
+        <ButtonClick OnClick="@OnCompleteButtonClicked">complete</ButtonClick>
+        <ButtonClick OnClick="@OnCancelButtonClicked">cancel</ButtonClick>
+    </CardFooter>
+</CardContainer>
+@code 
+{
+    [Parameter] public string title { get; set; }
+    [Parameter] public string key { get; set; }
+     
+    [Parameter]
+    public string options
+    { 
+        set
+        {
+            ListItems = value.Split(",").ToList();
+        } 
+    }
+    public List<string> ListItems { get; set; }
+
+    [Parameter]
+    public string CheckedItemsStr
+    {
+        set
+        {
+            CheckedItems = value.Split(",").ToList();
+        }
+    }
+    public List<string> CheckedItems { get; set; } = new();  
+}

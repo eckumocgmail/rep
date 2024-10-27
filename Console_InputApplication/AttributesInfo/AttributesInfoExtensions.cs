@@ -73,7 +73,7 @@ public static class AttributesInfoExtensions
     public static Dictionary<string, string> _GetPropertyAttributes( this Type ptype, string property)
     {
         var res = new Dictionary<string, string>();
-        var pproperty = ptype.GetProperties().First(p => p.Name == property);
+        var pproperty = ptype.GetProperties().FirstOrDefault(p => p.Name == property);
         if (pproperty == null)
             throw new ArgumentException(nameof(property));
         foreach (var kv in pproperty.GetCustomAttributesData())
@@ -84,6 +84,18 @@ public static class AttributesInfoExtensions
     }
 
 
+    public static Dictionary<string,Dictionary<string, string>> GetArgumentsAttributes(this Type ptype, string method)
+    {
+        Dictionary<string, Dictionary<string, string>> res = new();
+        var methodInfo = ptype.GetMethods().First(p => p.Name == method);
+        if (methodInfo == null)
+            throw new ArgumentException(nameof(method));
+        foreach(var par in methodInfo.GetParameters())
+        {
+            res[par.Name] = ptype.GetArgumentAttributes(methodInfo.Name, par.Name);
+        }
+        return res;
+    }
     public static Dictionary<string, string> GetArgumentAttributes(
         this Type ptype, string method, string parameter)
     {

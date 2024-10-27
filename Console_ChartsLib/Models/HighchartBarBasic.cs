@@ -286,7 +286,7 @@ namespace Highcharts.Models.HighchartBarBasic
 		public HighchartBarBasicPlotOptions PlotOptions{ get; set; }	[JsonProperty("legend")]
 		public HighchartBarBasicLegend Legend{ get; set; }	[JsonProperty("credits")]
 		public HighchartBarBasicCredits Credits{ get; set; }	[JsonProperty("series")]
-		public List<HighchartBarBasicSeriesItem> Series{ get; set; }
+		public List<HighchartBarBasicSeriesItem> Series { get; set; } = new();
 	}
 	
 	

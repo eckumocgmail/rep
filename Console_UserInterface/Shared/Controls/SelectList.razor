@@ -1,15 +1,24 @@
-﻿<ul class="list-group"> 
-    @foreach (var item in ListItems)
-    {
-        <li style="margin: 5px;" class="list-group-item" @onclick="async evt=>{ await OnSelect.InvokeAsync(item); StateHasChanged(); }">@item</li>
-    }    
-</ul>
-
+﻿@inherits BaseComponent
+<div>
+    <TextComponent FontSize="20">@Title</TextComponent>
+    <ul class="list-group">
+        @foreach (var item in ListItems)
+        {
+            <li style="height: 27px; padding: 0px 5px 0px 5px; margin: 0px 5px 0px 5px; font-size: 14px;" class="list-group-item @(SelectedItem == item? "active": "")" @onclick="async evt=>{ this.SelectedItem = item; await OnSelect.InvokeAsync(item); StateHasChanged(); }">@item</li>
+        }
+    </ul>
+</div>
 @code 
 {
+    [Parameter]
+    public string Title { get; set; }
+
     [Parameter]
     public EventCallback<object> OnSelect { get; set; }
 
     [Parameter]
     public List<string> ListItems { get; set; }
+
+    [Parameter]
+    public string SelectedItem { get; set; }
 }

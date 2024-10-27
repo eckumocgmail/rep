@@ -1,10 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
  
+
+/// <summary>
+/// Реализовация управления группами пользователя
+/// </summary>
 public class GroupingUser : BaseGrouping<UserContext, UserGroup, UserGroups>
 {
     private readonly DbContextUser _model;

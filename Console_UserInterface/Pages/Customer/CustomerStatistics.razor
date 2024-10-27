@@ -1,6 +1,6 @@
 ﻿@page "/customer/statistics"
-<h3>Статистика спроса</h3>
-
+@inherits BaseComponent
+<PageTitle>Статистика продаж</PageTitle>
 <table>
     <tr>
         <th>#</th>
@@ -8,12 +8,19 @@
         <th>Коэффициент</th>
     </tr>
     <tr>
-        <th></th>
-        <th></th>
-        <th></th>
+        @for (int i = 1; i <= Model.Count(); i++)
+        {
+            var pModel = Model.ToList()[i - 1];
+
+            <th>@i</th>
+            <th>@pModel.Key</th>
+            <th>@pModel.Value</th>
+        }                
     </tr>   
 </table>
 @code 
 {
-
+    [Parameter]
+    [NotNullNotEmpty]
+    public Dictionary<string, int> Model { get; set; }
 }

@@ -21,8 +21,8 @@ public class UserAccount: BaseEntity
     [Label("Электронный адрес")]
     [NotNullNotEmpty("Не указан электронный адрес")]
     [Icon("email")]
-    [UniqValue("Этот адрес электронной почты уже зарегистрирован")]
-    [JsonProperty("Email")]
+    [UniqValue(nameof(DbContextUser), "Этот адрес электронной почты уже зарегистрирован")]
+    [JsonProperty("Email")] 
     public string Email { get; set; } = "eckumoc@gmail.com";
 
 

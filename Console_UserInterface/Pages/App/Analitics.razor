@@ -1,0 +1,168 @@
+﻿@page "/app/analitics"
+@using Console_StatisticsModel.BusinessAnaliticsServices;
+@using System.ComponentModel.DataAnnotations;
+@inherits BaseComponent
+@inject NavigationManager nav
+@inject IInputService input
+@inject BusinessAnaliticsService businessAnaliticsService
+@code
+{
+    [NotInput]
+    [NotNullNotEmpty]
+    public Tuple<string, string> DataRange { get; set; } = new("2024-01-01", "2024-01-01");
+
+    [NotInput]
+    [NotNullNotEmpty]
+    public string SelectedChartType { get; set; } = "BarBasic";
+
+    [NotInput]
+    [NotNullNotEmpty]
+    public string SelectedIndicator { get; set; } = "Производительность";
+
+    [NotInput]
+    [NotNullNotEmpty]
+    public List<string> ChartTypesSelectList { get; set; } = new List<string>() { "Table", "PieChart", "BarBasic", "LineBasic", "AreaChart" };
+
+    [NotInput]
+    [NotNullNotEmpty]
+    public List<string> IndicatorsSelectList { get; set; } = new List<string>() { "Эффективность" };
+
+    public Dictionary<string, List<float?>> SeriesData { get; set; } = new();
+    public List<List<object>> SeriesList { get; set; } = new();
+
+    public int datasetId { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        this.EditorModel = new InputFormModel(this);
+        var datasets = businessAnaliticsService.GetDatasets();
+        var dataset = datasets.FirstOrDefault();
+        if (dataset is null)
+            throw new Exception("Нет данных по dataset");
+        this.datasetId = dataset.Id;
+        IndicatorsSelectList = businessAnaliticsService.GetIndicators().Select(ind => ind.Name).ToList();
+        UpdateView();
+    }
+
+    bool Success = false;
+
+
+    public void UpdateView()
+    {
+        try
+        {
+            this.ValidationErrors = this.Validate();
+            if (this.ValidationErrors.Where(kv => kv.Value.Count() > 0).Count() > 0 )
+            {
+                throw new ValidationException(this.ValidationErrors.ToJsonOnScreen());
+            }
+            Success = true;
+            if (String.IsNullOrWhiteSpace(SelectedIndicator))
+            {
+                Success = false;
+                ValidationErrors["SelectedIndicator"] = new() { "Не установлен SelectedIndicator" };
+            }
+            else
+            {
+                var indicator = businessAnaliticsService.GetIndicatorByName(SelectedIndicator);
+                IEnumerable<BusinessData> dataset = 
+                    businessAnaliticsService.GetIndicatorValues(indicator.Id, datasetId, DataRange.Item1, 1);
+
+                SeriesData = businessAnaliticsService.GetLineSeriesData(businessAnaliticsService.GetResources().First().Id, datasetId, DataRange.Item1, 1);
+
+                SeriesList.Clear();
+                foreach(var kv in SeriesData)
+                {
+                    var list = new List<object>();
+                    list.Add(kv.Key);
+                    list.AddRange(kv.Value.Select(p => (object)p));
+                    SeriesList.Add(list);
+                }
+
+            }
+
+        }
+        catch(Exception ex)
+        {
+            Success = false;
+            this.Error($"Ошибка при выполнении метода UpdateView(): {ex.ToDocument()}");
+        }
+        StateHasChanged();
+    }
+
+    public void OnChartTypeChanged(object evt)
+    {
+        SelectedChartType = evt.ToString();
+        this.UpdateView();
+        StateHasChanged();
+    }
+    public void OnIndicatorSelected(object indicator)
+    {        
+        SelectedIndicator = indicator.ToString();
+        StateHasChanged();
+    }
+    public void OnDateRangeChanged(Tuple<string, string> evt)
+    {
+        DataRange = evt;
+        StateHasChanged();
+    }
+}
+@code
+{
+    public InputFormModel EditorModel { get; set; }
+    public string Title { get; set; } = "Заголовок";
+    public string OX { get; set; } = "Ось X";
+    public string OY { get; set; } = "Ось Y";
+    public Dictionary<string, List<float?>> DictionaryModel { get; set; } = new()
+    {
+        // {"производительность", new List<float?>(){ 1f,2f,3f } }
+    };
+}
+
+<PageTitle>Главная страница</PageTitle>
+<CardContainer>
+    <CardHeader>
+        <ToolsBar>
+            <SelectBox Options="@ChartTypesSelectList" OnChange="@(evt => OnChartTypeChanged(evt))"></SelectBox>
+            <SelectBox Options="@IndicatorsSelectList" OnChange="@(indicator => OnIndicatorSelected(indicator) )"></SelectBox>
+            <DateRangeControl OnChanged="(evt => { OnDateRangeChanged(DataRange = evt); StateHasChanged(); })"></DateRangeControl>
+            <ButtonClick OnClick="(evt => { UpdateView(); })" Width="100%">Update</ButtonClick>
+        </ToolsBar>
+        @if (!Success)
+        {
+            <ValidationErrorsView Model="@ValidationErrors" Name="@GetType().GetTypeName()"></ValidationErrorsView>
+        }
+    </CardHeader>
+    <CardBody>
+                                        
+        @switch(SelectedChartType)
+        {
+            case "Table":
+
+                <ListTableView Title="@Title" Model="@SeriesList"></ListTableView>
+                
+                break;
+            case "AreaChart":
+                <AreaChart ></AreaChart>
+                break;
+            case "BarBasic":
+                <BarBasic Title="@Title" OX="@OX" OY="@OY" Model="@SeriesData"></BarBasic>
+                break;
+            case "LineBasic":
+                <LineBasic></LineBasic>
+                break;
+            case "PieChart":
+                <BlazorBootstrap.PieChart ></BlazorBootstrap.PieChart>
+                break;                 
+            default:
+                <AlertComponent Color="danger">@SelectedChartType не поддерживается</AlertComponent>
+            break;
+        }
+        <EditForm Model="@EditorModel"></EditForm>
+             
+    </CardBody>
+    <CardFooter>
+        
+    </CardFooter>
+</CardContainer>
+

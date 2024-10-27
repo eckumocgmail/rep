@@ -1,10 +1,9 @@
 ﻿@page "/user/confirmation"
 @attribute [Authorize(Roles = "webuser")]
 @inject MailRuService2 mailru
-
 @inject NavigationManager nav
 @inject SigninUser signin
-
+<PageTitle>Подтверждение личности</PageTitle>
 @code 
 {
     public string ActivationCode { get; set; } = "";

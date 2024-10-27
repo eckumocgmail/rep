@@ -15,6 +15,7 @@ using System.Linq;
 using System.Reflection;
 using Console_InputApplication;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 public static class O1 {
 
@@ -740,6 +741,8 @@ public class ReflectionService
         try
         {
             invArgs = new List<object>();
+            var attrs = method.DeclaringType.GetArgumentsAttributes(method.Name);
+            
             foreach (ParameterInfo pinfo in method.GetParameters())
             {
                 if (pinfo.IsOptional == false && pars.ContainsKey(pinfo.Name) == false)
@@ -747,17 +750,22 @@ public class ReflectionService
                     throw new Exception("require argument " + pinfo.Name);
                 }
                 string parameterName = pinfo.ParameterType.Name;
-
+                if( !attrs.ContainsKey(parameterName) )
+                {
+                    throw new Exception("Не получены атрибуты для параметры " + parameterName);
+                }
+                object p = null;
+                var parameters = attrs[parameterName];
                 if (parameterName.StartsWith("Dictionary"))
                 {
                     Dictionary<string, object> dictionary = JsonConvert.DeserializeObject<Dictionary<string, object>>(pars[pinfo.Name].ToString());
-                    invArgs.Add(dictionary);
+                    invArgs.Add(p = dictionary);
                 }
                 else
                 {
-                    invArgs.Add(pars[pinfo.Name]);
+                    invArgs.Add(p = pars[pinfo.Name]);
                 }
-
+                attrs.Validate(parameterName, p, parameters);
             }
         }
         catch (Exception ex)

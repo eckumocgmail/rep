@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-
+﻿
 using System.Reflection;
 
 /// <summary>
@@ -8,6 +6,13 @@ using System.Reflection;
 /// </summary>
 public static class InputFormExtensions
 {
+
+    public static string[] Push( this string[] args, string val)
+    {
+        var list = args.ToList();
+        list.Add(val);
+        return list.ToArray();
+    }
     /// <summary>
     /// Создание формы ввода
     /// </summary>
@@ -25,7 +30,7 @@ public static class InputFormExtensions
             throw new Exception($"Аргументы вызова невалидны: {validationResults.ToJson()}");
         }
 #pragma warning restore CS8604 // Возможно, аргумент-ссылка, допускающий значение NULL.
-        var methodInfo = controller.GetMethod(action);
+        var methodInfo = controller.GetMethods().FirstOrDefault(m => m.Name == action);
         var actionModel = new MyActionModel();
         actionModel.Name = action;
         actionModel.Type = methodInfo.ReturnType.GetTypeName();
@@ -57,6 +62,8 @@ public static class InputFormExtensions
             }
             catch(Exception ex)
             {
+                if (param.IsOptional == false)
+                    throw;
                 formModel.Error($"{ex}");
             }
         }

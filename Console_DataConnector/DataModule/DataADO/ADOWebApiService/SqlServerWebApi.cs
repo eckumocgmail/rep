@@ -102,10 +102,14 @@ namespace Console_DataConnector.DataModule.DataADO.ADOWebApiService
         public async Task<Tuple<int, object>> Request(string url, Dictionary<string, string> args=null, Dictionary<string, string> headers = null, byte[] body=null)
         {
             this.Info(url);
+
             await Task.CompletedTask;
+
             var ids = url.Split('/').ToList();
             ids.RemoveAt(0);
+
             object p = new List<object>(Services);
+
             ((List<object>)p).AddRange(Procedures);
             var success = new List<string>();
             if(ids.Count()==0)
@@ -117,6 +121,7 @@ namespace Console_DataConnector.DataModule.DataADO.ADOWebApiService
                     available = ((List<object>)p).Select(p => p.ToString())
                 }); 
             }
+
             foreach (var id in ids) 
             {
              

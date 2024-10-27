@@ -181,7 +181,7 @@ public static class TextFactoryExtensions
                 }
                 catch(Exception ex)
                 {
-                    AppProviderService.GetInstance().Info($"Исключение при копироавнии данных в поле с ключом {kv.Key} => {ex.Message}");
+                    AppProviderService.GetInstance().Info($"Исключение при копировании данных в поле с ключом {kv.Key} => {ex.Message}");
                 }
 
             }
@@ -201,6 +201,11 @@ public static class TextFactoryExtensions
     {
         object ActionResult = null;
         Type type = p.GetType();
+
+
+        var setter = new TextDataSetter();
+        
+     
         var method = type.GetMethods().Where(m => m.Name == action).FirstOrDefault();        
         try
         {
@@ -209,18 +214,28 @@ public static class TextFactoryExtensions
             {
                 if(parameters.ContainsKey(name))
                 {
-                    parr.Add(parameters[name]);
+                    var typeName = method.GetParameters().First(p => p.Name == name).ParameterType.GetTypeName();
+                    if (parameters[name] is null)
+                    {
+                        parr.Add(null);
+                    }
+                    else
+                    {
+                        var textValue = parameters[name].ToString();
+                        var argValue = TextDataSetter.FromText(textValue, typeName);
+                        parr.Add(argValue);
+                    }
                 }
                 else
                 {
-                    throw new ArgumentException();
+                    throw new ArgumentException(name, "Отсутсвует фактическое значение параметры выпол");
                 }                
             }
             ActionResult = method.Invoke(p, parr.ToArray());
         }
         catch (Exception ex)
         {
-            throw new Exception($"Исключение проброшено из метода {TypeExtensions2.GetTypeName(type)}.{action}", ex);
+            throw new Exception($"Исключение проброшено из метода {TypeExtensions2.GetTypeName(type)}.{action}: {ex.Message}", ex);
         }
         return ActionResult;
     }
