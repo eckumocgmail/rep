@@ -197,6 +197,7 @@ else
                 public Task<string> Eval<T>(string s) => Task.FromResult(s);
                 public void OnImageClicked()
                 {
+                    var fileId = "file_"+Model.Name;
                     Eval<string>($"document.getElementById('{("file_" + Model.Name)}').click(); ").Wait();
                 }
                 
@@ -207,11 +208,21 @@ else
                 }
             }
             <div>
-                   
-                <input type="hidden" name="@Model.Name" id="@Model.Name" value="@Model.Value" />
-                    <input type="file" name="file_@Model.Name" id="file_@Model.Name" onchange="var reader = new FileReader(); reader.onload = function () { document.getElementsByTagName('img')[0].src=reader.result;}; reader.readAsDataURL( document.getElementsByName('file_@(Model.Name)')[0].files[0]);" />
+                <div style="width: 180px; height: 140px;" class="btn btn-info" @onclick="@OnImageClicked">
+                    @if (@Model.Value is not null)
+                    {
+                        <img id="img_@Model.Name" />
+                    }
+                    else
+                    {
+                        <span>Прикрепить изображение</span>    
+                    }
 
-                <img style="width: 222px; height: 222px;" id="img_@Model.Name" @onclick="@OnImageClicked" />
+                </div>
+                <input type="hidden" name="@Model.Name" id="@Model.Name" value="@Model.Value" />
+                <input style="visibility: hidden;" type="file"  name="file_@Model.Name" id="file_@Model.Name" onchange="var reader = new FileReader(); reader.onload = function () { document.getElementsByTagName('img')[0].src=reader.result;}; reader.readAsDataURL( document.getElementsByName('file_@(Model.Name)')[0].files[0]);" />
+         
+                    
             </div>
         }
         else

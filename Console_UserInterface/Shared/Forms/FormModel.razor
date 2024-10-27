@@ -56,32 +56,45 @@
     protected async Task Validate()
     {
         await Task.CompletedTask;
-        if (Form is null)
-            return;
-        if (Form.Item is null && Form.Json is not null)
+        try
         {
-            Form.Item =  Form.Json.FromJson<object>();
-        }
-        if (Form.Item is not null)
-        {
-            var message = Form.Item.Validate();
-            SetErrors(Form, message);
-            Form.FormFields.ForEach(item =>
+            if (Form is null)
+                return;
+            if (Form.Item is null && Form.Json is not null)
             {
-                item.State = message.ContainsKey(item.Name) && message[item.Name].Count() > 0 ? "invalid" : "valid";
-            });
-            this.Info(message.ToJson());
+                Form.Item = Form.Json.FromJson<object>();
+            }
+            if (Form.Item is not null)
+            {
+                var message = Form.Item.Validate();
+                SetErrors(Form, message);
+                Form.FormFields.ForEach(item =>
+                {
+                    item.State = message.ContainsKey(item.Name) && message[item.Name].Count() > 0 ? "invalid" : "valid";
+                });
+                this.Info(message.ToJson());
 
+            }
+            if (Form.IsValid)
+            {
+                await OnValidated.InvokeAsync();
+            }
         }
-        if (Form.IsValid)
+        catch(Exception ex)
         {
-            await OnValidated.InvokeAsync();
+            this.Error(this.UserMessage = $"Ошибка при валидации : {ex.Message}");
+            throw;
         }
         StateHasChanged();
     }
     [Parameter]
     public string Title { get; set; }
 
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        await this.Validate();
+    }
 
     public bool IsValid()
     {

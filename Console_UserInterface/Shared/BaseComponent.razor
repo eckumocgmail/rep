@@ -4,7 +4,7 @@
     [Parameter]
     public virtual RenderFragment ChildContent { get; set; }
     public Dictionary<string, List<string>> ValidationErrors { get; set; }
-
+    public string UserMessage { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -22,5 +22,6 @@
     else
     {
         <ValidationErrorsView Model="ValidationErrors" Name="GetType().GetTypeName()"></ValidationErrorsView>
-    }    
+    }   
+    
 </div>

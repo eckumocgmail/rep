@@ -9,13 +9,14 @@ using System;
 
 
 [Label("Личные данные")]
-// [Index(nameof(SurName))]
+[UniqValues($"{nameof(SurName)},{nameof(FirstName)},{nameof(LastName)}")]
 public class UserPerson: BaseEntity
 {
     public string GetFullName()
     {
         return $"{SurName} {FirstName} {LastName}";
     }
+
     public UserPerson( )
     {
           

@@ -190,8 +190,6 @@ namespace Console_UserInterface
             builder.Services.AddControllers();
             builder.Services.AddServerSideBlazor();
             builder.Services.AddHttpContextAccessor();
-            
-            
             builder.Services.AddTransient<GeoLocationService>();
             builder.Services.AddSingleton<AppRouterMiddleware>();
             builder.Services.AddScoped<SqlServerWebApi>();
