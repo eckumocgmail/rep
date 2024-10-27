@@ -383,7 +383,21 @@ public static class TypeExtensions2
         }
         return false;
     }
-   
+
+    public static List<string> GetOwnParameterNames(this object type)
+    {
+        if (type is Type)
+            return (from p in new List<PropertyInfo>(((Type)type).GetProperties()) where ((Type)type).GetPropertyAttributes(p.Name).ContainsKey("ParameterAttribute") &&  p.DeclaringType == ((Type)type) select p.Name).ToList();
+        else
+        {
+            var ptype = type.GetType();
+            type.Info(ptype.Name);
+            var properties = ptype.GetProperties().Select(p => p.Name).ToList();//.Where( prop => type.GetType().BaseType.GetProperties().Select(p => p.Name).Contains(prop.Name) == false).Select(p => p.Name).ToList();
+            return properties;
+            //return (from p in new List<PropertyInfo>(properties) where p.DeclaringType == type.GetType() select p.Name).ToList();
+        }
+    }
+    
     public static List<string> GetOwnPropertyNames(this object type)
     {
         if (type is Type)

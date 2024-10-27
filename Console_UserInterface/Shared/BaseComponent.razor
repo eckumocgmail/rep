@@ -3,9 +3,9 @@
 {
     [Parameter]
     public virtual RenderFragment ChildContent { get; set; }
-    protected Dictionary<string, List<string>> ValidationErrors { get; set; } 
+    public Dictionary<string, List<string>> ValidationErrors { get; set; }
 
-    
+
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();

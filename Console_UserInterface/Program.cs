@@ -75,40 +75,43 @@ namespace Console_UserInterface
         public static void Main(string[] args)
         {
             RegTypes();
-           
-
-             
 
 
 
-            var account = new UserAccount();
-            var model = new InputFormModel(account);
-            args.Info(model.Validate().ToJsonOnScreen());
-
-
-
-            //CustomDbContext.Build();
-            //BookingInitializer.InitData();
-            //UpdateDatabases();
-            /*new RoleSelectionModel()
+            using (var db = new DbContextUser())
             {
-                Role = "customer"
-            }.Validate().
-            ToJsonOnScreen().WriteToConsole();*/
-            //Console_DataConnector.Program.Main(args);
-            //new SelectDataAttribute($"{nameof(UserRole)}.{nameof(UserRole.Code)}").Options.ToJsonOnScreen().WriteToConsole();
-           
-            //args.Info(Assembly.GetExecutingAssembly().GetName().Name);
-                      
-            //UpdateDatabases();
+                var dbset = db.GetDbSet(nameof(UserAccount));
+                foreach(var p in dbset)
+                {
+                    db.Info(((object)p).ToString());
+                }
+                
+            }
+                //Console_DataConnector.Program.Main(args);          
+
+                args.Info(Assembly.GetExecutingAssembly().GetName().Name);
+         
             var builder = WebApplication.CreateBuilder(args);
             ConfigureServices(builder);
             Configure(builder); 
-            
+        }
+
+        static void testAttr()
+        {
+            //new SelectDataAttribute($"{nameof(UserRole)}.{nameof(UserRole.Code)}").Options.ToJsonOnScreen().WriteToConsole();
+
+        }
+
+        static void upgrade()
+        {
+            UpdateDatabases();
+        }
+        static void testHelp()
+        {
+
             //new HelpService().GetContents().ToJsonOnScreen().WriteToConsole();
             //new HelpService().GetArticles().ToJsonOnScreen().WriteToConsole();
         }
-
 
         /// <summary>
         /// Регистрация типов
@@ -217,6 +220,8 @@ namespace Console_UserInterface
         [Label("Создание структуры баз данных")]
         public static void UpdateDatabases()
         {
+            CustomDbContext.Build();
+            BookingInitializer.InitData();
             using (var db = new NavMenuDbContext())
             {
                 db.Database.EnsureDeleted();

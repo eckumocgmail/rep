@@ -56,10 +56,12 @@
                 }).ToList();
                 db.SaveChanges();
                 result.Result.BusinessFunctions = db.UsersRoles_.Where(ur => ur.UserId == result.Result.Id).ToList();
+                                
             }
             if (result.Succeeded)
             {
-                nav.NavigateTo("/public/search-products");
+                message = "";
+                nav.NavigateTo("/");
             }
             else
             {
@@ -75,19 +77,26 @@
 }
 @code
 {
+    [Label("Выбор роли")]
     public class RoleSelectionModel
     {
+        [Label("Функция в системе")]
         [NotNullNotEmpty]
         [SelectData($"{nameof(UserRole)}.{nameof(UserRole.Code)}")]
-        public string Role { get;set; }
+        public string Role { get; set; } = "customer";
 
         public RoleSelectionModel()
         {
-            Role = "";
+            Role = "customer";
         }
     }
 }
+
 <PageTitle>ЕвроАвто/Регистрация</PageTitle>
+@if(String.IsNullOrWhiteSpace(message) == false)
+{
+    <AlertComponent Color="info">@message</AlertComponent>
+}
 <MasterDialog
     OnComplete="OnSignupComplete"
     Models='@(new List<object>(){ 

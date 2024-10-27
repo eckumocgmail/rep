@@ -1,14 +1,11 @@
 ﻿@using Console_InputApplication.ViewEvents;
-@inherits LayoutComponentBase
+@inherits BaseComponent
 @using static Console_UserInterface.Shared.Forms.ValidationForm;
 @inject ILogger<ValidationForm> Logger
 @code
 {   
     [Parameter]
     public InputFormModel Form { get; set; }
-
-    [Parameter]
-    public RenderFragment ChildContent { get; set; }
 
     [Parameter]
     public bool Border { get; set; }
@@ -21,7 +18,11 @@
 
     bool Debug = true;
 }
-@code {
+@code 
+{
+    [Parameter]
+    public Action<bool> OnValidation { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
@@ -70,7 +71,7 @@
                 item.State = message.ContainsKey(item.Name) && message[item.Name].Count() > 0 ? "invalid" : "valid";
             });
             this.Info(message.ToJson());
-            
+
         }
         if (Form.IsValid)
         {
@@ -80,6 +81,12 @@
     }
     [Parameter]
     public string Title { get; set; }
+
+
+    public bool IsValid()
+    {
+        return this.Errors.Where(kv => kv.Value.Count() > 0).Count() > 0;
+    }
 }
 @if (Form == null)
 {
@@ -96,7 +103,7 @@ else
         <h2>@(Title is not null ? Title : Form.Title)</h2><hr/>
         <div class="text-black-50 text-info">@Form.Description</div>
    
-        @foreach (var kv in Errors)
+        @*@foreach (var kv in Errors)
         {
             @foreach (var error in kv.Value)
             {
@@ -104,7 +111,7 @@ else
             }
         }
         
-        <div class="text-black-50 text-danger" align="left">@Form.Error</div>
+        <div class="text-black-50 text-danger" align="left">@Form.Error</div>*@
         <div>
             <div>
                  
@@ -144,9 +151,13 @@ else
         this.Info("OnPropertyChanged()");
         try
         {
-            Dictionary<string, List<string>> message = this.Form.Item.Validate();
-            //ValidateOnInput(Form.Item, evt);
+            Dictionary<string, List<string>> message = ValidateOnInput(Form.Item, evt);
             Form.IsValid = message.Where(kv => kv.Value.Count() > 0).Count() == 0;
+            if( OnValidation != null)
+            {
+                OnValidation(Form.IsValid);
+            }
+
             SetErrors(Form, message);
             Form.FormFields.ForEach(item =>
             {

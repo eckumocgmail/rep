@@ -18,8 +18,13 @@ public class InputSelectAttribute : BaseInputAttribute {
     public InputSelectAttribute(string exp)  
     {
         //Options = (IEnumerable<string>)Expression.Compile(exp, this);
+        if (exp[0].IsEng()==false && exp[0].IsRus()==false)
+            exp = exp.Substring(1);
+        if (exp[exp.Length-1].IsEng() == false && exp[exp.Length - 1].IsRus() == false)
+            exp = exp.Substring(0, exp.Length - 1);
         if(String.IsNullOrWhiteSpace(exp) == false)
             this.Options = exp.Split(",").Select(x => x.Trim()).ToList();
+        
     }
     public static IEnumerable<string> GetControlTypes() => AttrsUtil.GetControlTypes();
     public static IEnumerable<string> GetInputTypes() => BaseInputAttribute.GetInputTypes();
@@ -40,7 +45,7 @@ public class InputSelectAttribute : BaseInputAttribute {
         if (value is null)
             return null;
         if (Options.Contains(value.ToString()) == false)
-            return $"Значение может быть только одним из заданных значений";
+            return $"Тип {model.GetTypeName()} свойство {property} Значение может быть только одним из заданных значений: \n{Options.ToJsonOnScreen()} \n текущее значение {value} ";
         return null;
     }
 

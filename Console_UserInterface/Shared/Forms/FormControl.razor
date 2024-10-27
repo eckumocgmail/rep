@@ -209,7 +209,7 @@ else
             <div>
                    
                 <input type="hidden" name="@Model.Name" id="@Model.Name" value="@Model.Value" />
-                <input type="file" name="file_@Model.Name" id="file_@Model.Name" onchange="var reader = new FileReader(); reader.onload = function () { document.getElementsByTagName('img')[0].src=reader.result;}; reader.readAsDataURL( document.getElementsByTagName('input')[6].files[0]);" />
+                    <input type="file" name="file_@Model.Name" id="file_@Model.Name" onchange="var reader = new FileReader(); reader.onload = function () { document.getElementsByTagName('img')[0].src=reader.result;}; reader.readAsDataURL( document.getElementsByName('file_@(Model.Name)')[0].files[0]);" />
 
                 <img style="width: 222px; height: 222px;" id="img_@Model.Name" @onclick="@OnImageClicked" />
             </div>
@@ -226,7 +226,8 @@ else
         }
         @foreach (var error in Model.Errors)
         {
-            <div><small class="form-text text-danger">@error</small></div>
+                <div class="form-text text-danger d-flex flex-wrap w-100" style="white-space: break-spaces; text-overflow: clip; text-indent: each-line; ">@error</div>
+          
         }
     }
 </div>

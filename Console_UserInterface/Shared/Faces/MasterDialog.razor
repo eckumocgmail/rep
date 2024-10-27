@@ -20,27 +20,30 @@
     {
         await base.OnInitializedAsync();
         this.EditorFormModel = new InputFormModel(Models[Cursor]);
-
+        this.FormIsValid = this.EditorFormModel.IsValid;
         this.EnsureIsValide();
     }
+
+    public bool FormIsValid { get; set; } = false;
 }
 @try
 {
     <CardContainer>
         <CardHeader>
             <h2>@Title @(Cursor + 1) шаг</h2>
+            @*if (FormModelRef is not null && FormModelRef.Form is not null && FormModelRef.Form.Item is not null)
+            {                
+                <p>@(FormModelRef.Form.Item.Validate().ToJsonOnScreen())</p>
+            }*@
         </CardHeader>
-        <CardBody>
-
-            <AlertComponent Color="info"> @(EditorFormModel.Validate().ToJsonOnScreen())</AlertComponent>
-            <FormModel @ref="@FormModelRef" Form="@(EditorFormModel)"></FormModel>
-            
-
+        <CardBody>       
+            <div style="width: 100%; max-height: 480px; overflow-y: auto;">
+                <FormModel @ref="@FormModelRef" Form="@(EditorFormModel)" OnValidation="@(evt => { FormIsValid = evt; StateHasChanged();})"></FormModel>
+            </div>
         </CardBody>
         <CardFooter>
-            
-            <button class="btn btn-sm btn-primary @((FormModelRef is not null && FormModelRef.Form is not null && FormModelRef.Form.IsValid == false? "disabled": ""))" @onclick="OnSubmitClicked">@(Cursor == (Models.Count() - 1) ? "готово" : "далее")</button>
-            <button class="btn btn-sm btn-primary" @onclick="OnReturnClicked">@(Cursor == 0 ? "отмена" : "назад")</button>
+            <button class="btn btn-sm btn-primary @((  ((Cursor == Models.Count() )|| (FormIsValid == false))? "disabled": ""))" @onclick="OnSubmitClicked">@(Cursor == (Models.Count() - 1) ? "готово" : "далее")</button>
+            <button class="btn btn-sm btn-primary @((Cursor == 0? "disabled": ""))" @onclick="OnReturnClicked">@(Cursor == 0 ? "отмена" : "назад")</button>
         </CardFooter>
     </CardContainer>
 }
@@ -69,6 +72,7 @@ catch(Exception ex)
         {
             Cursor++;
             this.EditorFormModel = new InputFormModel(Models[Cursor]);
+            this.FormIsValid = this.EditorFormModel.IsValid;
             StateHasChanged();
         }
 
@@ -89,6 +93,8 @@ catch(Exception ex)
         else
         {
             Cursor--;
+            this.EditorFormModel = new InputFormModel(Models[Cursor]);
+            this.FormIsValid = this.EditorFormModel.IsValid;
             StateHasChanged();
         }
         

@@ -1,4 +1,6 @@
 ﻿@page "/customer/statistics"
+@attribute [Label("Статистика")]
+@attribute [Authorize(Roles = "customer")]
 @inherits BaseComponent
 <PageTitle>Статистика продаж</PageTitle>
 <table>

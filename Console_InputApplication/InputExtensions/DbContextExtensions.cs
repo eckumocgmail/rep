@@ -78,15 +78,20 @@ public static class DbContextExtensions
         HashSet<Type> entities = new HashSet<Type>();
         foreach (MethodInfo info in type.GetMethods())
         {
-            if (info.Name.StartsWith("get_") == true && info.ReturnType.Name.StartsWith("ISuperSer"))
+            var rs = new ReflectionService();
+            var all = dbContext.GetType().GetProperties().Where(prop => prop.PropertyType.IsExtendsFrom(typeof(DbSet<>))).Select(prop => prop.PropertyType.GetGenericArguments()[0].GetTypeName()).ToList();
+            var dbset = dbContext.GetType().GetProperties().Where(prop => prop.PropertyType.IsExtendsFrom(typeof(DbSet<>))).FirstOrDefault(prop => prop.PropertyType.GetGenericArguments()[0].GetTypeName() == entity).GetValue(dbContext);
+
+            if (dbset is null)
             {
-                if (info.Name.IndexOf("MigrationHistory") == -1)
-                {
-                    return info.Invoke(dbContext, new object[0]);
-                }
+                throw new ArgumentException("entity", $"Не удалось найти массив данных для {entity}");
+            }
+            else
+            {
+                return dbset;
             }
         }
-        return entities;
+        throw new ArgumentException("entity", $"Не удалось найти массив данных для {entity}");
     }
 }
     

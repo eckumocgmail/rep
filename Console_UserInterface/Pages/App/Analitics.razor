@@ -109,10 +109,13 @@
 }
 @code
 {
+    [NotInput]
     public InputFormModel EditorModel { get; set; }
     public string Title { get; set; } = "Заголовок";
     public string OX { get; set; } = "Ось X";
     public string OY { get; set; } = "Ось Y";
+
+    [NotInput]
     public Dictionary<string, List<float?>> DictionaryModel { get; set; } = new()
     {
         // {"производительность", new List<float?>(){ 1f,2f,3f } }

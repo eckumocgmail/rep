@@ -34,63 +34,56 @@ public class UniqValueAttribute : BaseValidationAttribute, MyValidation
 
     public override string Validate(object model, string property, object value)
     {
-        var typeName = model.GetType().GetTypeName();
-        var _dbContextType = model.GetDbContextWithEntity();
-
-        if (_dbContextType is null)
-            throw new NullReferenceException($"{GetType().GetTypeName()} не удалось определить контекст данных");
-        if(_dbContextType is not null)
+        try
         {
-            _dbContextTypeName = _dbContextType.GetTypeName();
-        }
-        if (_dbContextTypeName is null)
-            throw new NullReferenceException($"{GetType().GetTypeName()} содержит ссылку на null  в свойстве _dbContextTypeName");
-        _dbContextTypeName = _dbContextType.GetTypeName();
+            var typeName = model.GetType().GetTypeName();
+            var _dbContextType = model.GetDbContextWithEntity();
 
-        using (var db = _dbContextTypeName.New<DbContext>())
-        {
-            var dbset = db.GetDbSet(model.GetType().GetTypeName());
-            int id = (int)new ReflectionService().GetValue(model, "Id");
-            bool isUniq = true;
-            foreach (var record in ((IEnumerable<dynamic>)dbset))
+            if (_dbContextType is null)
             {
-                if (record.Id != id)
+                throw new NullReferenceException($"{GetType().GetTypeName()} не удалось определить контекст данных");
+            }
+
+            if (_dbContextType is not null)
+            {
+                _dbContextTypeName = _dbContextType.GetTypeName();
+            }
+            if (_dbContextTypeName is null)
+                throw new NullReferenceException($"{GetType().GetTypeName()} содержит ссылку на null  в свойстве _dbContextTypeName");
+            _dbContextTypeName = _dbContextType.GetTypeName();
+
+            using (var db = _dbContextTypeName.New<DbContext>())
+            {
+                var rs = new ReflectionService();
+                var dbset = db.GetDbSet(model.GetType().GetTypeName());
+                foreach (dynamic next in dbset)
                 {
-                    object recordPropertyValue = new ReflectionService().GetValue(record, property);
-                    if (value == null)
+                    var val = rs.GetValue(next, property);
+                    if (val is null || value is null)
                     {
-                        if (recordPropertyValue == null)
+                        if (value == val)
                         {
-                            isUniq = false;
-                            break;
+                            return GetMessage(model, property, value);
                         }
                     }
                     else
                     {
-                        if (recordPropertyValue == null)
+                        if (value.ToString().ToLower() == val.ToString().ToLower())
                         {
-                            continue;
-                        }
-                        else
-                        {
-                            if (recordPropertyValue.ToString() == value.ToString())
-                            {
-                                isUniq = false;
-                                break;
-                            }
+                            return GetMessage(model, property, value);
                         }
                     }
                 }
+                return null;
             }
-
-            //bool result = (from i in ((IEnumerable<dynamic>)dbsetObj)
-            //where new ReflectionService().GetValue(model, property) == value && i.Id != id
-            //select i).Count() == 0;
-            return isUniq ? null : GetMessage(model, property, value);
-        }        
+        }    
+        catch (Exception ex)
+        {
+            return $"Метод проверки упал с исключением: {ex.Message}";
+        }
     }
 
-    public string GetMessage(object model, string property, object value)
+    public override string GetMessage(object model, string property, object value)
     {
         if (string.IsNullOrEmpty(_error))
         {

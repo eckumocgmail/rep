@@ -1,8 +1,11 @@
 ﻿using Blazored.Modal;
 using Blazored.Modal.Services;
 
+using Console_UserInterface.Shared;
+using Console_UserInterface.Shared.Controls;
 using Console_UserInterface.Shared.Deps;
 using Console_UserInterface.Shared.Dialogs;
+using Console_UserInterface.Shared.Forms;
 
 using Microsoft.AspNetCore.Components;
 
@@ -43,6 +46,52 @@ public class InputService: IInputService
             todo(result);
         }            
         return key;
+    }
+
+    public IEnumerable<string> MultiSelect(string title, IEnumerable<string> options, ref string[] args)
+    {
+        throw new NotImplementedException();
+    }
+
+    public string SingleSelect(string title, IEnumerable<string> options, ref string[] args)
+    {
+        return SingleSelectAsync(title, options).Result;    
+    }
+    public async Task<string> SingleSelectAsync(string title, IEnumerable<string> options)
+    {
+        string SelectedItem = null;
+        IModalReference modalRef = null;
+        var parmeters = new ModalParameters();
+        parmeters.Add("Parameters", new Dictionary<string, object>() {
+            { "Title", title  },
+            { "ListItems", options.ToList() },
+            { "OnSelect", (object evt)=>{
+                SelectedItem = ((SelectList)evt).SelectedItem;
+            } }
+        });
+        parmeters.Add("OnCompleted", (object evt) =>
+        {
+            SelectedItem = ((SelectList)evt).SelectedItem;
+            modalRef.Close();
+        });
+        parmeters.Add("OnCanceled", (object evt) =>
+        {
+            modalRef.Close();
+        });
+        modalRef = this._modal.Show<SubmitForm<SelectList>>("Выберите из списка", parmeters, new ModalOptions()
+        {
+            ContentScrollable = true
+        });
+        var result = await modalRef.Result;
+        if (result.Cancelled)
+        {
+            Console.WriteLine("Modal was cancelled");
+            return null;
+        }
+        else
+        {
+            return SelectedItem;
+        }
     }
 
     public Task<IEnumerable<string>> CheckListAsync(string title, IEnumerable<string> options, ref string[] args)
@@ -104,9 +153,38 @@ public class InputService: IInputService
         return checkList.CheckedItems;
     }
 
-    public bool ConfirmContinue(string title)
+    public bool? ConfirmContinue(string title)
     {
-        throw new NotImplementedException();
+        string SelectedItem = null;
+        IModalReference modalRef = null;
+        var parmeters = new ModalParameters();
+        parmeters.Add("Parameters", new Dictionary<string, object>() {                           
+        });
+        bool res = false;
+        parmeters.Add("OnCompleted", (object evt) =>
+        {
+            res = true;
+            modalRef.Close();
+        });
+        parmeters.Add("OnCanceled", (object evt) =>
+        {
+            res = false;
+            modalRef.Close();
+        });
+        modalRef = this._modal.Show<SubmitForm<TextComponent>>("Выберите из списка", parmeters, new ModalOptions()
+        {
+            ContentScrollable = true
+        });
+        var result = modalRef.Result.Result;
+        if (result.Cancelled)
+        {
+            Console.WriteLine("Modal was cancelled");
+            return null;
+        }
+        else
+        {
+            return res;
+        }
     }
 
     public TModel Input<TModel>(string title, Func<object, List<string>> validate, ref string[] args)
@@ -259,19 +337,46 @@ public class InputService: IInputService
         throw new NotImplementedException();
     }
 
+
+    public class InputYearModel
+    {
+        [Label("Год")]
+        [InputYear]
+        [NotNullNotEmpty]
+        public string Value { get; set; } = "2000";
+    }
     public string InputYear(string title, Func<object, List<string>> validate, ref string[] args)
     {
-        throw new NotImplementedException();
-    }
+        var item = new InputYearModel();
 
-    public IEnumerable<string> MultiSelect(string title, IEnumerable<string> options, ref string[] args)
-    {
-        throw new NotImplementedException();
-    }
+        string SelectedItem = null;
+        IModalReference modalRef = null;
+        var parmeters = new ModalParameters();
+        parmeters.Add("Model", item);
 
-    public string SingleSelect(string title, IEnumerable<string> options, ref string[] args)
-    {
-        throw new NotImplementedException();
+       
+        parmeters.Add("OnCompleted", (object evt) =>
+        {
+            modalRef.Close();
+        });
+        parmeters.Add("OnCanceled", (object evt) =>
+        {
+            modalRef.Close();
+        });
+        modalRef = this._modal.Show<FormEditor>("", parmeters, new ModalOptions()
+        {
+            ContentScrollable = true
+        });
+        var result = modalRef.Result.Result;
+        if (result.Cancelled)
+        {
+            Console.WriteLine("Modal was cancelled");
+            return null;
+        }
+        else
+        {
+            return "";
+        }
     }
 
     public TModel CreateInputDialog<TModel>() where TModel : class
@@ -285,6 +390,11 @@ public class InputService: IInputService
     }
 
     public TModel CreateExecuteDialog<TModel>(string controller, string action, Action<TModel> oncompleted, Action<TModel> oncanceled, Action<Exception> onerror) where TModel : class
+    {
+        throw new NotImplementedException();
+    }
+
+    bool IUserControl.ConfirmContinue(string title)
     {
         throw new NotImplementedException();
     }

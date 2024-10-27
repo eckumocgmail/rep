@@ -18,7 +18,7 @@
     <CardHeader>
          
         <SearchControl SearchQuery="@SearchQuery" SearchOptions="@SearchOptions" OnSearch="@OnSearch"></SearchControl>
-        <TextComponent FontSize="@(20)" Color="black">Выбранные услуги</TextComponent>
+        <TextComponent FontSize="20" Color="black">Выбранные услуги</TextComponent>
         <ToolsBar>
             <ButtonClick>добавить</ButtonClick>
         </ToolsBar>
@@ -26,7 +26,7 @@
         </ListGroup>
     </CardHeader>
     <CardBody>           
-        <TextComponent FontSize="@(20)">Доступные услуги</TextComponent>
+        <TextComponent FontSize="20">Доступные услуги</TextComponent>
         <ListGroup Items="@WorkNames" OnListGroupItemClickedCallback="item => { WorkNames.Remove(item); SelectedWorks.Add(item); StateHasChanged(); }">
         </ListGroup>
     </CardBody>

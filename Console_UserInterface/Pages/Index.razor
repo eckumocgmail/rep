@@ -30,8 +30,8 @@
     public int datasetId { get; set; }
     protected override async Task OnInitializedAsync()
     {
-        await base.OnInitializedAsync();
-        this.EditorModel = new InputFormModel(this);
+        await base.OnInitializedAsync();        
+        this.EditorModel = new InputFormModel(this, this.GetOwnParameterNames().ToArray());
         var datasets = businessAnaliticsService.GetDatasets();
         var dataset = datasets.FirstOrDefault();
         if (dataset is null)
@@ -106,10 +106,14 @@
 }
 @code
 {
+
+    [NotInput]
     public InputFormModel EditorModel { get; set; }
     public string Title { get; set; } = "Заголовок";
     public string OX { get; set; } = "Ось X";
     public string OY { get; set; } = "Ось Y";
+
+    [NotInput]
     public Dictionary<string, List<float?>> DictionaryModel { get; set; } = new()
     {
         // {"производительность", new List<float?>(){ 1f,2f,3f } }
@@ -146,7 +150,11 @@
                 <BarBasic Title="@Title" OX="@OX" OY="@OY" Model="@SeriesData"></BarBasic>
                 break;
             case "LineBasic":
-                <LineBasic></LineBasic>
+                <LineBasic Title="@Title"
+                           YAxis="@OY"
+                           SeriesName="@SelectedIndicator"
+                           SeriesData="@SeriesData.First().Value">
+                </LineBasic>
                 break;
             case "PieChart":
                 <BlazorBootstrap.PieChart ></BlazorBootstrap.PieChart>
