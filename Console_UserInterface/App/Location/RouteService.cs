@@ -41,16 +41,23 @@ namespace Console_UserInterface.Services.Location
 
         public void AddNavigation()
         {
-            var navigation = new Dictionary<string, string>(db.AppRoutes.ToList().Select(route => new KeyValuePair<string, string>(db.AppPages.First(p => p.Id == route.AppPageId).Name, route.Uri)));
-            AppPage navPage = page.CreateNavPage("Меню", navigation);
-            db.AppPages.Add(navPage);
-            db.PageComponents.AddRange(navPage.PageComponents);
-
-            db.AppRoutes.Add(new()
+            try
             {
-                Uri = "/api/",
-                AppPage = navPage
-            });
+                var navigation = new Dictionary<string, string>(db.AppRoutes.ToList().Select(route => new KeyValuePair<string, string>(db.AppPages.First(p => p.Id == route.AppPageId).Name, route.Uri)));
+                AppPage navPage = page.CreateNavPage("Меню", navigation);
+                db.AppPages.Add(navPage);
+                db.PageComponents.AddRange(navPage.PageComponents);
+
+                db.AppRoutes.Add(new()
+                {
+                    Uri = "/api/",
+                    AppPage = navPage
+                });
+            }
+            catch(Exception ex)
+            {
+                ex.Message.WriteToConsole();
+            }
         }
     }
 }

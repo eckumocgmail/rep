@@ -48,7 +48,7 @@ namespace Console_DataConnector
                         { "Приложение",  ()=>DataProgram.Run(ref args)  },
                         { "Выход", ()=>InputConsole.Exit() }
                     }, ref args);
-                        todo();
+                    todo();
                 }
                 
 

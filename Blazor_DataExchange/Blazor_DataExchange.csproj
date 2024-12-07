@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Console_DataConnector\Console_DataConnector.csproj" />
+    <ProjectReference Include="..\Console_InputApplication\Console_InputApplication.csproj" />
+    <ProjectReference Include="..\Console_UserInterface\Console_UserInterface.csproj" />
+  </ItemGroup>
+
+</Project>

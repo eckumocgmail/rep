@@ -1,10 +1,4 @@
-﻿
-using Console_InputApplication;
-
-using Console_StatisticsModel.BusinessAnaliticsServices;
-
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 using Newtonsoft.Json.Linq;
 
@@ -222,7 +216,7 @@ public class BusinessInitiallizer
         res["BusinessDatasources"] = InitBusinessDatasources(db);
         res["BusinessReports"] = InitBusinessReports(db);
         res["BusinessResources"] = InitBusinessResources(db);
-      
+        res["BusinessOLAP"] = InitBusinessOLAP(db);
         res["BusinessDatasets"] = InitBusinessDatasets(db);       
         res["BusinessData"] = InitBusinessData(db);       
         return res;

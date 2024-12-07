@@ -63,6 +63,7 @@
     <Folder Include="AppUnits\InterfaceModule\InterfaceModel\" />
     <Folder Include="AppUnits\InterfaceModule\InterfaceApi\" />
     <Folder Include="App\Models\" />
+    <Folder Include="Tests\" />
   </ItemGroup>
   <ItemGroup>
     <None Update="Help\Articles\Customer.html">

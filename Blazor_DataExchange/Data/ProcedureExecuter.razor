@@ -1,0 +1,94 @@
+﻿@page "/fetchdata"
+@inherits BaseComponent
+@using Console_DataConnector.DataModule.DataODBC.Connectors;
+@using Console_UserInterface.Shared;
+@using Newtonsoft.Json.Linq;
+<h3>ProcedureExecuter</h3>
+@inject BusinessAnaliticsService business
+@code 
+{
+    private List<string> TablesNames { get; set; } = new();
+    private Dictionary<string, string> Connections { get; set; } = new();
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        this.Connections = new (
+            business.GetDatasources().Select(ds => new KeyValuePair<string, string>
+                (
+                    ds.Name,
+                    ds.ConnectionString
+                )).ToList());
+
+    }
+    OdbcDatabaseManager manager;
+    private string SelectedDataSource { get; set; }
+    private string SelectedDataTable { get; set; }
+    private void OnDatasourceSelectionChanged(string Selected)
+    {
+        try
+        {
+            var odbc = new OdbcDataSource(Connections[this.SelectedDataSource = Selected]);
+            manager = new OdbcDatabaseManager(odbc);
+            this.TablesNames = odbc.GetTables().ToList();
+            this.UserMessage = "";
+            StateHasChanged();
+        }
+        catch(Exception ex)
+        {
+            this.UserMessage = ex.Message;
+        }
+    }
+
+    JArray Dataset { get; set; }
+    private void OnTableSelectionChanged(string Selected)
+    {
+        try
+        {
+            var odbc = new OdbcDataSource(Connections[this.SelectedDataSource]);
+            
+            var fasade = manager.memory[SelectedDataTable = Selected];
+            Dataset = fasade.SelectPage(1, 10);
+            UserMessage = "";
+        }
+        catch(Exception ex)
+        {
+            UserMessage = ex.Message;
+        }
+
+        StateHasChanged();
+    }
+} 
+
+<Console_UserInterface.Shared.Layouts.CardContainer>
+    <CardHeader>
+        @if (String.IsNullOrWhiteSpace(this.UserMessage) == false)
+        {
+            <div class="alert alert-warning">@UserMessage</div>
+        }
+        <Console_UserInterface.Shared.Layouts.SplitPane>
+            <Left><Console_UserInterface.Shared.Controls.SelectBox Options="@Connections.Keys.ToList()" OnChange="@OnDatasourceSelectionChanged"></Console_UserInterface.Shared.Controls.SelectBox></Left>
+            <Right><Console_UserInterface.Shared.Controls.SelectBox Options="@TablesNames" OnChange="@OnTableSelectionChanged"></Console_UserInterface.Shared.Controls.SelectBox></Right>
+        </Console_UserInterface.Shared.Layouts.SplitPane>
+    </CardHeader>
+    <CardBody>
+        @if (Dataset is not null)
+        {
+
+            <table class="table table-bordered table-dark table-hover">
+                @foreach (JObject token in Dataset)
+                {
+                    var datarow = (token.ToString().FromJson<Dictionary<string, object>>());
+                    <tr>
+                        @foreach (var kv in datarow)
+                        {
+                            <td>@kv.Value</td>
+                        }
+                    </tr>
+                }
+            </table>
+
+        }
+
+    </CardBody>
+    <CardFooter></CardFooter>
+</Console_UserInterface.Shared.Layouts.CardContainer>

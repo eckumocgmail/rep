@@ -43,6 +43,19 @@ public class TypeNode<T> : IDictionary<string, TypeNode<T>>
         todo(this);
         GetChildren().ForEach(child => child.ForEach(todo));
     }
+    /// <summary>
+    /// Конструктор
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="item"></param>
+    /// <param name="parent"></param>
+    public TypeNode(string name, TypeNode<T> parent)
+    {
+        
+        NodeName = name;
+        Parent = parent;
+        ChildNodes = new SortedDictionary<string, TypeNode<T>>();
+    }
 
     /// <summary>
     /// Конструктор

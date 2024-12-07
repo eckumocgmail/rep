@@ -25,7 +25,7 @@ namespace Console_UserInterface
     /// <summary>
     /// Программирование
     /// </summary>
-    public class Program
+    public class Program 
     {
         public SummaryViewModel[] Items { get; set; } = new SummaryViewModel[]
         {
@@ -75,7 +75,7 @@ namespace Console_UserInterface
         public static void Main(string[] args)
         {
             RegTypes();
-
+            Test.TestApp();
 
 
             using (var db = new DbContextUser())
@@ -116,7 +116,7 @@ namespace Console_UserInterface
         /// <summary>
         /// Регистрация типов
         /// </summary>
-        private static void RegTypes()
+        public static void RegTypes()
         {
             ServiceFactory.Get().Info("регистрирую типы данных ");
             
@@ -130,8 +130,8 @@ namespace Console_UserInterface
             ServiceFactory.Get().AddTypes(Assembly.GetExecutingAssembly().Modules.Select(mod => mod.Assembly));
             ServiceFactory.Get().AddTypes(Assembly.GetCallingAssembly().Modules.Select(mod => mod.Assembly));
             ServiceFactory.Get().AddTypes(Assembly.GetEntryAssembly().Modules.Select(mod => mod.Assembly));
-            ServiceFactory.Get().AddTypes(typeof(Program).Assembly.Modules.Select(mod => mod.Assembly));
-            ServiceFactory.Get().AddTypes(typeof(Program).Assembly);
+            ServiceFactory.Get().AddTypes(typeof(Console_UserInterface.Program).Assembly.Modules.Select(mod => mod.Assembly));
+            ServiceFactory.Get().AddTypes(typeof(Console_UserInterface.Program).Assembly);
             ServiceFactory.Get().AddTypes(typeof(KeyAttribute).Assembly);
             ServiceFactory.Get().AddTypes(typeof(System.Object).Assembly);
             ServiceFactory.Get().AddTypes(typeof(string).Assembly);

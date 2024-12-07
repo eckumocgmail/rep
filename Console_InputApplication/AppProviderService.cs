@@ -278,16 +278,23 @@ public partial class AppProviderService : IServiceProvider
 /// </summary>
 public static class IServiceProviderExtrensions
 {
-    public static T Get<T>(this IServiceProvider sp)
+    public static T Get<T>(this IServiceProvider sp) where T : class
     {
-        if( typeof(T).IsInterface )
+        try
         {
-            var implementation = typeof(T).Assembly.GetTypes().Where(pt => pt.GetInterfaces().Contains(typeof(T))).FirstOrDefault();
-            return (T)sp.GetService(implementation);
+            if (typeof(T).IsInterface)
+            {
+                var implementation = typeof(T).Assembly.GetTypes().Where(pt => pt.GetInterfaces().Contains(typeof(T))).FirstOrDefault();
+                return (T)sp.GetService(implementation);
+            }
+            else
+            {
+                return sp.GetService<T>();
+            }
+        }    
+        catch( Exception )
+        {
+            return null;
         }
-        else
-        {
-            return sp.GetService<T>();
-        }        
     }
 }

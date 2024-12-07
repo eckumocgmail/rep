@@ -63,20 +63,12 @@ public class UniqValuesAttribute : BaseValidationAttribute, MyValidation
                         text2 += $"{val},";
                     }
                     
-                    if (val is null || value is null)
+                   
+                    if (text2.ToString().ToLower() == text1.ToString().ToLower())
                     {
-                        if (value == val)
-                        {
-                            return GetMessage(model, property, value);
-                        }
+                        return GetMessage(model, property, value);
                     }
-                    else
-                    {
-                        if (value.ToString().ToLower() == val.ToString().ToLower())
-                        {
-                            return GetMessage(model, property, value);
-                        }
-                    }
+                     
                 }
                 return null;
             }

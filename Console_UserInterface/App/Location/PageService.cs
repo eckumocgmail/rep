@@ -32,7 +32,7 @@ namespace Console_UserInterface.Services.Location
 
         public PageComponent CreateNavLink(string key, string value)
         {
-            throw new NotImplementedException();
+            return new PageComponent();
         }
 
         public List<string> GetInputProperties(Type ptype)

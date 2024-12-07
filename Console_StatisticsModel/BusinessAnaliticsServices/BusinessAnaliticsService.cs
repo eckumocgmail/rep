@@ -7,8 +7,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Console_StatisticsModel.BusinessAnaliticsServices
-{
 
     /**
      * 
@@ -33,6 +31,10 @@ end
     {
         private readonly BusinessDataModel businessDataModel;
 
+        public  IEnumerable<BusinessDatasource> GetDatasources()
+        {
+            return businessDataModel.BusinessDatasources.ToList();
+        }
 
         public BusinessAnaliticsService(BusinessDataModel businessDataModel)
         {
@@ -191,4 +193,3 @@ end
             return res;
         }
     }
-}

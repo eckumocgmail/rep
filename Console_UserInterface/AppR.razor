@@ -1,6 +1,8 @@
-﻿@using Console_UserInterface.Services.Location;
+﻿@using Console_UserInterface.App.Location;
+@using Console_UserInterface.Services.Location;
 @using static Console_UserInterface.Services.Location.LocationDbContext;
 @inject NavigationManager nav
+@inject LocationMenuBuilder builder
 @inject LocationService location
 @code
 {
@@ -15,9 +17,11 @@
         };
     }
 }
+@(builder.Build().Count())
+<MenuView Menus="@(builder.Test())"></MenuView>
 <CascadingBlazoredModal>
     <CascadingAuthenticationState>
-        <Router AppAssembly="@typeof(App).Assembly">
+        <Router AppAssembly="@typeof(AppR).Assembly">
             <Found Context="routeData">
                 <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
                     <NotAuthorized>
@@ -33,7 +37,9 @@
                 <FocusOnNavigate RouteData="@routeData" Selector="h1" />
             </Found>
             <NotFound>
-                <MainMenu></MainMenu>
+                sdf
+                
+                sfd
                 @if (Page is not null)
                 {
                     <PageView Model="Page"></PageView>

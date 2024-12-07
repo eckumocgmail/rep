@@ -44,7 +44,7 @@ public class MainMenuBuilder
         private List<IMenuItemModel> items;
         private IMenuItemModel model;
 
-        public MenuItemModel(MenuItemModel parent, string text, params IMenuItemModel[] items): base(text, null, parent)
+        public MenuItemModel(MenuItemModel parent, string text, params IMenuItemModel[] items): base(text, parent)
         {
             this.parent = parent;
             this.labelText = text;
@@ -69,6 +69,7 @@ public class MainMenuBuilder
             this.labelText = Text;
         }
 
+        public List<IMenuItemModel> GetItems() => items;
         public List<IMenuItemModel> GetChildNodes() => childNodes;
         public string GetSize() => fontSize;    // font-size
         public string GetText() => labelText;    // label text

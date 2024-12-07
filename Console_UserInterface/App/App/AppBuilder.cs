@@ -21,13 +21,19 @@ public class AppBuilder
     };
 
 
+
+     
+
+
+
+
     /// <summary>
     /// Модель меню навигации по типам из пространства имён
     /// </summary>        
-    /// <param name="mapping">
+    /// <param name="mappingForRouteVars">
     /// Маппинг значений для маршрута
     /// </param>
-    public Dictionary<string, string> CreateNavMenu<T>(Dictionary<string, string> mapping = null)
+    public Dictionary<string, string> CreateNavMenu<T>(Dictionary<string, string> mappingForRouteVars = null)
     {
         Dictionary<string, string> result = new();
         var snamespace = typeof(T).Namespace;
@@ -35,15 +41,15 @@ public class AppBuilder
         result = new Dictionary<string, string>(types.Select(type =>
         {
             var route = type.GetAttributes()["RouteAttribute"];
-            if (mapping is not null)
+            if (mappingForRouteVars is not null)
             {
                 if (route.IndexOf("{") != -1)
                 {
                     var exp = route.Substring(route.IndexOf("{") + 1, route.IndexOf("}") - route.IndexOf("{") - 1);
                     exp = exp.Replace(":int", "");
-                    if (mapping.ContainsKey(exp))
+                    if (mappingForRouteVars.ContainsKey(exp))
                     {
-                        route = route.Substring(0, route.IndexOf("{")) + mapping[exp] + route.Substring(route.IndexOf("}") + 1);
+                        route = route.Substring(0, route.IndexOf("{")) + mappingForRouteVars[exp] + route.Substring(route.IndexOf("}") + 1);
                     }
                 }
             }

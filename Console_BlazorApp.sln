@@ -23,7 +23,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Console_RestConnector", "Co
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Console_EmailApplication", "..\..\ProjectsConsole\Console_EmailApplication\Console_EmailApplication.csproj", "{5E9D63BB-6BF4-4578-BEA1-024850B79D18}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Console_StatisticsModel", "Console_StatisticsModel\Console_StatisticsModel.csproj", "{183DA53E-A20F-4FEC-A30F-584B3DC6D824}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Console_StatisticsModel", "Console_StatisticsModel\Console_StatisticsModel.csproj", "{183DA53E-A20F-4FEC-A30F-584B3DC6D824}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor_DataExchange", "Blazor_DataExchange\Blazor_DataExchange.csproj", "{39F4B9ED-FBD2-4E05-ACCC-2C36C963CDE3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -75,6 +77,10 @@ Global
 		{183DA53E-A20F-4FEC-A30F-584B3DC6D824}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{183DA53E-A20F-4FEC-A30F-584B3DC6D824}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{183DA53E-A20F-4FEC-A30F-584B3DC6D824}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39F4B9ED-FBD2-4E05-ACCC-2C36C963CDE3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39F4B9ED-FBD2-4E05-ACCC-2C36C963CDE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39F4B9ED-FBD2-4E05-ACCC-2C36C963CDE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39F4B9ED-FBD2-4E05-ACCC-2C36C963CDE3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

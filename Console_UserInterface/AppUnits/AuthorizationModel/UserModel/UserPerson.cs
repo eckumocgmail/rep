@@ -1,15 +1,9 @@
-﻿
-
-using Microsoft.EntityFrameworkCore;
-
+﻿using Microsoft.EntityFrameworkCore;
 using System;
 
-
-
-
-
 [Label("Личные данные")]
-[UniqValues($"{nameof(SurName)},{nameof(FirstName)},{nameof(LastName)}")]
+//[UniqValues($"{nameof(SurName)},{nameof(FirstName)},{nameof(LastName)}")]
+[Index(nameof(SurName),nameof(LastName))]
 public class UserPerson: BaseEntity
 {
     public string GetFullName()
@@ -21,6 +15,8 @@ public class UserPerson: BaseEntity
     {
           
     }
+
+
     public UserPerson(string surName, string firstName, string lastName, DateTime? birthday, string tel)
     {
         SurName = surName;
@@ -29,6 +25,7 @@ public class UserPerson: BaseEntity
         Birthday = birthday;
         Tel = tel;
     }
+
 
     [InputOrder(1)]
     [Label("Фамилия")]

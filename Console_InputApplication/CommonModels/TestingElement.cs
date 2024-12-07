@@ -220,11 +220,13 @@ public abstract class TestingElement: TestingReport
     /// <param name="test">Функция проверки функций</param>
     /// <param name="success">Сообщение при успешной проверки</param>
     /// <param name="failed">Сообщение при провале проверки</param>
-    public void AssertService<T>(Predicate<T> test, string success, string failed)
+    public void AssertService<T>(Predicate<T> test, string success, string failed) where T : class
     {
         try
         {
             var service = provider.Get<T>();
+            if (service is null)
+                throw new NullReferenceException("Не удалось получить ссылку на объект типа "+typeof(T).GetTypeName());
             var result = test(service);
             this.Messages.Add(result? success: failed);
         }

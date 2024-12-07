@@ -1,7 +1,4 @@
-﻿using Console_StatisticsModel.BusinessAnaliticsServices;
-
-using Microsoft.EntityFrameworkCore;
-
+﻿
 namespace Console_StatisticsModel
 {
     internal class Program

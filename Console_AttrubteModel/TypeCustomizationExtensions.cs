@@ -32,6 +32,8 @@ public static class TypeCustomizationExtensions
         
         using (var dp = new CustomService())
         {
+            if (dp.HasType(type))
+                dp.ToType(type);
             var res = dp.GetAttributes(type);
             return res;
         }        

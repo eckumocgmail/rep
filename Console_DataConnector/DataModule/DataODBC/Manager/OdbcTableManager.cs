@@ -65,7 +65,8 @@ namespace Console_DataConnector.DataModule.DataODBC.Manager
 
         public JArray SelectPage(long page, long size)
         {
-            return datasource.GetJsonResult("select * from " + metadata.name + " limit " + page + " , " + size);
+            //return datasource.GetJsonResult("select * from " + metadata.name + " limit " + page + " , " + size);
+            return datasource.GetJsonResult($"DECLARE  @StartRow int = {page},  @RowsPerPage int = {size}; select * from " + metadata.name + " order by Id ASC OFFSET @StartRow - 1 ROWS FETCH NEXT @RowsPerPage ROWS ONLY;" );
         }
 
 

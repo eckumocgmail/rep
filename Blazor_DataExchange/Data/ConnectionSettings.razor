@@ -1,0 +1,6 @@
+﻿@using Console_DataConnector.DataModule.DataADO.ADODbConnectionStrings;
+<Console_UserInterface.Shared.Forms.FormEditor Model="@Model"></Console_UserInterface.Shared.Forms.FormEditor>
+@code 
+{
+    public SqlServerConnectionString Model { get; set; } = new();
+}

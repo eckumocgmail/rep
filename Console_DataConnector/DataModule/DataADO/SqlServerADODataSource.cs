@@ -135,6 +135,12 @@ namespace Console_DataConnector.DataModule.DataADO
             return JResult;
         }
 
+        public DataTable GetDataTable(string sql)
+        {
+            DataTable ResultDataTable = ExecuteQuery(sql);
+            return ResultDataTable;
+        }
+
         public JObject GetSingleJObject(string sql)
         {
             DataTable ResultDataTable = ExecuteQuery(sql);

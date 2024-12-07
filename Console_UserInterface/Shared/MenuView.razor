@@ -1,0 +1,45 @@
+﻿@using static MainMenuBuilder;
+<div class="card" >
+    <label>MainMenuView</label>
+    <input type="checkbox" value="visible" @oninput="@(evt => { this.VisibleEditor = (bool)evt.Value; StateHasChanged(); })"/>
+    <p>@Menus.ToJson()</p>
+    @if(VisibleEditor)
+    {
+        <div>
+            <DataEditorView ></DataEditorView>    
+        </div>
+    }
+    <ul class="list-group" style="flex-direction: row; display: flex; flex-wrap: nowrap; padding: 0px; margin: 0px; justify-items: left; ">
+        @foreach (var menu in Menus)
+        {
+            <li class="list-group-item" style="margin: 0px; padding: 0px; width: 320px;" @onmouseleave="@(evt => {menu.Expanded = false; StateHasChanged(); })">
+                <span class="btn btn-primary" style="margin: 0px; padding: 0px; width: 320px;" @onmouseover="@(evt => {menu.Expanded = true; StateHasChanged(); })">@(((MenuItemModel)menu).NodeName)</span>
+                <div style="margin-left: 30px;  ">
+                    @if( menu.Expanded )
+                    {
+                        <ul class="list-group" style="flex-direction: column; display: flex; flex-wrap: nowrap; padding: 0px; margin: 0px; justify-items: left; ">
+                            @foreach (var item in menu.GetItems())
+                            {
+                                <li class="list-group-item" style="margin: 0px; padding: 0px; width: 280px;">
+                                    <span class="btn btn-primary" style="margin: 0px; padding: 0px; width: 280px;">@(((MenuItemModel)item).NodeName)</span>
+                                </li>
+                            }
+                        </ul>
+                    }
+                </div>
+               
+               
+            </li>
+        }
+    </ul>
+   
+</div>
+
+@code 
+{
+
+    [Parameter] 
+    public List<MenuItemModel> Menus { get; set; }
+    public bool VisibleEditor = false;
+
+}

@@ -1,0 +1,40 @@
+﻿@using static MainMenuBuilder;
+<div class="card" >
+    <label>MainMenuView</label>
+    <input type="checkbox" value="visible" @oninput="@(evt => { this.VisibleEditor = (bool)evt.Value; StateHasChanged(); })"/>
+    <p>@Menus.ToJson()</p>
+    @if(VisibleEditor)
+    {
+        <div>
+            <DataEditorView ></DataEditorView>    
+        </div>
+    }
+    <ul class="list-group" style="flex-direction: column; display: flex; flex-wrap: nowrap; padding: 0px; margin: 0px; justify-items: left; ">
+        @foreach (var menu in Menus)
+        {
+            <li class="list-group-item" style="margin: 0px; padding: 0px; width: 320px;">
+                <span class="btn btn-primary" style="margin: 0px; padding: 0px; width: 320px;">@(((MenuItemModel)menu).NodeName)</span>
+              
+                <ul class="list-group" style="flex-direction: column; display: flex; flex-wrap: nowrap; padding: 0px; margin: 0px; justify-items: left; ">
+                    @foreach (var item in menu.GetChildNodes())
+                    {
+                        <li class="list-group-item" style="margin: 0px; padding: 0px; width: 320px;">
+                            <span class="btn btn-primary" style="margin: 0px; padding: 0px; width: 320px;">@(((MenuItemModel)item).NodeName)</span>
+                        </li>
+                    }
+                </ul>
+               
+            </li>
+        }
+    </ul>
+   
+</div>
+
+@code 
+{
+
+    [Parameter] 
+    public List<MenuItemModel> Menus { get; set; }
+    public bool VisibleEditor = false;
+
+}

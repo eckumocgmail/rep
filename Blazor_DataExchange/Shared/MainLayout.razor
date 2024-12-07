@@ -1,0 +1,29 @@
+﻿@inherits LayoutComponentBase
+
+<PageTitle>Blazor_DataExchange</PageTitle>
+@code
+{
+    private bool ShowSideBar { get; set; } = true;
+    private StateName State { get; set; } = StateName.loading;
+
+    public enum StateName
+    {
+        loading,waiting,error,success
+    }
+}
+<div class="page">
+    @if (ShowSideBar)
+    {
+        <div class="sidebar">
+            <NavMenu></NavMenu>
+        </div>
+    }    
+    <main>        
+        <article class="content px-4">
+            @Body
+        </article>
+        <div class="bottom-row px-4">
+            @State 
+        </div>
+    </main>
+</div>
